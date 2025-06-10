@@ -1,20 +1,14 @@
-import {
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-} from '@mui/material'
-import type { User } from '../../types/User'
-import UserRow from './UserRow'
+import { Table, TableHead, TableRow, TableCell, TableBody } from '@mui/material';
+import type { User } from '../../types/User';
+import UserRow from './UserRow';
 
 export interface UserListProps {
-  users: User[]
-  onDelete: (id: number) => void
+  users: User[];
+  onDelete: (id: number) => void;
 }
 
 export default function UserList({ users, onDelete }: UserListProps) {
-  if (!Array.isArray(users)) return null
+  if (!Array.isArray(users)) return null;
 
   return (
     <Table>
@@ -26,10 +20,10 @@ export default function UserList({ users, onDelete }: UserListProps) {
         </TableRow>
       </TableHead>
       <TableBody>
-        {users.map(user => (
+        {users.map((user) => (
           <UserRow key={user.id} user={user} onDelete={onDelete} />
         ))}
       </TableBody>
     </Table>
-  )
+  );
 }

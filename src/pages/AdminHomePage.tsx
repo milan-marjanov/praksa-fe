@@ -1,76 +1,76 @@
-import {
-  Avatar,
-  Box,
-  Button,
-  CircularProgress,
-  Container,
-  Typography,
-} from '@mui/material'
-import { useEffect, useState } from 'react'
-import UserList from '../components/admin_panel/UserList'
-import AddUserModal from '../components/admin_panel/AddUserModal'
-import ConfirmDialog from '../components/admin_panel/ConfirmDialog'
-import AppHeader from '../components/common/AppHeader'
-import type { User } from '../types/User'
-import type { CreateUserDTO } from '../types/CreateUserDTO'
-import { getAllUsers, createUser, deleteUser } from '../services/userService'
+import { Avatar, Box, Button, CircularProgress, Container, Typography } from '@mui/material';
+import { useEffect, useState } from 'react';
+import UserList from '../components/admin_panel/UserList';
+import AddUserModal from '../components/admin_panel/AddUserModal';
+import ConfirmDialog from '../components/admin_panel/ConfirmDialog';
+import type { User } from '../types/User';
+import type { CreateUserDTO } from '../types/CreateUserDTO';
+import { getAllUsers, createUser, deleteUser } from '../services/userService';
 
 export default function AdminHomePage() {
-  const [users, setUsers] = useState<User[]>([])
-  const [loading, setLoading] = useState(true)
-  const [addOpen, setAddOpen] = useState(false)
-  const [deleteId, setDeleteId] = useState<number | null>(null)
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [addOpen, setAddOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true)
+      setLoading(true);
       try {
-        const data = await getAllUsers()
-        setUsers(Array.isArray(data) ? data : [])
+        const data = await getAllUsers();
+        setUsers(Array.isArray(data) ? data : []);
       } catch {
-        setUsers([])
+        setUsers([]);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
-    fetchData()
-  }, [])
+    };
+    fetchData();
+  }, []);
 
   const handleAdd = async (u: CreateUserDTO) => {
     try {
-      const created = await createUser(u)
-      setUsers(prev => [...prev, created])
+      const created = await createUser(u);
+      setUsers((prev) => [...prev, created]);
     } catch (err) {
-      console.error(err)
+      console.error(err);
     }
-  }
+  };
 
   const handleDelete = async () => {
     if (deleteId !== null) {
       try {
-        await deleteUser(deleteId)
-        setUsers(prev => prev.filter(u => u.id !== deleteId))
+        await deleteUser(deleteId);
+        setUsers((prev) => prev.filter((u) => u.id !== deleteId));
       } catch (err) {
-        console.error(err)
+        console.error(err);
       } finally {
-        setDeleteId(null)
+        setDeleteId(null);
       }
     }
-  }
+  };
 
   return (
     <>
-      <AppHeader
-        title="Admin Panel"
-      />
+      <Typography variant="h4" sx={{ ml: 2, mt: 5 }}>
+        Admin Panel
+      </Typography>
 
       <Container sx={{ mt: 4 }}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
           <Box display="flex" alignItems="center">
             <Avatar sx={{ bgcolor: 'secondary.main', width: 40, height: 40 }}>A</Avatar>
-            <Typography variant="h6" sx={{ ml: 2 }}>Petar Subotić</Typography>
+            <Typography variant="h6" sx={{ ml: 2, fontSize: '1.4rem' }}>
+              Petar Subotić
+            </Typography>
           </Box>
-          <Button variant="contained" color="secondary" onClick={() => setAddOpen(true)}>
+          <Button
+            variant="contained"
+            size="large"
+            color="secondary"
+            onClick={() => setAddOpen(true)}
+            sx={{ fontSize: '1rem' }}
+          >
             Add User
           </Button>
         </Box>
@@ -80,7 +80,7 @@ export default function AdminHomePage() {
             <CircularProgress />
           </Box>
         ) : (
-          <UserList users={users} onDelete={id => setDeleteId(id)} />
+          <UserList users={users} onDelete={(id) => setDeleteId(id)} />
         )}
       </Container>
 
@@ -95,5 +95,5 @@ export default function AdminHomePage() {
         Are you sure you want to delete this user?
       </ConfirmDialog>
     </>
-  )
+  );
 }

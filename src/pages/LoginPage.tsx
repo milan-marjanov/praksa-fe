@@ -1,12 +1,19 @@
+import { Container } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import LoginForm from '../component/LoginForm';
-import PageLayout from '../component/PageLayout';
+import LoginForm from '../components/login/LoginForm';
 
 export default function LoginPage() {
   return (
-    <PageLayout>
+    <Container
+      sx={{
+        marginTop: 8,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}
+    >
       <Avatar sx={{ m: 1, bgcolor: '#4B570E' }}>
         <LockOutlinedIcon />
       </Avatar>
@@ -14,6 +21,6 @@ export default function LoginPage() {
         Login
       </Typography>
       <LoginForm />
-    </PageLayout>
+    </Container>
   );
 }

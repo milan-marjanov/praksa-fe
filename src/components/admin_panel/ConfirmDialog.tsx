@@ -1,18 +1,20 @@
-import {
-  Dialog, DialogTitle, DialogContent, DialogActions, Button,
-} from '@mui/material'
-import React from 'react'
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
+import React from 'react';
 
 interface ConfirmDialogProps {
-  open: boolean
-  title: string
-  onCancel(): void
-  onConfirm(): void
-  children: React.ReactNode
+  open: boolean;
+  title: string;
+  onCancel(): void;
+  onConfirm(): void;
+  children: React.ReactNode;
 }
 
 export default function ConfirmDialog({
-  open, title, children, onCancel, onConfirm,
+  open,
+  title,
+  children,
+  onCancel,
+  onConfirm,
 }: ConfirmDialogProps) {
   return (
     <Dialog open={open} onClose={onCancel}>
@@ -25,5 +27,5 @@ export default function ConfirmDialog({
         </Button>
       </DialogActions>
     </Dialog>
-  )
+  );
 }
