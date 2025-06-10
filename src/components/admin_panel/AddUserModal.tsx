@@ -1,5 +1,5 @@
-import { Modal, Box, Typography, TextField, Button } from '@mui/material'
 import { useState } from 'react'
+import { Modal, Box, Typography, TextField, Button } from '@mui/material'
 import type { CreateUserDTO } from '../../types/CreateUserDTO'
 
 const style = {
@@ -31,11 +31,7 @@ export default function AddUserModal({ open, onClose, onAdd }: AddUserModalProps
       setFirstName(''); setLastName(''); setEmail('')
       onClose()
     } catch (err: any) {
-      if (err.response?.status === 409) {
-        setError('Email already in use')
-      } else {
-        setError('Something went wrong')
-      }
+      setError(err.message)
     }
   }
 
@@ -75,12 +71,8 @@ export default function AddUserModal({ open, onClose, onAdd }: AddUserModalProps
         )}
 
         <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <Button onClick={onClose} sx={{ mr: 1 }}>
-            Cancel
-          </Button>
-          <Button variant="contained" onClick={handleAdd}>
-            Add User
-          </Button>
+          <Button onClick={onClose} sx={{ mr: 1 }}>Cancel</Button>
+          <Button variant="contained" onClick={handleAdd}>Add User</Button>
         </Box>
       </Box>
     </Modal>
