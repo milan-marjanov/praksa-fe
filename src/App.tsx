@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import LoginPage from './pages/LoginPage';
-//import AdminHomePage from './pages/AdminHomePage'
+import AdminHomePage from './pages/AdminHomePage'
 import Navbar from './component/NavBar';
 import theme from './theme';
 
@@ -19,7 +19,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<LoginPage />} />
             <Route path="/login" element={<LoginPage />} />
-            {/*<Route path="/admin" element={<AdminHomePage />} />*/}
+            <Route path="/admin" element={<AdminHomePage />} />
           </Routes>
         </Router>
       </div>

@@ -1,0 +1,99 @@
+import {
+  Avatar,
+  Box,
+  Button,
+  CircularProgress,
+  Container,
+  Typography,
+} from '@mui/material'
+import { useEffect, useState } from 'react'
+import UserList from '../components/admin_panel/UserList'
+import AddUserModal from '../components/admin_panel/AddUserModal'
+import ConfirmDialog from '../components/admin_panel/ConfirmDialog'
+import AppHeader from '../components/common/AppHeader'
+import type { User } from '../types/User'
+import type { CreateUserDTO } from '../types/CreateUserDTO'
+import { getAllUsers, createUser, deleteUser } from '../services/userService'
+
+export default function AdminHomePage() {
+  const [users, setUsers] = useState<User[]>([])
+  const [loading, setLoading] = useState(true)
+  const [addOpen, setAddOpen] = useState(false)
+  const [deleteId, setDeleteId] = useState<number | null>(null)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true)
+      try {
+        const data = await getAllUsers()
+        setUsers(Array.isArray(data) ? data : [])
+      } catch {
+        setUsers([])
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
+  }, [])
+
+  const handleAdd = async (u: CreateUserDTO) => {
+    try {
+      const created = await createUser(u)
+      setUsers(prev => [...prev, created])
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  const handleDelete = async () => {
+    if (deleteId !== null) {
+      try {
+        await deleteUser(deleteId)
+        setUsers(prev => prev.filter(u => u.id !== deleteId))
+      } catch (err) {
+        console.error(err)
+      } finally {
+        setDeleteId(null)
+      }
+    }
+  }
+
+  return (
+    <>
+      <AppHeader
+        title="Admin Panel"
+      />
+
+      <Container sx={{ mt: 4 }}>
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
+          <Box display="flex" alignItems="center">
+            <Avatar sx={{ bgcolor: 'secondary.main', width: 40, height: 40 }}>A</Avatar>
+            <Typography variant="h6" sx={{ ml: 2 }}>Petar Subotić</Typography>
+          </Box>
+          <Button variant="contained" color="secondary" onClick={() => setAddOpen(true)}>
+            Add User
+          </Button>
+        </Box>
+
+        {loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          <UserList users={users} onDelete={id => setDeleteId(id)} />
+        )}
+      </Container>
+
+      <AddUserModal open={addOpen} onClose={() => setAddOpen(false)} onAdd={handleAdd} />
+
+      <ConfirmDialog
+        open={deleteId !== null}
+        title="Confirm Delete"
+        onCancel={() => setDeleteId(null)}
+        onConfirm={handleDelete}
+      >
+        Are you sure you want to delete this user?
+      </ConfirmDialog>
+    </>
+  )
+}
