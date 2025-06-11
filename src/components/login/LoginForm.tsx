@@ -28,8 +28,7 @@ export default function LoginForm() {
     event.preventDefault();
     setError('');
 
-    // Basic validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setError('Please enter a valid email address.');
       return;
@@ -55,13 +54,11 @@ export default function LoginForm() {
       if (decoded.role === 'USER') {
         navigate('/userHomepage');
       } else if (decoded.role === 'ADMIN') {
-        navigate('/adminHomepage');
+        navigate('/admin');
       } else {
         setError('Unauthorized role.');
       }
     } catch (e: unknown) {
-      // This usually won't happen because API functions catch errors internally,
-      // but it's here as a fallback just in case.
       setError(e instanceof Error ? e.message : 'Login failed. Please try again.');
     }
   };

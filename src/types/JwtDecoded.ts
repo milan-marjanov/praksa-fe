@@ -1,6 +1,7 @@
 export interface JwtDecoded {
-  username: string;
-  email: string;
-  role: string;
+  sub: string;
+  id: number;
+  role: 'ADMIN' | 'USER';
+  iat: number;
   exp: number;
 }

@@ -6,12 +6,13 @@ import LoginPage from './pages/LoginPage';
 import AdminHomePage from './pages/AdminHomePage';
 import Navbar from './components/common/Navbar';
 import theme from './theme';
+import ProtectedRoute from './components/common/ProtectedRoute';
+import UnauthorizedPage from './pages/UnauthorizedPage';
 
 export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-
       <div className="App">
         <Router>
           <Navbar />
@@ -19,7 +20,26 @@ export default function App() {
           <Routes>
             <Route path="/" element={<LoginPage />} />
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/admin" element={<AdminHomePage />} />
+
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute allowedRoles={['ADMIN']}>
+                  <AdminHomePage />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* <Route
+          path="/user"
+          element={
+            <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
+              <UserHomePage />
+            </ProtectedRoute>
+          }
+        /> */}
+
+            <Route path="/unauthorized" element={<UnauthorizedPage />} />
           </Routes>
         </Router>
       </div>

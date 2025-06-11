@@ -24,7 +24,7 @@ export default function Navbar() {
               <EventIcon />
             </Avatar>
             <Typography variant="h5" component="div" sx={{ fontWeight: 'bold' }}>
-              SimpleEventApp
+              SimpleEvent
             </Typography>
           </Box>
         </Link>
