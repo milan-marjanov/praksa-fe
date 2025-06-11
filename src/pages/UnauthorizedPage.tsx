@@ -1,7 +1,7 @@
 import Button from '@mui/material/Button';
 import { Link } from 'react-router-dom';
 
-const NotFoundPage = () => {
+const UnauthorizedPage = () => {
   return (
     <div>
       <h1>Unauthorized Page</h1>
@@ -14,4 +14,4 @@ const NotFoundPage = () => {
   );
 };
 
-export default NotFoundPage;
+export default UnauthorizedPage;
