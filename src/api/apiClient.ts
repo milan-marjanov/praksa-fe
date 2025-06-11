@@ -2,28 +2,25 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_API,
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   headers: { 'Content-Type': 'application/json' },
 });
 
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    if (!config.url?.startsWith('/auth')) {
+      const token = localStorage.getItem('jwtToken');
+      if (token && token !== 'null') {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
     return config;
   },
-  (err) => {
-    console.error('Request error:', err);
-    return Promise.reject(err);
-  },
+  (error) => Promise.reject(error),
 );
 
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (res) => res,
   (error) => {
     const { response } = error;
     if (!response) {
@@ -39,7 +36,7 @@ api.interceptors.response.use(
         break;
       case 401:
         toast.warn('Session expired. Redirecting to login...');
-        localStorage.removeItem('authToken');
+        localStorage.removeItem('jwtToken');
         window.location.href = '/login';
         break;
       case 403:
@@ -54,12 +51,7 @@ api.interceptors.response.use(
       default:
         toast.error(data.message || `Error: ${status}`);
     }
-
-    return Promise.reject({
-      status,
-      message: data.message || response.statusText,
-      original: error,
-    });
+    return Promise.reject(error);
   },
 );
 
