@@ -30,27 +30,7 @@ api.interceptors.response.use(
     }
 
     const { status, data } = response;
-    switch (status) {
-      case 400:
-        toast.error(data.message || 'Bad request.');
-        break;
-      case 401:
-        toast.warn('Session expired. Redirecting to login...');
-        localStorage.removeItem('jwtToken');
-        window.location.href = '/login';
-        break;
-      case 403:
-        toast.error('You do not have permission to perform that action.');
-        break;
-      case 404:
-        toast.info('Requested resource not found.');
-        break;
-      case 500:
-        toast.error('Server error – please try again later.');
-        break;
-      default:
-        toast.error(data.message || `Error: ${status}`);
-    }
+    toast.error(data.message || `Error: ${status}`);
     return Promise.reject(error);
   },
 );
