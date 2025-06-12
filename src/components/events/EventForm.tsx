@@ -27,8 +27,6 @@ const formButtonStyle = {
   fontWeight: 'bold',
 };
 
-
-
 export default function EventForm({ users, creatorId, event, onSubmit }: EventFormProps) {
   const [eventName, setEventName] = useState('');
   const [description, setDescription] = useState('');
