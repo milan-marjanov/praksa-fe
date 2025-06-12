@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   TextField,
   FormControl,
@@ -12,9 +12,10 @@ import {
   FormHelperText,
 } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material/Select';
-import { User } from '../types/User';
+import { EventFormProps } from '../../types/EventFormProps';
+import { EventDTO } from '../../types/EventDTO';
 
-const createEventButtonStyle = {
+const formButtonStyle = {
   mt: 3,
   mb: 2,
   width: 300,
@@ -26,16 +27,21 @@ const createEventButtonStyle = {
   fontWeight: 'bold',
 };
 
-interface CreateEventFormProps {
-  users: User[];
-  creatorId: number | null;
-}
 
-export default function CreateEventForm({ users, creatorId }: CreateEventFormProps) {
+
+export default function EventForm({ users, creatorId, event, onSubmit }: EventFormProps) {
   const [eventName, setEventName] = useState('');
   const [description, setDescription] = useState('');
   const [participants, setParticipants] = useState<number[]>([]);
   const [errors, setErrors] = useState({ name: '', participants: '' });
+
+  useEffect(() => {
+    if (event) {
+      setEventName(event.name);
+      setDescription(event.description);
+      setParticipants(event.participants);
+    }
+  }, [event]);
 
   const allParticipantIds = users.map((user) => user.id);
   const isAllSelected = participants.length === users.length && users.length > 0;
@@ -49,7 +55,6 @@ export default function CreateEventForm({ users, creatorId }: CreateEventFormPro
 
   const handleParticipantsChange = (event: SelectChangeEvent<typeof participants>) => {
     const value = event.target.value as number[];
-
     let updatedParticipants: number[];
 
     if (value.includes(-1)) {
@@ -84,13 +89,16 @@ export default function CreateEventForm({ users, creatorId }: CreateEventFormPro
     setErrors(newErrors);
 
     if (!hasError) {
-      const eventData = {
+      const eventData: EventDTO = {
+        id: event?.id ?? 0, // id is required in EventDTO, 0 for create case
         name: eventName,
         description,
         participants,
-        creatorId,
+        creatorId: creatorId!, // assuming creatorId is never null here
       };
-      console.log('Event data:', eventData);
+
+      const isUpdate = !!event && !!event.id;
+      onSubmit(eventData, isUpdate, event?.id);
     }
   };
 
@@ -126,24 +134,16 @@ export default function CreateEventForm({ users, creatorId }: CreateEventFormPro
           input={<OutlinedInput label="Participants *" />}
           renderValue={(selected) =>
             selected
-              .map((id) =>
-                users.find((user) => user.id === id)
-                  ? `${users.find((user) => user.id === id)!.firstName} ${users.find((user) => user.id === id)!.lastName}`
-                  : '',
+              .map(
+                (id) =>
+                  users.find((user) => user.id === id)?.firstName +
+                  ' ' +
+                  users.find((user) => user.id === id)?.lastName,
               )
               .join(', ')
           }
         >
-          <MenuItem
-            value={-1}
-            sx={{
-              backgroundColor: '#f0f0f0',
-              fontWeight: 'bold',
-              '&:hover': {
-                backgroundColor: '#e0e0e0',
-              },
-            }}
-          >
+          <MenuItem value={-1}>
             <Checkbox checked={isAllSelected} />
             <ListItemText primary="Select All" />
           </MenuItem>
@@ -157,8 +157,8 @@ export default function CreateEventForm({ users, creatorId }: CreateEventFormPro
         <FormHelperText>{errors.participants}</FormHelperText>
       </FormControl>
 
-      <Button type="submit" variant="contained" sx={createEventButtonStyle}>
-        Create Event
+      <Button type="submit" variant="contained" sx={formButtonStyle}>
+        {event ? 'Save Changes' : 'Create Event'}
       </Button>
     </form>
   );

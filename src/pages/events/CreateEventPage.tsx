@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Container, Typography } from '@mui/material';
-import { getAllUsers } from '../services/userService';
-import { User } from '../types/User';
-import { decodeJwt } from '../services/authService';
-import CreateEventForm from '../components/CreateEventForm';
+import { getAllUsers } from '../../services/userService';
+import { User } from '../../types/User';
+import { decodeJwt } from '../../services/authService';
+import EventForm from '../../components/events/EventForm';
+import { EventDTO } from '../../types/EventDTO';
 
 export default function CreateEventPage() {
   const [users, setUsers] = useState<User[]>([]);
@@ -27,6 +28,18 @@ export default function CreateEventPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  const handleCreateEvent = (eventData: EventDTO, isUpdate: boolean) => {
+    if (isUpdate) {
+      // Should not happen on this page
+      console.warn('Update attempted on create page, ignoring.');
+      return;
+    }
+
+    console.log('Creating event with data:', eventData);
+    // Example: call create API here
+    // createEvent(eventData).then(() => navigate('/events'));
+  };
+
   if (loading) {
     return (
       <Container maxWidth="sm" sx={{ marginTop: 5, textAlign: 'center' }}>
@@ -42,10 +55,10 @@ export default function CreateEventPage() {
       maxWidth="sm"
       sx={{ marginTop: 5, display: 'flex', flexDirection: 'column', alignItems: 'center' }}
     >
-      <Typography component="h1" variant="h5">
+      <Typography component="h1" variant="h5" gutterBottom>
         Create New Event
       </Typography>
-      <CreateEventForm users={filteredUsers} creatorId={creatorId} />
+      <EventForm users={filteredUsers} creatorId={creatorId} onSubmit={handleCreateEvent} />
     </Container>
   );
 }
