@@ -9,6 +9,8 @@ import theme from './theme';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import UnauthorizedPage from './pages/UnauthorizedPage';
 import UpdateEventPage from './pages/UpdateEventPage';
+import CreateEventPage from './pages/CreateEventPage';
+
 
 export default function App() {
   return (
@@ -32,14 +34,14 @@ export default function App() {
               }
             />
 
-            {/* <Route
-          path="/user"
-          element={
-            <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
-              <UserHomePage />
-            </ProtectedRoute>
-          }
-        /> */}
+            <Route
+              path="/createEvent"
+              element={
+                <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                  <CreateEventPage />
+                </ProtectedRoute>
+              }
+            />
 
             <Route path="/unauthorized" element={<UnauthorizedPage />} />
           </Routes>
