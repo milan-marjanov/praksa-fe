@@ -1,19 +1,31 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Container, Box, Avatar, Typography, Button } from '@mui/material';
+import { UpdateProfileModal } from '../components/profile/UpdateProfileModal';
 
 const MyProfilePage: React.FC = () => {
-  
   const firstName = 'John';
   const lastName = 'Doe';
   const email = 'john.doe@example.com';
   const profilePictureUrl: string | null = null;
+
+  const [openUpdate, setOpenUpdate] = useState(false);
+
+  const handleUpdate = async (data: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    profilePicture?: File;
+  }) => {
+    console.log('Payload za update:', data);
+    setOpenUpdate(false);
+  };
 
   return (
     <Container
       maxWidth="sm"
       sx={{
         my: 10,
-        p: 13,
+        p: 4,
         backgroundColor: 'background.default',
         borderRadius: 3,
         boxShadow: 2,
@@ -34,8 +46,8 @@ const MyProfilePage: React.FC = () => {
           </Typography>
         </Box>
 
-        <Box display="flex" flexDirection="column" alignItems="flex-end" gap={3}>
-          <Button variant="contained" size="medium">
+        <Box display="flex" flexDirection="column" alignItems="flex-end" gap={2}>
+          <Button variant="contained" size="medium" onClick={() => setOpenUpdate(true)}>
             Update Profile
           </Button>
           <Button variant="contained" size="medium">
@@ -43,6 +55,12 @@ const MyProfilePage: React.FC = () => {
           </Button>
         </Box>
       </Box>
+
+      <UpdateProfileModal
+        open={openUpdate}
+        onClose={() => setOpenUpdate(false)}
+        onUpdate={handleUpdate}
+      />
     </Container>
   );
 };

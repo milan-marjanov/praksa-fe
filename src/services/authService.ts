@@ -1,6 +1,6 @@
 import api from '../api/apiClient';
 import { jwtDecode } from 'jwt-decode';
-import type { JwtDecoded } from '../types/JwtDecoded';
+import type { JwtDecoded } from '../types/JwtDecodedDTO';
 
 export async function login(email: string, password: string): Promise<string | undefined> {
   try {

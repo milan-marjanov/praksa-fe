@@ -1,6 +1,6 @@
 import { TableRow, TableCell, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import type { User } from '../../types/User';
+import type { User } from '../../types/UserDTO';
 
 interface UserRowProps {
   user: User;

@@ -1,5 +1,5 @@
 import { Table, TableHead, TableRow, TableCell, TableBody } from '@mui/material';
-import type { User } from '../../types/User';
+import type { User } from '../../types/UserDTO';
 import UserRow from './UserRow';
 
 export interface UserListProps {
