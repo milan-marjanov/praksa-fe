@@ -1,5 +1,5 @@
 import api from '../api/apiClient';
-import type { User } from '../types/User';
+import type { User } from '../types/UserDTO';
 import type { CreateUserDTO } from '../types/CreateUserDTO';
 
 export const getAllUsers = (): Promise<User[]> => api.get<User[]>('/api').then((res) => res.data);

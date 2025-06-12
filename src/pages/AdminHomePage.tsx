@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import UserList from '../components/admin_panel/UserList';
 import AddUserModal from '../components/admin_panel/AddUserModal';
 import ConfirmDialog from '../components/admin_panel/ConfirmDialog';
-import type { User } from '../types/User';
+import type { User } from '../types/UserDTO';
 import type { CreateUserDTO } from '../types/CreateUserDTO';
 import { getAllUsers, createUser, deleteUser } from '../services/userService';
 import { useNavigate } from 'react-router-dom';
