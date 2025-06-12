@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
 import { Container, Box, Avatar, Typography, Button } from '@mui/material';
 import { UpdateProfileModal } from '../components/profile/UpdateProfileModal';
+import { ChangePasswordModal } from '../components/profile/ChangePasswordModal';
+import { PasswordChangeRequestDTO } from '../types/PasswordChangeRequestDTO';
+import { changePassword } from '../services/profileService';
+import { getCurrentUserId } from '../services/authService';
 
 const MyProfilePage: React.FC = () => {
-  const firstName = 'John';
-  const lastName = 'Doe';
-  const email = 'john.doe@example.com';
+  const firstName = 'Stefan';
+  const lastName = 'Nemanja';
+  const email = 'stefan.nemanja@example.com';
   const profilePictureUrl: string | null = null;
 
   const [openUpdate, setOpenUpdate] = useState(false);
+  const [openChangePwd, setOpenChangePwd] = useState(false);
+  const id = getCurrentUserId();
 
   const handleUpdate = async (data: {
     firstName: string;
@@ -18,6 +24,11 @@ const MyProfilePage: React.FC = () => {
   }) => {
     console.log('Payload za update:', data);
     setOpenUpdate(false);
+  };
+
+  const handleChangePassword = async (dto: PasswordChangeRequestDTO) => {
+    await changePassword(id, dto);
+    setOpenChangePwd(false);
   };
 
   return (
@@ -47,10 +58,10 @@ const MyProfilePage: React.FC = () => {
         </Box>
 
         <Box display="flex" flexDirection="column" alignItems="flex-end" gap={2}>
-          <Button variant="contained" size="medium" onClick={() => setOpenUpdate(true)}>
+          <Button variant="contained" onClick={() => setOpenUpdate(true)}>
             Update Profile
           </Button>
-          <Button variant="contained" size="medium">
+          <Button variant="contained" onClick={() => setOpenChangePwd(true)}>
             Change Password
           </Button>
         </Box>
@@ -60,6 +71,11 @@ const MyProfilePage: React.FC = () => {
         open={openUpdate}
         onClose={() => setOpenUpdate(false)}
         onUpdate={handleUpdate}
+      />
+      <ChangePasswordModal
+        open={openChangePwd}
+        onClose={() => setOpenChangePwd(false)}
+        onChangePassword={handleChangePassword}
       />
     </Container>
   );

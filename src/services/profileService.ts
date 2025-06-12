@@ -1,4 +1,5 @@
 import api from '../api/apiClient';
+import { PasswordChangeRequestDTO } from '../types/PasswordChangeRequestDTO';
 import type { MyProfileDTO, UserProfileDTO } from '../types/ProfileDTO';
 import { UpdateProfileRequestDTO } from '../types/UpdateProfileRequestDTO';
 
@@ -22,3 +23,9 @@ export const updateProfile = (data: UpdateProfileRequestDTO): Promise<void> => {
     })
     .then(() => {});
 };
+
+export const changePassword = (
+  id: number,
+  dto: PasswordChangeRequestDTO
+): Promise<void> =>
+  api.post<void>(`/api/user/${id}/change-password`, dto).then(() => {});
