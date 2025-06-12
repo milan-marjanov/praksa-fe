@@ -6,12 +6,14 @@ import ConfirmDialog from '../components/admin_panel/ConfirmDialog';
 import type { User } from '../types/User';
 import type { CreateUserDTO } from '../types/CreateUserDTO';
 import { getAllUsers, createUser, deleteUser } from '../services/userService';
+import { useNavigate } from 'react-router-dom';
 
 export default function AdminHomePage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [addOpen, setAddOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -94,6 +96,23 @@ export default function AdminHomePage() {
       >
         Are you sure you want to delete this user?
       </ConfirmDialog>
+
+      <Button
+        variant="contained"
+        size="large"
+        color="secondary"
+        sx={{
+          position: 'fixed', 
+          bottom: 50,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+          fontSize: '1rem'
+        }}
+        onClick={() => navigate('/myprofile')}
+      >
+        My Profile
+      </Button>
     </>
   );
 }

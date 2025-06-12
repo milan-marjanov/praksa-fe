@@ -52,7 +52,7 @@ export default function LoginForm() {
       }
 
       if (decoded.role === 'USER') {
-        navigate('/userHomepage');
+        navigate('/userHomePage');
       } else if (decoded.role === 'ADMIN') {
         navigate('/admin');
       } else {
