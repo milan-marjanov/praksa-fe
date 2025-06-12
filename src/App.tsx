@@ -8,7 +8,9 @@ import Navbar from './components/common/Navbar';
 import theme from './theme';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import UnauthorizedPage from './pages/UnauthorizedPage';
+import UpdateEventPage from './pages/UpdateEventPage';
 import CreateEventPage from './pages/CreateEventPage';
+
 
 export default function App() {
   return (
@@ -21,6 +23,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<LoginPage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/updateEvent" element={<UpdateEventPage />} />
 
             <Route
               path="/admin"
