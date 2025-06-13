@@ -1,4 +1,3 @@
-// src/pages/ProfilePage.tsx
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Box, Avatar, Typography, Button, CircularProgress } from '@mui/material';
