@@ -1,4 +1,4 @@
-import api from '../api/apiClient';
+import api from '../axios/AxiosClient';
 import type { User } from '../types/User';
 import type { CreateUserDTO } from '../types/CreateUserDTO';
 

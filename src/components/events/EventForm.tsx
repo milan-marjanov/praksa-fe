@@ -12,8 +12,7 @@ import {
   FormHelperText,
 } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material/Select';
-import { EventFormProps } from '../../types/EventFormProps';
-import { EventDTO } from '../../types/EventDTO';
+import { EventFormProps, EventDTO } from '../../types/Event';
 
 const formButtonStyle = {
   mt: 3,
@@ -68,11 +67,9 @@ export default function EventForm({ users, creatorId, event, onSubmit }: EventFo
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    let hasError = false;
+  const validateEventForm = (eventName: string, participants: number[]) => {
     const newErrors = { name: '', participants: '' };
+    let hasError = false;
 
     if (eventName.trim() === '') {
       newErrors.name = 'Event name is required';
@@ -84,20 +81,26 @@ export default function EventForm({ users, creatorId, event, onSubmit }: EventFo
       hasError = true;
     }
 
+    return { hasError, newErrors };
+  };
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const { hasError, newErrors } = validateEventForm(eventName, participants);
     setErrors(newErrors);
 
-    if (!hasError) {
-      const eventData: EventDTO = {
-        id: event?.id ?? 0, // id is required in EventDTO, 0 for create case
-        name: eventName,
-        description,
-        participants,
-        creatorId: creatorId!, // assuming creatorId is never null here
-      };
+    if (hasError) return;
 
-      const isUpdate = !!event && !!event.id;
-      onSubmit(eventData, isUpdate, event?.id);
-    }
+    const eventData: EventDTO = {
+      id: event?.id ?? 0,
+      name: eventName,
+      description,
+      participants,
+      creatorId: creatorId!,
+    };
+
+    const isUpdate = !!event?.id;
+    onSubmit(eventData, isUpdate, event?.id);
   };
 
   return (

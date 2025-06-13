@@ -1,5 +1,12 @@
 import { User } from '../types/User';
-import { EventDTO } from '../types/EventDTO';
+
+export interface EventDTO {
+  id: number;
+  name: string;
+  description: string;
+  participants: number[];
+  creatorId: number;
+}
 
 export interface EventFormProps {
   users: User[];

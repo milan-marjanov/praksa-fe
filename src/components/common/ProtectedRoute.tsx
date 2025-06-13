@@ -1,7 +1,8 @@
 // components/common/ProtectedRoute.tsx
 import { Navigate, useLocation } from 'react-router-dom';
-import { decodeJwt } from '../../services/authService';
 import { JSX } from 'react';
+import { jwtDecode } from 'jwt-decode';
+import { JwtDecoded } from '../../types/JwtDecoded';
 
 type Props = {
   children: JSX.Element;
@@ -17,7 +18,7 @@ export default function ProtectedRoute({ children, allowedRoles }: Props) {
   }
 
   try {
-    const { exp, role } = decodeJwt(token);
+    const { exp, role } = jwtDecode<JwtDecoded>(token);
 
     if (exp * 1000 < Date.now()) {
       localStorage.removeItem('jwtToken');

@@ -1,44 +1,19 @@
-import { useEffect, useState } from 'react';
 import { Container, Typography } from '@mui/material';
-import { getAllUsers } from '../../services/userService';
-import { User } from '../../types/User';
-import { decodeJwt } from '../../services/authService';
-import EventForm from '../../components/events/EventForm'; // Adjust path if needed
-import { EventDTO } from '../../types/EventDTO';
+import EventForm from '../../components/events/EventForm';
+import { EventDTO } from '../../types/Event';
+import { containerStyle } from '../../styles/CommonStyles';
+import { useSetupEventForm } from '../../hooks/UseEventForm';
 
 const mockEvent: EventDTO = {
   id: 1,
   name: 'Team Building Workshop',
   description: 'A collaborative event to strengthen team dynamics.',
   participants: [1, 2],
-  creatorId: 0, // You can set a default here, will be overwritten below
+  creatorId: 0,
 };
 
 export default function UpdateEventPage() {
-  const [users, setUsers] = useState<User[]>([]);
-  const [creatorId, setCreatorId] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [eventData, setEventData] = useState<EventDTO | null>(null);
-
-  useEffect(() => {
-    const token = localStorage.getItem('jwtToken');
-    if (token) {
-      try {
-        const decoded = decodeJwt(token);
-        setCreatorId(decoded.id);
-      } catch (err) {
-        console.error('Failed to decode JWT token', err);
-      }
-    }
-
-    getAllUsers()
-      .then((data) => setUsers(data))
-      .catch((err) => console.error('Failed to fetch users', err))
-      .finally(() => setLoading(false));
-
-    // Simulate fetching event data, here using mockEvent
-    setEventData(mockEvent);
-  }, []);
+  const { creatorId, users, loading, eventData } = useSetupEventForm(mockEvent);
 
   const handleUpdateEvent = (updatedEventData: EventDTO, isUpdate: boolean) => {
     if (!isUpdate) {
@@ -52,7 +27,7 @@ export default function UpdateEventPage() {
 
   if (loading || !eventData || creatorId === null) {
     return (
-      <Container maxWidth="sm" sx={{ marginTop: 5, textAlign: 'center' }}>
+      <Container sx={{ ...containerStyle, marginTop: 5 }}>
         <Typography>Loading...</Typography>
       </Container>
     );
@@ -60,17 +35,11 @@ export default function UpdateEventPage() {
 
   const filteredUsers = users.filter((user) => user.id !== creatorId);
 
-  // Inject the correct creatorId into eventData
   const eventWithCreator = { ...eventData, creatorId };
 
   return (
-    <Container
-      maxWidth="sm"
-      sx={{ marginTop: 5, display: 'flex', flexDirection: 'column', alignItems: 'center' }}
-    >
-      <Typography component="h1" variant="h5" gutterBottom>
-        Edit Event
-      </Typography>
+    <Container maxWidth="sm" sx={{ ...containerStyle, marginTop: 5 }}>
+      <Typography variant="h5">Edit Event</Typography>
       <EventForm
         users={filteredUsers}
         creatorId={creatorId}
