@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Modal, Box, Typography, TextField, Button } from '@mui/material';
+import buttonStyle from '../../styles/buttonStyle';
 
 const pwdStyle = {
   position: 'absolute' as const,
@@ -81,10 +82,10 @@ export function ChangePasswordModal({ open, onClose, onChangePassword }: ChangeP
         )}
 
         <Box display="flex" justifyContent="flex-end">
-          <Button onClick={onClose} sx={{ mr: 1 }}>
+          <Button sx={{ ...buttonStyle, mr: 1 }} onClick={onClose}>
             Cancel
           </Button>
-          <Button variant="contained" onClick={handleChange}>
+          <Button variant="contained" sx={buttonStyle} onClick={handleChange}>
             Change
           </Button>
         </Box>

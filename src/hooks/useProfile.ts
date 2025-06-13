@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { getMyProfile, getUserProfile } from '../services/profileService';
-import type { MyProfileDTO, UserProfileDTO } from '../types/ProfileDTO';
+import { getMyProfile, getUserProfile } from '../services/userService';
+import type { MyProfileDTO, UserProfileDTO } from '../types/User';
 
 type Result = {
   data: MyProfileDTO | UserProfileDTO | null;

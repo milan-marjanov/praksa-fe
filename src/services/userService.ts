@@ -1,11 +1,50 @@
-import api from '../axios/axiosClient';
-import type { User } from '../types/UserDTO';
-import type { CreateUserDTO } from '../types/CreateUserDTO';
+import api from '../axios/AxiosClient';
+import {
+  UserDTO,
+  CreateUserDTO,
+  MyProfileDTO,
+  UserProfileDTO,
+  UpdateProfileRequestDTO,
+  PasswordChangeRequestDTO,
+} from '../types/User';
 
-export const getAllUsers = (): Promise<User[]> => api.get<User[]>('/api').then((res) => res.data);
+export async function getAllUsers() {
+  const response = await api.get<UserDTO[]>('/api');
+  return response.data;
+}
 
-export const createUser = (user: CreateUserDTO): Promise<User> =>
-  api.post<User>('/api/admin/createUser', user).then((res) => res.data);
+export async function createUser(user: CreateUserDTO) {
+  const response = await api.post<UserDTO>('/api/admin/createUser', user);
+  return response.data;
+}
 
-export const deleteUser = (id: number): Promise<void> =>
-  api.delete(`/api/admin/${id}`).then(() => {});
+export async function deleteUser(id: number) {
+  await api.delete(`/api/admin/${id}`);
+}
+
+export async function getMyProfile() {
+  const response = await api.get<MyProfileDTO>('/api/user/profile');
+  return response.data;
+}
+
+export async function getUserProfile(id: number) {
+  const response = await api.get<UserProfileDTO>(`/api/user/${id}/public-profile`);
+  return response.data;
+}
+
+export async function updateProfile(data: UpdateProfileRequestDTO) {
+  const formData = new FormData();
+  Object.entries(data).forEach(([key, value]) => {
+    if (value != null) {
+      formData.append(key, value as any);
+    }
+  });
+
+  await api.patch('/api/user/profile', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+}
+
+export async function changePassword(id: number, dto: PasswordChangeRequestDTO) {
+  await api.post(`/api/user/${id}/change-password`, dto);
+}

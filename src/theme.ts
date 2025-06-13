@@ -9,7 +9,14 @@ const theme = createTheme({
   shape: { borderRadius: 12 },
   typography: {
     h5: { fontWeight: 400, letterSpacing: '0.5px' },
-    button: { textTransform: 'none', fontWeight: 500, color: '#95C11F' },
+    button: {
+      textTransform: 'none',
+      fontWeight: 500,
+      color: '#95C11F',
+      fontSize: '1rem',
+      padding: '8px 20px',
+      borderRadius: 1,
+    },
   },
 });
 

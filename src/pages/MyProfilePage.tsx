@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { Container, Box, Avatar, Typography, Button } from '@mui/material';
 import { UpdateProfileModal } from '../components/profile/UpdateProfileModal';
 import { ChangePasswordModal } from '../components/profile/ChangePasswordModal';
-import { PasswordChangeRequestDTO } from '../types/PasswordChangeRequestDTO';
-import { changePassword } from '../services/profileService';
+import { PasswordChangeRequestDTO } from '../types/User';
+import { changePassword } from '../services/userService';
 import { getCurrentUserId } from '../services/authService';
+import buttonStyle from '../styles/buttonStyle';
 
 const MyProfilePage: React.FC = () => {
   const firstName = 'Stefan';
@@ -58,10 +59,10 @@ const MyProfilePage: React.FC = () => {
         </Box>
 
         <Box display="flex" flexDirection="column" alignItems="flex-end" gap={2}>
-          <Button variant="contained" onClick={() => setOpenUpdate(true)}>
+          <Button variant="contained" sx={buttonStyle} onClick={() => setOpenUpdate(true)}>
             Update Profile
           </Button>
-          <Button variant="contained" onClick={() => setOpenChangePwd(true)}>
+          <Button variant="contained" sx={buttonStyle} onClick={() => setOpenChangePwd(true)}>
             Change Password
           </Button>
         </Box>

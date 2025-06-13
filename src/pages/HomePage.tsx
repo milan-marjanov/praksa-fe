@@ -1,5 +1,6 @@
 import { Container, Button, Stack } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import buttonStyle from '../styles/buttonStyle';
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -7,7 +8,7 @@ export default function HomePage() {
   return (
     <Container maxWidth="sm" sx={{ mt: 4 }}>
       <Stack spacing={2}>
-        <Button variant="contained" onClick={() => navigate('/myprofile')}>
+        <Button variant="contained" sx={buttonStyle} onClick={() => navigate('/myprofile')}>
           My Profile
         </Button>
       </Stack>

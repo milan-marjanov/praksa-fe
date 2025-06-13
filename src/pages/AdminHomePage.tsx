@@ -3,13 +3,14 @@ import { useEffect, useState } from 'react';
 import UserList from '../components/admin_panel/UserList';
 import AddUserModal from '../components/admin_panel/AddUserModal';
 import ConfirmDialog from '../components/admin_panel/ConfirmDialog';
-import type { User } from '../types/UserDTO';
-import type { CreateUserDTO } from '../types/CreateUserDTO';
+import type { UserDTO } from '../types/User';
+import type { CreateUserDTO } from '../types/User';
 import { getAllUsers, createUser, deleteUser } from '../services/userService';
 import { useNavigate } from 'react-router-dom';
+import buttonStyle from '../styles/buttonStyle';
 
 export default function AdminHomePage() {
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<UserDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [addOpen, setAddOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
@@ -39,16 +40,14 @@ export default function AdminHomePage() {
     }
   };
 
-  const handleDelete = async () => {
-    if (deleteId !== null) {
-      try {
-        await deleteUser(deleteId);
-        setUsers((prev) => prev.filter((u) => u.id !== deleteId));
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setDeleteId(null);
-      }
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteUser(id);
+      setUsers((prev) => prev.filter((u) => u.id !== id));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setDeleteId(null);
     }
   };
 
@@ -68,10 +67,9 @@ export default function AdminHomePage() {
           </Box>
           <Button
             variant="contained"
+            sx={buttonStyle}
             size="large"
-            color="secondary"
             onClick={() => setAddOpen(true)}
-            sx={{ fontSize: '1rem' }}
           >
             Add User
           </Button>
@@ -92,7 +90,7 @@ export default function AdminHomePage() {
         open={deleteId !== null}
         title="Confirm Delete"
         onCancel={() => setDeleteId(null)}
-        onConfirm={handleDelete}
+        onConfirm={() => handleDelete(deleteId!)}
       >
         Are you sure you want to delete this user?
       </ConfirmDialog>
@@ -100,14 +98,12 @@ export default function AdminHomePage() {
       <Button
         variant="contained"
         size="large"
-        color="secondary"
         sx={{
+          ...buttonStyle,
           position: 'fixed',
           bottom: 50,
           left: '50%',
           transform: 'translateX(-50%)',
-          zIndex: (theme) => theme.zIndex.drawer + 1,
-          fontSize: '1rem',
         }}
         onClick={() => navigate('/myprofile')}
       >

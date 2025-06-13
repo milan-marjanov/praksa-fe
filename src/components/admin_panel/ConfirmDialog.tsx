@@ -1,5 +1,6 @@
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 import React from 'react';
+import buttonStyle from '../../styles/buttonStyle';
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -21,8 +22,10 @@ export default function ConfirmDialog({
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>{children}</DialogContent>
       <DialogActions>
-        <Button onClick={onCancel}>Cancel</Button>
-        <Button color="error" onClick={onConfirm}>
+        <Button sx={buttonStyle} onClick={onCancel}>
+          Cancel
+        </Button>
+        <Button sx={buttonStyle} color="error" onClick={onConfirm}>
           Delete
         </Button>
       </DialogActions>

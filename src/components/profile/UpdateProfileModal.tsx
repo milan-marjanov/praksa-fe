@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Box, Typography, TextField, Button, Avatar, IconButton } from '@mui/material';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
+import buttonStyle from '../../styles/buttonStyle';
 
 const style = {
   position: 'absolute' as const,
@@ -92,10 +93,10 @@ export function UpdateProfileModal({ open, onClose, onUpdate }: UpdateProfileMod
         )}
 
         <Box display="flex" justifyContent="flex-end">
-          <Button onClick={onClose} sx={{ mr: 1 }}>
+          <Button sx={{ ...buttonStyle, mr: 1 }} onClick={onClose}>
             Cancel
           </Button>
-          <Button variant="contained" onClick={handleUpdate}>
+          <Button variant="contained" sx={buttonStyle} onClick={handleUpdate}>
             Update
           </Button>
         </Box>

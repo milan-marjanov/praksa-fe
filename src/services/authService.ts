@@ -1,6 +1,6 @@
-import api from '../axios/axiosClient';
+import api from '../axios/AxiosClient';
 import { jwtDecode } from 'jwt-decode';
-import type { JwtDecoded } from '../types/JwtDecodedDTO';
+import type { JwtDecoded } from '../types/User';
 
 export async function login(email: string, password: string): Promise<string | undefined> {
   try {
