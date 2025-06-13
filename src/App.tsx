@@ -10,6 +10,7 @@ import ProtectedRoute from './components/common/ProtectedRoute';
 import UnauthorizedPage from './pages/UnauthorizedPage';
 import UpdateEventPage from './pages/events/UpdateEventPage';
 import CreateEventPage from './pages/events/CreateEventPage';
+import CreatedEventsPage from './pages/events/CreatedEventsPage';
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<LoginPage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/events/edit/:id" element={<UpdateEventPage />} />
 
             <Route
               path="/admin"
@@ -45,6 +47,15 @@ export default function App() {
               element={
                 <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
                   <UpdateEventPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/createdEvents"
+              element={
+                <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                  <CreatedEventsPage />
                 </ProtectedRoute>
               }
             />

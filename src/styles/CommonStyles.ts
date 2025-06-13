@@ -14,3 +14,19 @@ export const linkStyle = {
   textDecoration: 'none',
   color: 'inherit',
 };
+
+export const boxContainerStyle = {
+  display: 'flex',
+  flexWrap: 'wrap',
+  gap: 2,
+  justifyContent: 'center',
+  mb: 2,
+};
+
+export const eventCardStyle = {
+  width: 330,
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  minHeight: 220,
+};

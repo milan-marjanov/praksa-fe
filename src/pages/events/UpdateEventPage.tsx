@@ -6,9 +6,9 @@ import { useSetupEventForm } from '../../hooks/UseEventForm';
 
 const mockEvent: EventDTO = {
   id: 1,
-  name: 'Team Building Workshop',
+  title: 'Team Building Workshop',
   description: 'A collaborative event to strengthen team dynamics.',
-  participants: [1, 2],
+  participantIds: [1, 2],
   creatorId: 0,
 };
 
