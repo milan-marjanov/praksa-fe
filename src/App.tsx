@@ -10,6 +10,7 @@ import ProtectedRoute from './components/common/ProtectedRoute';
 import UnauthorizedPage from './pages/UnauthorizedPage';
 import HomePage from './pages/HomePage';
 import MyProfilePage from './pages/MyProfilePage';
+import ProfilePage from './pages/ProfilePage';
 
 export default function App() {
   return (
@@ -24,6 +25,7 @@ export default function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/home" element={<HomePage />} />
             <Route path="/myprofile" element={<MyProfilePage />} />
+            <Route path="/user/:userId" element={<ProfilePage />} />
             <Route
               path="/admin"
               element={
@@ -32,16 +34,6 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
-
-            {/* <Route
-          path="/user"
-          element={
-            <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
-              <UserHomePage />
-            </ProtectedRoute>
-          }
-        /> */}
-
             <Route path="/unauthorized" element={<UnauthorizedPage />} />
           </Routes>
         </Router>
