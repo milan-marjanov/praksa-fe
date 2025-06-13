@@ -1,13 +1,13 @@
-import api from '../api/apiClient';
+import api from '../axios/axiosClient';
 import { PasswordChangeRequestDTO } from '../types/PasswordChangeRequestDTO';
 import type { MyProfileDTO, UserProfileDTO } from '../types/ProfileDTO';
 import { UpdateProfileRequestDTO } from '../types/UpdateProfileRequestDTO';
 
 export const getMyProfile = (): Promise<MyProfileDTO> =>
-  api.get<MyProfileDTO>('/api/user/profile').then(res => res.data);
+  api.get<MyProfileDTO>('/api/user/profile').then((res) => res.data);
 
 export const getUserProfile = (id: number): Promise<UserProfileDTO> =>
-  api.get<UserProfileDTO>(`/api/user/${id}/public-profile`).then(res => res.data);
+  api.get<UserProfileDTO>(`/api/user/${id}/public-profile`).then((res) => res.data);
 
 export const updateProfile = (data: UpdateProfileRequestDTO): Promise<void> => {
   const formData = new FormData();
@@ -24,8 +24,5 @@ export const updateProfile = (data: UpdateProfileRequestDTO): Promise<void> => {
     .then(() => {});
 };
 
-export const changePassword = (
-  id: number,
-  dto: PasswordChangeRequestDTO
-): Promise<void> =>
+export const changePassword = (id: number, dto: PasswordChangeRequestDTO): Promise<void> =>
   api.post<void>(`/api/user/${id}/change-password`, dto).then(() => {});

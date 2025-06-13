@@ -102,12 +102,12 @@ export default function AdminHomePage() {
         size="large"
         color="secondary"
         sx={{
-          position: 'fixed', 
+          position: 'fixed',
           bottom: 50,
           left: '50%',
           transform: 'translateX(-50%)',
           zIndex: (theme) => theme.zIndex.drawer + 1,
-          fontSize: '1rem'
+          fontSize: '1rem',
         }}
         onClick={() => navigate('/myprofile')}
       >

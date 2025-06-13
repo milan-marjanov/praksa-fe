@@ -7,10 +7,7 @@ export default function HomePage() {
   return (
     <Container maxWidth="sm" sx={{ mt: 4 }}>
       <Stack spacing={2}>
-        <Button
-          variant="contained"
-          onClick={() => navigate('/myprofile')}
-        >
+        <Button variant="contained" onClick={() => navigate('/myprofile')}>
           My Profile
         </Button>
       </Stack>

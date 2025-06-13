@@ -22,11 +22,7 @@ export interface ChangePasswordModalProps {
   }): Promise<unknown>;
 }
 
-export function ChangePasswordModal({
-  open,
-  onClose,
-  onChangePassword,
-}: ChangePasswordModalProps) {
+export function ChangePasswordModal({ open, onClose, onChangePassword }: ChangePasswordModalProps) {
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [newPasswordConfirm, setNewPasswordConfirm] = useState('');

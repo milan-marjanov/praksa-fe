@@ -19,9 +19,7 @@ export default function useProfile(userId?: number): Result {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const profile = userId
-          ? await getUserProfile(userId)
-          : await getMyProfile();
+        const profile = userId ? await getUserProfile(userId) : await getMyProfile();
         if (!ignore) {
           setData(profile);
           setError(null);

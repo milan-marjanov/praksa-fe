@@ -10,13 +10,18 @@ const style = {
   bgcolor: 'background.paper',
   p: 4,
   borderRadius: 2,
-  boxShadow: 24
+  boxShadow: 24,
 };
 
 export interface UpdateProfileModalProps {
   open: boolean;
   onClose(): void;
-  onUpdate(data: { firstName: string; lastName: string; email: string; profilePicture?: File }): Promise<unknown>;
+  onUpdate(data: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    profilePicture?: File;
+  }): Promise<unknown>;
 }
 
 export function UpdateProfileModal({ open, onClose, onUpdate }: UpdateProfileModalProps) {
