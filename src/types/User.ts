@@ -42,3 +42,7 @@ export interface PasswordChangeRequestDTO {
   newPassword: string;
   newPasswordConfirm: string;
 }
+
+export interface ChangeProfilePictureDTO {
+  profilePicture: File;
+}

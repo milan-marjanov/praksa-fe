@@ -1,20 +1,23 @@
 import React, { useState } from 'react';
-import { Container, Box, Avatar, Typography, Button } from '@mui/material';
+import { Container, Box, Avatar, Typography, Button, IconButton } from '@mui/material';
 import { UpdateProfileModal } from '../components/profile/UpdateProfileModal';
 import { ChangePasswordModal } from '../components/profile/ChangePasswordModal';
-import { PasswordChangeRequestDTO } from '../types/User';
-import { changePassword } from '../services/userService';
+import { ChangePfpModal } from '../components/profile/ChangePfpModal';
+import { PasswordChangeRequestDTO, ChangeProfilePictureDTO } from '../types/User';
+import { changePassword, uploadProfilePicture } from '../services/userService';
 import { getCurrentUserId } from '../services/authService';
 import buttonStyle from '../styles/buttonStyle';
 
 const MyProfilePage: React.FC = () => {
-  const firstName = 'Stefan';
-  const lastName = 'Nemanja';
-  const email = 'stefan.nemanja@example.com';
-  const profilePictureUrl: string | null = null;
+  const [firstName] = useState('Stefan');
+  const [lastName] = useState('Nemanja');
+  const [email] = useState('stefan.nemanja@example.com');
+  const [profilePictureUrl, setProfilePictureUrl] = useState<string | null>(null);
 
   const [openUpdate, setOpenUpdate] = useState(false);
   const [openChangePwd, setOpenChangePwd] = useState(false);
+  const [openChangePfp, setOpenChangePfp] = useState(false);
+
   const id = getCurrentUserId();
 
   const handleUpdate = async (data: {
@@ -32,33 +35,52 @@ const MyProfilePage: React.FC = () => {
     setOpenChangePwd(false);
   };
 
+  const handleUploadPfp = async (file: File) => {
+    const dto: ChangeProfilePictureDTO = { profilePicture: file };
+    const url = await uploadProfilePicture(id, dto);
+    setProfilePictureUrl(url);
+    setOpenChangePfp(false);
+  };
+
   return (
     <Container
-      maxWidth="sm"
+      maxWidth={false}
       sx={{
+        width: '90vw',
+        maxWidth: 600,
+        mx: 'auto',
         my: 10,
-        p: 4,
-        backgroundColor: 'background.default',
-        borderRadius: 3,
-        boxShadow: 2,
+        p: 3,
+        bgcolor: 'background.paper',
+        borderRadius: 2,
+        boxShadow: 3,
       }}
     >
-      <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Box display="flex" flexDirection="column" alignItems="flex-start">
-          <Avatar
-            src={profilePictureUrl || undefined}
-            alt={`${firstName} ${lastName}`}
-            sx={{ width: 120, height: 120, mb: 2 }}
-          />
-          <Typography variant="h5">
+      <Box
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        justifyContent="space-evenly"
+        minHeight="60vh"
+      >
+        <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
+          <IconButton onClick={() => setOpenChangePfp(true)} sx={{ p: 0 }}>
+            <Avatar
+              src={profilePictureUrl || undefined}
+              alt={`${firstName} ${lastName}`}
+              sx={{ width: 120, height: 120, marginBottom: 4 }}
+            />
+          </IconButton>
+
+          <Typography variant="h5" textAlign="center">
             {firstName} {lastName}
           </Typography>
-          <Typography variant="body1" color="textSecondary">
+          <Typography variant="body2" color="textSecondary" textAlign="center">
             {email}
           </Typography>
         </Box>
 
-        <Box display="flex" flexDirection="column" alignItems="flex-end" gap={2}>
+        <Box display="flex" justifyContent="center" gap={2}>
           <Button variant="contained" sx={buttonStyle} onClick={() => setOpenUpdate(true)}>
             Update Profile
           </Button>
@@ -77,6 +99,11 @@ const MyProfilePage: React.FC = () => {
         open={openChangePwd}
         onClose={() => setOpenChangePwd(false)}
         onChangePassword={handleChangePassword}
+      />
+      <ChangePfpModal
+        open={openChangePfp}
+        onClose={() => setOpenChangePfp(false)}
+        onUpload={handleUploadPfp}
       />
     </Container>
   );

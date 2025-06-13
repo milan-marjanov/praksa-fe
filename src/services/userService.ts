@@ -6,6 +6,7 @@ import {
   UserProfileDTO,
   UpdateProfileRequestDTO,
   PasswordChangeRequestDTO,
+  ChangeProfilePictureDTO,
 } from '../types/User';
 
 export async function getAllUsers() {
@@ -47,4 +48,16 @@ export async function updateProfile(data: UpdateProfileRequestDTO) {
 
 export async function changePassword(id: number, dto: PasswordChangeRequestDTO) {
   await api.post(`/api/user/${id}/change-password`, dto);
+}
+
+export async function uploadProfilePicture(id: number, dto: ChangeProfilePictureDTO): Promise<string> {
+  const formData = new FormData();
+  formData.append('image', dto.profilePicture);
+
+  const response = await api.post<{ url: string }>(
+    `/api/user/${id}/upload-profile-picture`,
+    formData,
+    { headers: { 'Content-Type': 'multipart/form-data' } }
+  );
+  return response.data.url;
 }
