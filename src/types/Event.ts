@@ -2,9 +2,9 @@ import { User } from '../types/User';
 
 export interface EventDTO {
   id: number;
-  name: string;
+  title: string;
   description: string;
-  participants: number[];
+  participantIds: number[];
   creatorId: number;
 }
 

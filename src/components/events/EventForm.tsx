@@ -27,24 +27,24 @@ const formButtonStyle = {
 };
 
 export default function EventForm({ users, creatorId, event, onSubmit }: EventFormProps) {
-  const [eventName, setEventName] = useState('');
+  const [eventTitle, setEventTitle] = useState('');
   const [description, setDescription] = useState('');
   const [participants, setParticipants] = useState<number[]>([]);
   const [errors, setErrors] = useState({ name: '', participants: '' });
 
   useEffect(() => {
     if (event) {
-      setEventName(event.name);
+      setEventTitle(event.title);
       setDescription(event.description);
-      setParticipants(event.participants);
+      setParticipants(event.participantIds);
     }
   }, [event]);
 
   const allParticipantIds = users.map((user) => user.id);
   const isAllSelected = participants.length === users.length && users.length > 0;
 
-  const handleEventNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEventName(e.target.value);
+  const handleEventTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEventTitle(e.target.value);
     if (e.target.value.trim() !== '') {
       setErrors((prev) => ({ ...prev, name: '' }));
     }
@@ -67,11 +67,11 @@ export default function EventForm({ users, creatorId, event, onSubmit }: EventFo
     }
   };
 
-  const validateEventForm = (eventName: string, participants: number[]) => {
+  const validateEventForm = (eventTitle: string, participants: number[]) => {
     const newErrors = { name: '', participants: '' };
     let hasError = false;
 
-    if (eventName.trim() === '') {
+    if (eventTitle.trim() === '') {
       newErrors.name = 'Event name is required';
       hasError = true;
     }
@@ -86,16 +86,16 @@ export default function EventForm({ users, creatorId, event, onSubmit }: EventFo
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const { hasError, newErrors } = validateEventForm(eventName, participants);
+    const { hasError, newErrors } = validateEventForm(eventTitle, participants);
     setErrors(newErrors);
 
     if (hasError) return;
 
     const eventData: EventDTO = {
       id: event?.id ?? 0,
-      name: eventName,
+      title: eventTitle,
       description,
-      participants,
+      participantIds: participants,
       creatorId: creatorId!,
     };
 
@@ -108,8 +108,8 @@ export default function EventForm({ users, creatorId, event, onSubmit }: EventFo
       <TextField
         fullWidth
         label="Event Name *"
-        value={eventName}
-        onChange={handleEventNameChange}
+        value={eventTitle}
+        onChange={handleEventTitleChange}
         margin="normal"
         error={!!errors.name}
         helperText={errors.name}

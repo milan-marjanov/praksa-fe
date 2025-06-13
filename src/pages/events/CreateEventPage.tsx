@@ -3,20 +3,26 @@ import EventForm from '../../components/events/EventForm';
 import { EventDTO } from '../../types/Event';
 import { containerStyle } from '../../styles/CommonStyles';
 import { useSetupEventForm } from '../../hooks/UseEventForm';
+import { createEvent } from '../../services/eventService';
+import { useNavigate } from 'react-router-dom';
 
 export default function CreateEventPage() {
   const { creatorId, users, loading } = useSetupEventForm();
+  const navigate = useNavigate();
 
-  const handleCreateEvent = (eventData: EventDTO, isUpdate: boolean) => {
+  const handleCreateEvent = async (eventData: EventDTO, isUpdate: boolean) => {
     if (isUpdate) {
-      // Should not happen on this page
       console.warn('Update attempted on create page, ignoring.');
       return;
     }
 
-    console.log('Creating event with data:', eventData);
-    // Example: call create API here
-    // createEvent(eventData).then(() => navigate('/events'));
+    try {
+      console.log('Creating event with data:', eventData);
+      await createEvent(eventData);
+      navigate('/events');
+    } catch (error) {
+      console.error('Error creating event:', error);
+    }
   };
 
   if (loading) {
