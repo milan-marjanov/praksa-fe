@@ -1,33 +1,22 @@
 import { Container, Box, Card, CardContent, Typography, Button, CardActions } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import ConfirmDialog from '../../components/admin_panel/ConfirmDialog';
 import { EventDTO } from '../../types/Event';
-import { fetchAllEvents, deleteEvent } from '../../services/eventService';
+import { deleteEvent } from '../../services/eventService';
 import { boxContainerStyle, eventCardStyle } from '../../styles/CommonStyles';
+import { useEvents } from '../../hooks/UseEvents';
 
 export default function AllEventsCreatedPage() {
   const navigate = useNavigate();
-  const [events, setEvents] = useState<EventDTO[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const { events, setEvents, loading } = useEvents();
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
   const [selectedEventTitle, setSelectedEventTitle] = useState<string | null>(null);
 
-  useEffect(() => {
-    const loadEvents = async () => {
-      try {
-        const data = await fetchAllEvents();
-        setEvents(data ?? []);
-      } catch (error) {
-        console.error('Failed to load events:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadEvents();
-  }, []);
+  const handleEditClick = (event: EventDTO) => {
+    navigate('/updateEvent', { state: { event } });
+  };
 
   const handleDeleteClick = (id: number, title: string) => {
     setSelectedEventId(id);
@@ -81,15 +70,9 @@ export default function AllEventsCreatedPage() {
               </Typography>
             </CardContent>
             <CardActions sx={{ mt: 'auto', justifyContent: 'flex-start' }}>
-              <Button size="medium" onClick={() => navigate(`/updateEvent`, { state: { event } })}>
-                Edit
-              </Button>
+              <Button variant='outlined'  onClick={() => handleEditClick(event)}>Edit</Button>
 
-              <Button
-                size="medium"
-                color="error"
-                onClick={() => handleDeleteClick(event.id, event.title)}
-              >
+              <Button variant='outlined' color="error" onClick={() => handleDeleteClick(event.id, event.title)}>
                 Delete
               </Button>
             </CardActions>

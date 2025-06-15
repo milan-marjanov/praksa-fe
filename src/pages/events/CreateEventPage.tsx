@@ -13,11 +13,9 @@ export default function CreateEventPage() {
   const handleSubmit = async (eventData: CreateEventDto | UpdateEventDTO, isUpdate: boolean) => {
     try {
       if (isUpdate) {
-        // This page is for creation, so ignore updates here, but can log or throw if desired
         console.warn('Update attempted on CreateEventPage - ignoring');
         return;
       } else {
-        // Create new event
         console.log('Creating event with data:', eventData);
         await createEvent(eventData as CreateEventDto);
         navigate('/events');
@@ -45,7 +43,6 @@ export default function CreateEventPage() {
     );
   }
 
-  // Pass filtered users without the creator (since they are always included)
   const filteredUsers = users.filter((user) => user.id !== creatorId);
 
   return (
