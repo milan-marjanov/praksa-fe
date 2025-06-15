@@ -1,5 +1,5 @@
 import api from '../axios/AxiosClient';
-import { EventDTO, UpdateEventDTO } from '../types/Event';
+import { CreateEventDto, EventDTO, UpdateEventDTO } from '../types/Event';
 
 export const fetchAllEvents = async () => {
   try {
@@ -10,23 +10,23 @@ export const fetchAllEvents = async () => {
   }
 };
 
-export async function createEvent(eventData: EventDTO) {
+export async function createEvent(eventData: CreateEventDto) {
   try {
-    const response = await api.post<EventDTO>('/api/events/createEvent', eventData);
+    const response = await api.post<CreateEventDto>('/api/events/createEvent', eventData);
     return response.data;
   } catch {
     return undefined;
   }
 }
 
-export const updateEvent = async (eventId: number, eventData: UpdateEventDTO) => {
+export async function updateEvent(eventId: number, eventData: UpdateEventDTO) {
   try {
     const response = await api.patch(`/api/events/updateEvent/${eventId}`, eventData);
     return response.data;
   } catch {
     return undefined;
   }
-};
+}
 
 export const deleteEvent = async (eventId: number) => {
   try {

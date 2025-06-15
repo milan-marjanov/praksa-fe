@@ -1,27 +1,29 @@
 import { Container, Typography } from '@mui/material';
 import EventForm from '../../components/events/EventForm';
-import { EventDTO } from '../../types/Event';
+import { CreateEventDto, UpdateEventDTO } from '../../types/Event'; // Assuming UpdateEventDto is defined here
 import { containerStyle } from '../../styles/CommonStyles';
 import { useSetupEventForm } from '../../hooks/UseEventForm';
-import { createEvent } from '../../services/eventService';
+import { createEvent } from '../../services/eventService'; // Assuming updateEvent service exists
 import { useNavigate } from 'react-router-dom';
 
 export default function CreateEventPage() {
   const { creatorId, users, loading } = useSetupEventForm();
   const navigate = useNavigate();
 
-  const handleCreateEvent = async (eventData: EventDTO, isUpdate: boolean) => {
-    if (isUpdate) {
-      console.warn('Update attempted on create page, ignoring.');
-      return;
-    }
-
+  const handleSubmit = async (eventData: CreateEventDto | UpdateEventDTO, isUpdate: boolean) => {
     try {
-      console.log('Creating event with data:', eventData);
-      await createEvent(eventData);
-      navigate('/events');
+      if (isUpdate) {
+        // This page is for creation, so ignore updates here, but can log or throw if desired
+        console.warn('Update attempted on CreateEventPage - ignoring');
+        return;
+      } else {
+        // Create new event
+        console.log('Creating event with data:', eventData);
+        await createEvent(eventData as CreateEventDto);
+        navigate('/events');
+      }
     } catch (error) {
-      console.error('Error creating event:', error);
+      console.error('Error submitting event:', error);
     }
   };
 
@@ -33,6 +35,17 @@ export default function CreateEventPage() {
     );
   }
 
+  const creator = users.find((user) => user.id === creatorId);
+
+  if (!creator) {
+    return (
+      <Container maxWidth="sm" sx={{ marginTop: 5, textAlign: 'center' }}>
+        <Typography>Error: Creator not found.</Typography>
+      </Container>
+    );
+  }
+
+  // Pass filtered users without the creator (since they are always included)
   const filteredUsers = users.filter((user) => user.id !== creatorId);
 
   return (
@@ -40,7 +53,7 @@ export default function CreateEventPage() {
       <Typography component="h1" variant="h5" gutterBottom>
         Create New Event
       </Typography>
-      <EventForm users={filteredUsers} creatorId={creatorId} onSubmit={handleCreateEvent} />
+      <EventForm users={filteredUsers} creator={creator} onSubmit={handleSubmit} />
     </Container>
   );
 }

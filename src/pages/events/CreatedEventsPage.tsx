@@ -65,7 +65,7 @@ export default function AllEventsCreatedPage() {
 
   return (
     <Container sx={{ mt: 4 }}>
-      <Typography variant="h4" gutterBottom mb={3}>
+      <Typography variant="h4" mb={3}>
         My Created Events
       </Typography>
 
@@ -81,9 +81,10 @@ export default function AllEventsCreatedPage() {
               </Typography>
             </CardContent>
             <CardActions sx={{ mt: 'auto', justifyContent: 'flex-start' }}>
-              <Button size="medium" onClick={() => navigate(`/events/edit/${event.id}`)}>
+              <Button size="medium" onClick={() => navigate(`/updateEvent`, { state: { event } })}>
                 Edit
               </Button>
+
               <Button
                 size="medium"
                 color="error"

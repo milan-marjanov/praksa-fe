@@ -1,49 +1,98 @@
 import { Container, Typography } from '@mui/material';
 import EventForm from '../../components/events/EventForm';
-import { EventDTO } from '../../types/Event';
+import { ParticipantDto, UpdateEventDTO, EventDTO, CreateEventDto } from '../../types/Event';
 import { containerStyle } from '../../styles/CommonStyles';
-import { useSetupEventForm } from '../../hooks/UseEventForm';
-
-const mockEvent: EventDTO = {
-  id: 1,
-  title: 'Team Building Workshop',
-  description: 'A collaborative event to strengthen team dynamics.',
-  participantIds: [1, 2],
-  creatorId: 0,
-};
+import { useLocation, useNavigate } from 'react-router-dom';
+import { updateEvent } from '../../services/eventService';
+import { useEffect, useState } from 'react';
+import { getAllUsers } from '../../services/userService';
 
 export default function UpdateEventPage() {
-  const { creatorId, users, loading, eventData } = useSetupEventForm(mockEvent);
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  const handleUpdateEvent = (updatedEventData: EventDTO, isUpdate: boolean) => {
-    if (!isUpdate) {
-      console.warn('Create attempted on update page, ignoring.');
-      return;
+  const [eventData, setEventData] = useState<EventDTO | null>(null);
+  const [availableUsers, setAvailableUsers] = useState<ParticipantDto[]>([]);
+
+  useEffect(() => {
+    if (location.state?.event) {
+      setEventData(location.state.event);
+    } else {
+      navigate('/events', { replace: true });
     }
-    console.log('Updating event with data:', updatedEventData);
-    // Example: call update API here, e.g.
-    // updateEvent(eventId!, updatedEventData).then(() => navigate('/events'));
-  };
+  }, [location.state, navigate]);
 
-  if (loading || !eventData || creatorId === null) {
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const allUsers = await getAllUsers();
+        if (eventData) {
+          const filteredUsers = allUsers.filter((u) => u.id !== eventData.creator.id);
+          setAvailableUsers(filteredUsers);
+        }
+      } catch (err) {
+        console.error('Failed to fetch users:', err);
+      }
+    };
+
+    if (eventData) {
+      fetchUsers();
+    }
+  }, [eventData]);
+
+  if (!eventData) {
     return (
       <Container sx={{ ...containerStyle, marginTop: 5 }}>
-        <Typography>Loading...</Typography>
+        <Typography>Loading event data...</Typography>
       </Container>
     );
   }
 
-  const filteredUsers = users.filter((user) => user.id !== creatorId);
+  const creator = eventData.creator;
+  const participantIds = eventData.participants.filter((p) => p.id !== creator.id).map((p) => p.id);
 
-  const eventWithCreator = { ...eventData, creatorId };
+  const updateEventDto: UpdateEventDTO = {
+    title: eventData.title,
+    description: eventData.description,
+    participantIds,
+    timeOptions:
+      eventData.timeOptions?.map((t) => ({
+        id: t.id,
+        maxCapacity: t.maxCapacity ?? 0,
+        startTime: t.startTime,
+        endTime: t.endTime,
+        deadline: t.deadline,
+        createdAt: t.createdAt,
+      })) ?? [],
+    restaurantOptions: eventData.restaurantOptions ?? [],
+  };
+
+  const handleUpdateEvent = async (
+    updatedData: CreateEventDto | UpdateEventDTO,
+    isUpdate: boolean,
+  ) => {
+    if (!isUpdate) {
+      console.warn('Create attempted on update page, ignoring.');
+      return;
+    }
+
+    try {
+      await updateEvent(eventData.id, updatedData as UpdateEventDTO);
+      navigate('/events');
+    } catch (error) {
+      console.error('Failed to update event:', error);
+    }
+  };
 
   return (
     <Container maxWidth="sm" sx={{ ...containerStyle, marginTop: 5 }}>
-      <Typography variant="h5">Edit Event</Typography>
+      <Typography variant="h5" gutterBottom>
+        Edit Event
+      </Typography>
       <EventForm
-        users={filteredUsers}
-        creatorId={creatorId}
-        event={eventWithCreator}
+        users={availableUsers}
+        creator={creator}
+        event={updateEventDto}
         onSubmit={handleUpdateEvent}
       />
     </Container>

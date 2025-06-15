@@ -7,7 +7,7 @@ import { EventDTO } from '../types/Event';
 import { JwtDecoded } from '../types/JwtDecoded';
 
 export function useSetupEventForm(mockEvent?: EventDTO) {
-  const [creatorId, setCreatorId] = useState<number | null>(null);
+  const [creatorId, setCreatorId] = useState<number | undefined>(undefined);
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [eventData, setEventData] = useState<EventDTO | null>(null);
