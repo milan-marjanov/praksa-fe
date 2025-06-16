@@ -5,6 +5,7 @@ import type { JwtDecoded } from '../types/User';
 export async function login(email: string, password: string): Promise<string | undefined> {
   try {
     const { data } = await api.post<{ token: string }>('/auth/signin', {
+
       email,
       password,
     });
@@ -16,7 +17,6 @@ export async function login(email: string, password: string): Promise<string | u
 }
 
 export function decodeJwt(token: string): JwtDecoded {
-  console.log(jwtDecode<JwtDecoded>(token));
   return jwtDecode<JwtDecoded>(token);
 }
 

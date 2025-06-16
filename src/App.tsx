@@ -16,6 +16,7 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+
       <div className="App">
         <Router>
           <Navbar />
