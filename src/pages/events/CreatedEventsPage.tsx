@@ -7,7 +7,7 @@ import { deleteEvent } from '../../services/eventService';
 import { boxContainerStyle, eventCardStyle } from '../../styles/CommonStyles';
 import { UseEvents } from '../../hooks/UseEvents';
 
-export default function AllEventsCreatedPage() {
+export default function CreatedEventsPage() {
   const navigate = useNavigate();
   const { events, setEvents, loading } = UseEvents();
   const [openDialog, setOpenDialog] = useState(false);
@@ -54,37 +54,48 @@ export default function AllEventsCreatedPage() {
 
   return (
     <Container sx={{ mt: 4 }}>
-      <Typography variant="h4" mb={3}>
+      <Typography variant="h4" mb={2}>
         My Created Events
       </Typography>
 
-      <Box sx={boxContainerStyle}>
-        {events.map((event) => (
-          <Card key={event.id} sx={eventCardStyle}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                {event.title}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'justify' }}>
-                {event.description}
-              </Typography>
-            </CardContent>
-            <CardActions sx={{ mt: 'auto', justifyContent: 'flex-start' }}>
-              <Button variant="outlined" onClick={() => handleEditClick(event)}>
-                Edit
-              </Button>
+      <Button
+        variant="contained"
+        sx={{ mb: 3 }}
+        onClick={() => navigate('/createEvent')}
+      >
+        Create Event
+      </Button>
 
-              <Button
-                variant="outlined"
-                color="error"
-                onClick={() => handleDeleteClick(event.id, event.title)}
-              >
-                Delete
-              </Button>
-            </CardActions>
-          </Card>
-        ))}
-      </Box>
+      {events.length === 0 ? (
+        <Typography variant="body1">You have no created events.</Typography>
+      ) : (
+        <Box sx={boxContainerStyle}>
+          {events.map((event) => (
+            <Card key={event.id} sx={eventCardStyle}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  {event.title}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'justify' }}>
+                  {event.description}
+                </Typography>
+              </CardContent>
+              <CardActions sx={{ mt: 'auto', justifyContent: 'flex-start' }}>
+                <Button variant="outlined" onClick={() => handleEditClick(event)}>
+                  Edit
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="error"
+                  onClick={() => handleDeleteClick(event.id, event.title)}
+                >
+                  Delete
+                </Button>
+              </CardActions>
+            </Card>
+          ))}
+        </Box>
+      )}
 
       <ConfirmDialog
         open={openDialog}

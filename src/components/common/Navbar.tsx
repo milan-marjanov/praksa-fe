@@ -22,8 +22,8 @@ export default function Navbar() {
             gap: 2,
           }}
         >
-          <Button component={RouterLink} to="/createEvent" color="inherit">
-            Create Events
+          <Button component={RouterLink} to="/createdEvents" color="inherit">
+            Created Events
           </Button>
 
           <Box
