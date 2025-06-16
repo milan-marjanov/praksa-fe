@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react'
-import { Modal, Box, Typography, Button, Avatar, IconButton } from '@mui/material'
-import PhotoCameraIcon from '@mui/icons-material/PhotoCamera'
-import { buttonStyle } from '../../styles/style'
+import React, { useState, useEffect } from 'react';
+import { Modal, Box, Typography, Button, Avatar, IconButton } from '@mui/material';
+import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
+import { buttonStyle } from '../../styles/style';
 
 const style = {
   position: 'absolute' as const,
@@ -12,14 +12,14 @@ const style = {
   p: 4,
   borderRadius: 2,
   boxShadow: 24,
-}
+};
 
 export interface ChangePfpModalProps {
-  open: boolean
-  initialPreview?: string
-  onClose(): void
-  onUpload(file: File): Promise<void>
-  onRemove(): Promise<void>
+  open: boolean;
+  initialPreview?: string;
+  onClose(): void;
+  onUpload(file: File): Promise<void>;
+  onRemove(): Promise<void>;
 }
 
 export function ChangePfpModal({
@@ -29,49 +29,49 @@ export function ChangePfpModal({
   onUpload,
   onRemove,
 }: ChangePfpModalProps) {
-  const [file, setFile] = useState<File | null>(null)
-  const [preview, setPreview] = useState<string | null>(null)
-  const [removed, setRemoved] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [file, setFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [removed, setRemoved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // kad se otvori modal, podesi preview na trenutnu sliku
   useEffect(() => {
     if (open) {
-      setPreview(initialPreview || null)
-      setFile(null)
-      setRemoved(false)
-      setError(null)
+      setPreview(initialPreview || null);
+      setFile(null);
+      setRemoved(false);
+      setError(null);
     }
-  }, [open, initialPreview])
+  }, [open, initialPreview]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0] ?? null
-    setRemoved(false)
-    setFile(f)
-    setPreview(f ? URL.createObjectURL(f) : null)
-  }
+    const f = e.target.files?.[0] ?? null;
+    setRemoved(false);
+    setFile(f);
+    setPreview(f ? URL.createObjectURL(f) : null);
+  };
 
   const handleRemove = () => {
     // samo briše preview i označava removed; ne zove backend odmah
-    setRemoved(true)
-    setFile(null)
-    setPreview(null)
-    setError(null)
-  }
+    setRemoved(true);
+    setFile(null);
+    setPreview(null);
+    setError(null);
+  };
 
   const handleSave = async () => {
-    setError(null)
+    setError(null);
     try {
       if (removed) {
-        await onRemove()
+        await onRemove();
       } else if (file) {
-        await onUpload(file)
+        await onUpload(file);
       }
-      onClose()
+      onClose();
     } catch (e: any) {
-      setError(e.message || 'Error saving changes')
+      setError(e.message || 'Error saving changes');
     }
-  }
+  };
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -111,5 +111,5 @@ export function ChangePfpModal({
         </Box>
       </Box>
     </Modal>
-  )
+  );
 }

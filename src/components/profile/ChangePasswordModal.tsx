@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react';
 import {
   Modal,
   Box,
@@ -7,11 +7,11 @@ import {
   Button,
   IconButton,
   InputAdornment,
-} from '@mui/material'
-import { Visibility, VisibilityOff } from '@mui/icons-material'
-import { toast } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
-import { buttonStyle } from '../../styles/style'
+} from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { buttonStyle } from '../../styles/style';
 
 const pwdStyle = {
   position: 'absolute' as const,
@@ -22,58 +22,54 @@ const pwdStyle = {
   p: 4,
   borderRadius: 2,
   boxShadow: 24,
-}
+};
 
 export interface ChangePasswordModalProps {
-  open: boolean
-  onClose(): void
+  open: boolean;
+  onClose(): void;
   onChangePassword(data: {
-    oldPassword: string
-    newPassword: string
-    newPasswordConfirm: string
-  }): Promise<unknown>
+    oldPassword: string;
+    newPassword: string;
+    newPasswordConfirm: string;
+  }): Promise<unknown>;
 }
 
-export function ChangePasswordModal({
-  open,
-  onClose,
-  onChangePassword,
-}: ChangePasswordModalProps) {
-  const [oldPassword, setOldPassword] = useState('')
-  const [newPassword, setNewPassword] = useState('')
-  const [newPasswordConfirm, setNewPasswordConfirm] = useState('')
-  const [error, setError] = useState<string | null>(null)
+export function ChangePasswordModal({ open, onClose, onChangePassword }: ChangePasswordModalProps) {
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [newPasswordConfirm, setNewPasswordConfirm] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
-  const [showOld, setShowOld] = useState(false)
-  const [showNew, setShowNew] = useState(false)
-  const [showConfirm, setShowConfirm] = useState(false)
+  const [showOld, setShowOld] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   useEffect(() => {
     if (open) {
-      setOldPassword('')
-      setNewPassword('')
-      setNewPasswordConfirm('')
-      setError(null)
-      setShowOld(false)
-      setShowNew(false)
-      setShowConfirm(false)
+      setOldPassword('');
+      setNewPassword('');
+      setNewPasswordConfirm('');
+      setError(null);
+      setShowOld(false);
+      setShowNew(false);
+      setShowConfirm(false);
     }
-  }, [open])
+  }, [open]);
 
   const handleChange = async () => {
-    setError(null)
+    setError(null);
     if (newPassword !== newPasswordConfirm) {
-      setError('New passwords do not match')
-      return
+      setError('New passwords do not match');
+      return;
     }
     try {
-      await onChangePassword({ oldPassword, newPassword, newPasswordConfirm })
-      toast.success('Password changed successfully')
-      onClose()
+      await onChangePassword({ oldPassword, newPassword, newPasswordConfirm });
+      toast.success('Password changed successfully');
+      onClose();
     } catch (err: any) {
-      setError(err.message || 'Error changing password')
+      setError(err.message || 'Error changing password');
     }
-  }
+  };
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -91,10 +87,7 @@ export function ChangePasswordModal({
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
-                <IconButton
-                  edge="end"
-                  onClick={() => setShowOld((s) => !s)}
-                >
+                <IconButton edge="end" onClick={() => setShowOld((s) => !s)}>
                   {showOld ? <VisibilityOff /> : <Visibility />}
                 </IconButton>
               </InputAdornment>
@@ -111,10 +104,7 @@ export function ChangePasswordModal({
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
-                <IconButton
-                  edge="end"
-                  onClick={() => setShowNew((s) => !s)}
-                >
+                <IconButton edge="end" onClick={() => setShowNew((s) => !s)}>
                   {showNew ? <VisibilityOff /> : <Visibility />}
                 </IconButton>
               </InputAdornment>
@@ -131,10 +121,7 @@ export function ChangePasswordModal({
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
-                <IconButton
-                  edge="end"
-                  onClick={() => setShowConfirm((s) => !s)}
-                >
+                <IconButton edge="end" onClick={() => setShowConfirm((s) => !s)}>
                   {showConfirm ? <VisibilityOff /> : <Visibility />}
                 </IconButton>
               </InputAdornment>
@@ -156,5 +143,5 @@ export function ChangePasswordModal({
         </Box>
       </Box>
     </Modal>
-  )
+  );
 }

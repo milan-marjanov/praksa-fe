@@ -50,18 +50,18 @@ export async function uploadProfilePicture(dto: ChangeProfilePictureDTO) {
   });
 }
 
-export async function getProfileImage(): Promise<string | null> {
+export async function getProfileImage(){
   try {
     const response = await api.get<Blob>('/api/user/image', {
       responseType: 'blob',
-      validateStatus: (status) => status === 200 || status === 404
-    })
+      validateStatus: (status) => status === 200 || status === 404 || status== 403
+    });
     if (response.status === 200) {
-      return URL.createObjectURL(response.data)
+      return URL.createObjectURL(response.data);
     }
-    return null
+    return null;
   } catch {
-    return null
+    return null;
   }
 }
 
