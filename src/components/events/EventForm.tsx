@@ -13,18 +13,7 @@ import {
 } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material/Select';
 import { CreateEventDto, UpdateEventDTO, EventFormProps } from '../../types/Event';
-
-const formButtonStyle = {
-  mt: 3,
-  mb: 2,
-  width: 300,
-  mx: 'auto',
-  backgroundColor: 'primary.main',
-  '&:hover': {
-    backgroundColor: 'secondary.main',
-  },
-  fontWeight: 'bold',
-};
+import { formButtonStyle } from '../../styles/CommonStyles';
 
 export default function EventForm({ users, creator, event, onSubmit }: EventFormProps) {
   const [eventTitle, setEventTitle] = useState('');
@@ -89,6 +78,7 @@ export default function EventForm({ users, creator, event, onSubmit }: EventForm
 
     return { hasError, newErrors };
   };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -105,8 +95,8 @@ export default function EventForm({ users, creator, event, onSubmit }: EventForm
         title: eventTitle,
         description,
         participantIds: allParticipantIds,
-        timeOptions: 'timeOptions' in event ? event.timeOptions : [],
-        restaurantOptions: 'restaurantOptions' in event ? event.restaurantOptions : [],
+        timeOptions: event?.timeOptions ?? [],
+        restaurantOptions: event?.restaurantOptions ?? [],
       };
       await onSubmit(updateData, true);
     } else {

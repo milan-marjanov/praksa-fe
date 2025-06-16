@@ -30,3 +30,15 @@ export const eventCardStyle = {
   justifyContent: 'center',
   minHeight: 220,
 };
+
+export const formButtonStyle = {
+  mt: 3,
+  mb: 2,
+  width: 300,
+  mx: 'auto',
+  backgroundColor: 'primary.main',
+  '&:hover': {
+    backgroundColor: 'secondary.main',
+  },
+  fontWeight: 'bold',
+};

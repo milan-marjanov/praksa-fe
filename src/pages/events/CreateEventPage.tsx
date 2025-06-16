@@ -1,13 +1,13 @@
 import { Container, Typography } from '@mui/material';
 import EventForm from '../../components/events/EventForm';
-import { CreateEventDto, UpdateEventDTO } from '../../types/Event'; // Assuming UpdateEventDto is defined here
+import { CreateEventDto, UpdateEventDTO } from '../../types/Event';
 import { containerStyle } from '../../styles/CommonStyles';
-import { useSetupEventForm } from '../../hooks/UseEventForm';
-import { createEvent } from '../../services/eventService'; // Assuming updateEvent service exists
+import { UseSetupEventForm } from '../../hooks/UseSetupEventForm';
+import { createEvent } from '../../services/eventService';
 import { useNavigate } from 'react-router-dom';
 
 export default function CreateEventPage() {
-  const { creatorId, users, loading } = useSetupEventForm();
+  const { creator, filteredUsers, loading } = UseSetupEventForm();
   const navigate = useNavigate();
 
   const handleSubmit = async (eventData: CreateEventDto | UpdateEventDTO, isUpdate: boolean) => {
@@ -18,32 +18,20 @@ export default function CreateEventPage() {
       } else {
         console.log('Creating event with data:', eventData);
         await createEvent(eventData as CreateEventDto);
-        navigate('/events');
+        navigate('/createdEvents');
       }
     } catch (error) {
       console.error('Error submitting event:', error);
     }
   };
 
-  if (loading) {
+  if (loading || !creator) {
     return (
-      <Container maxWidth="sm" sx={{ marginTop: 5, textAlign: 'center' }}>
+      <Container maxWidth="sm" sx={{ ...containerStyle, marginTop: 5 }}>
         <Typography>Loading users...</Typography>
       </Container>
     );
   }
-
-  const creator = users.find((user) => user.id === creatorId);
-
-  if (!creator) {
-    return (
-      <Container maxWidth="sm" sx={{ marginTop: 5, textAlign: 'center' }}>
-        <Typography>Error: Creator not found.</Typography>
-      </Container>
-    );
-  }
-
-  const filteredUsers = users.filter((user) => user.id !== creatorId);
 
   return (
     <Container maxWidth="sm" sx={{ ...containerStyle, marginTop: 5 }}>

@@ -50,10 +50,10 @@ export interface UpdateEventDTO {
   title: string;
   description: string;
   participantIds: number[];
-  timeOptions: TimeOptionDTO[];
+  timeOptions: TimeOption[];
   restaurantOptions: RestaurantOption[];
 }
-
+/*
 export interface TimeOptionDTO {
   id?: number;
   maxCapacity: number;
@@ -61,4 +61,4 @@ export interface TimeOptionDTO {
   endTime: string;
   deadline: string;
   createdAt?: string;
-}
+}*/

@@ -1,9 +1,8 @@
-// src/hooks/useEvents.ts
 import { useEffect, useState } from 'react';
 import { EventDTO } from '../types/Event';
 import { fetchAllEvents } from '../services/eventService';
 
-export function useEvents() {
+export function UseEvents() {
   const [events, setEvents] = useState<EventDTO[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 

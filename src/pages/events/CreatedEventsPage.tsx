@@ -5,11 +5,11 @@ import ConfirmDialog from '../../components/admin_panel/ConfirmDialog';
 import { EventDTO } from '../../types/Event';
 import { deleteEvent } from '../../services/eventService';
 import { boxContainerStyle, eventCardStyle } from '../../styles/CommonStyles';
-import { useEvents } from '../../hooks/UseEvents';
+import { UseEvents } from '../../hooks/UseEvents';
 
 export default function AllEventsCreatedPage() {
   const navigate = useNavigate();
-  const { events, setEvents, loading } = useEvents();
+  const { events, setEvents, loading } = UseEvents();
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
   const [selectedEventTitle, setSelectedEventTitle] = useState<string | null>(null);
@@ -70,9 +70,15 @@ export default function AllEventsCreatedPage() {
               </Typography>
             </CardContent>
             <CardActions sx={{ mt: 'auto', justifyContent: 'flex-start' }}>
-              <Button variant='outlined'  onClick={() => handleEditClick(event)}>Edit</Button>
+              <Button variant="outlined" onClick={() => handleEditClick(event)}>
+                Edit
+              </Button>
 
-              <Button variant='outlined' color="error" onClick={() => handleDeleteClick(event.id, event.title)}>
+              <Button
+                variant="outlined"
+                color="error"
+                onClick={() => handleDeleteClick(event.id, event.title)}
+              >
                 Delete
               </Button>
             </CardActions>

@@ -1,46 +1,28 @@
 import { Container, Typography } from '@mui/material';
 import EventForm from '../../components/events/EventForm';
-import { ParticipantDto, UpdateEventDTO, EventDTO, CreateEventDto } from '../../types/Event';
+import { UpdateEventDTO, EventDTO, CreateEventDto } from '../../types/Event';
 import { containerStyle } from '../../styles/CommonStyles';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { updateEvent } from '../../services/eventService';
 import { useEffect, useState } from 'react';
-import { getAllUsers } from '../../services/userService';
+import { UseSetupEventForm } from '../../hooks/UseSetupEventForm';
 
 export default function UpdateEventPage() {
   const location = useLocation();
   const navigate = useNavigate();
-
   const [eventData, setEventData] = useState<EventDTO | null>(null);
-  const [availableUsers, setAvailableUsers] = useState<ParticipantDto[]>([]);
+
+  const { creator, filteredUsers, loading } = UseSetupEventForm();
 
   useEffect(() => {
     if (location.state?.event) {
       setEventData(location.state.event);
     } else {
-      navigate('/events', { replace: true });
+      navigate('/createdEvents', { replace: true });
     }
   }, [location.state, navigate]);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const allUsers = await getAllUsers();
-        if (eventData) {
-          const filteredUsers = allUsers.filter((u) => u.id !== eventData.creator.id);
-          setAvailableUsers(filteredUsers);
-        }
-      } catch (err) {
-        console.error('Failed to fetch users:', err);
-      }
-    };
-
-    if (eventData) {
-      fetchUsers();
-    }
-  }, [eventData]);
-
-  if (!eventData) {
+  if (!eventData || loading || !creator) {
     return (
       <Container sx={{ ...containerStyle, marginTop: 5 }}>
         <Typography>Loading event data...</Typography>
@@ -48,22 +30,13 @@ export default function UpdateEventPage() {
     );
   }
 
-  const creator = eventData.creator;
-  const participantIds = eventData.participants.filter((p) => p.id !== creator.id).map((p) => p.id);
+  const participantIds = eventData.participants.map((p) => p.id);
 
   const updateEventDto: UpdateEventDTO = {
     title: eventData.title,
     description: eventData.description,
     participantIds,
-    timeOptions:
-      eventData.timeOptions?.map((t) => ({
-        id: t.id,
-        maxCapacity: t.maxCapacity ?? 0,
-        startTime: t.startTime,
-        endTime: t.endTime,
-        deadline: t.deadline,
-        createdAt: t.createdAt,
-      })) ?? [],
+    timeOptions: eventData.timeOptions ?? [],
     restaurantOptions: eventData.restaurantOptions ?? [],
   };
 
@@ -78,7 +51,7 @@ export default function UpdateEventPage() {
 
     try {
       await updateEvent(eventData.id, updatedData as UpdateEventDTO);
-      navigate('/events');
+      navigate('/createdEvents');
     } catch (error) {
       console.error('Failed to update event:', error);
     }
@@ -90,7 +63,7 @@ export default function UpdateEventPage() {
         Edit Event
       </Typography>
       <EventForm
-        users={availableUsers}
+        users={filteredUsers}
         creator={creator}
         event={updateEventDto}
         onSubmit={handleUpdateEvent}
