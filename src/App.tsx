@@ -8,18 +8,49 @@ import Navbar from './components/common/Navbar';
 import theme from './theme';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import UnauthorizedPage from './pages/UnauthorizedPage';
+import HomePage from './pages/HomePage';
+import MyProfilePage from './pages/MyProfilePage';
+import ProfilePage from './pages/ProfilePage';
 
 export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+
       <div className="App">
         <Router>
           <Navbar />
 
           <Routes>
-            <Route path="/" element={<LoginPage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/" element={<LoginPage />} />
+
+            <Route
+              path="/home"
+              element={
+                <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                  <HomePage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/myprofile"
+              element={
+                <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                  <MyProfilePage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/user/:userId"
+              element={
+                <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                  <ProfilePage />
+                </ProtectedRoute>
+              }
+            />
 
             <Route
               path="/admin"
@@ -29,15 +60,6 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
-
-            {/* <Route
-          path="/user"
-          element={
-            <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
-              <UserHomePage />
-            </ProtectedRoute>
-          }
-        /> */}
 
             <Route path="/unauthorized" element={<UnauthorizedPage />} />
           </Routes>

@@ -5,6 +5,7 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import { buttonStyle } from '../../styles/style';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
@@ -12,18 +13,6 @@ export default function LoginForm() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const loginButtonStyle = {
-    padding: '5px 10px',
-    borderRadius: '15px',
-    fontSize: '1rem',
-    fontWeight: 'bold',
-    mt: 2,
-    mb: 2,
-    backgroundColor: '#95C11F',
-    '&:hover': {
-      backgroundColor: '#7A9717',
-    },
-  };
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError('');
@@ -52,7 +41,7 @@ export default function LoginForm() {
       }
 
       if (decoded.role === 'USER') {
-        navigate('/userHomepage');
+        navigate('/home');
       } else if (decoded.role === 'ADMIN') {
         navigate('/admin');
       } else {
@@ -96,7 +85,12 @@ export default function LoginForm() {
           {error}
         </Typography>
       )}
-      <Button type="submit" fullWidth variant="contained" sx={loginButtonStyle}>
+      <Button
+        type="submit"
+        fullWidth
+        variant="contained"
+        sx={{ ...buttonStyle, padding: '5px 10px', fontSize: '1rem', fontWeight: 'bold', mt: 2 }}
+      >
         Log in
       </Button>
     </Box>

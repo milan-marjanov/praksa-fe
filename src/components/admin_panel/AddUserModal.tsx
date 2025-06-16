@@ -1,6 +1,7 @@
-import { useState } from 'react';
-import { Modal, Box, Typography, TextField, Button } from '@mui/material';
-import type { CreateUserDTO } from '../../types/CreateUserDTO';
+import { useState } from 'react';;
+import { Modal, Box, Typography, TextField, Button } from '@mui/material';;
+import type { CreateUserDTO } from '../../types/User';
+import { buttonStyle } from '../../styles/style';;
 
 const style = {
   position: 'absolute' as const,
@@ -74,10 +75,10 @@ export default function AddUserModal({ open, onClose, onAdd }: AddUserModalProps
         )}
 
         <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <Button onClick={onClose} sx={{ mr: 1 }}>
+          <Button sx={buttonStyle} onClick={onClose}>
             Cancel
           </Button>
-          <Button variant="contained" onClick={handleAdd}>
+          <Button variant="contained" sx={buttonStyle} onClick={handleAdd}>
             Add User
           </Button>
         </Box>
