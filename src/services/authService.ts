@@ -1,8 +1,6 @@
-import api from '../api/apiClient';
-import { jwtDecode } from 'jwt-decode';
-import type { JwtDecoded } from '../types/JwtDecoded';
+import api from '../axios/AxiosClient';
 
-export async function login(email: string, password: string): Promise<string | undefined> {
+export async function login(email: string, password: string) {
   try {
     const { data } = await api.post<{ token: string }>('auth/signin', {
       email,
@@ -13,9 +11,4 @@ export async function login(email: string, password: string): Promise<string | u
   } catch {
     return undefined;
   }
-}
-
-export function decodeJwt(token: string): JwtDecoded {
-  console.log(jwtDecode<JwtDecoded>(token));
-  return jwtDecode<JwtDecoded>(token);
 }
