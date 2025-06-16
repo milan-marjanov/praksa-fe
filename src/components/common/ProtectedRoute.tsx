@@ -1,7 +1,7 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { JSX } from 'react';
 import { jwtDecode } from 'jwt-decode';
-import { JwtDecoded } from '../../types/JwtDecoded';
+import { JwtDecoded } from '../../types/User';
 
 type Props = {
   children: JSX.Element;

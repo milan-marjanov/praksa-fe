@@ -6,18 +6,14 @@ import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { jwtDecode } from 'jwt-decode';
-import { JwtDecoded } from '../../types/JwtDecoded';
-import { buttonStyle } from '../../styles/style';
+import { JwtDecoded } from '../../types/User';
+import { buttonStyle } from '../../styles/CommonStyles';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setError('');
 
   const validateForm = (email: string, password: string): string | null => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

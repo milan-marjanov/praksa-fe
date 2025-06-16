@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Box, Avatar, Typography, Button, CircularProgress } from '@mui/material';
 import useProfile from '../hooks/useProfile';
-import { buttonStyle } from '../styles/style';
+import { buttonStyle } from '../styles/CommonStyles';
 
 const defaultAvatar = '/default-avatar.png';
 
@@ -17,7 +17,6 @@ const ProfilePage: React.FC = () => {
   useEffect(() => {
     if (!data) return;
     if (data.profilePictureUrl) {
-      // formiramo pun URL do fajla koji stoji u /images na backendu
       setAvatarSrc(`${import.meta.env.VITE_API_BASE_URL}/images/${data.profilePictureUrl}`);
     } else {
       setAvatarSrc(defaultAvatar);
@@ -35,10 +34,10 @@ const ProfilePage: React.FC = () => {
     return (
       <Container sx={{ mt: 10, textAlign: 'center' }}>
         <Typography color="error" sx={{ mb: 2 }}>
-          Greška prilikom učitavanja profila.
+          Error.
         </Typography>
         <Button sx={buttonStyle} onClick={() => navigate(-1)}>
-          Nazad
+          Back
         </Button>
       </Container>
     );
@@ -59,7 +58,7 @@ const ProfilePage: React.FC = () => {
           {data.firstName} {data.lastName}
         </Typography>
         <Button variant="contained" sx={buttonStyle} onClick={() => navigate(-1)}>
-          Nazad na listu
+          Back
         </Button>
       </Box>
     </Container>

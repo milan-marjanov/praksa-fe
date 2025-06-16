@@ -5,7 +5,6 @@ import type { JwtDecoded } from '../types/User';
 export async function login(email: string, password: string) {
   try {
     const { data } = await api.post<{ token: string }>('/auth/signin', {
-
       email,
       password,
     });
@@ -16,16 +15,13 @@ export async function login(email: string, password: string) {
   }
 }
 
-export function decodeJwt(token: string): JwtDecoded {
-  return jwtDecode<JwtDecoded>(token);
-}
-
 export function getCurrentUserId(): number {
   const token = localStorage.getItem('jwtToken');
   if (!token) {
     throw new Error('No JWT token found');
   }
-  const { id } = decodeJwt(token);
+  const decoded = jwtDecode<JwtDecoded>(token);
+  const { id } = decoded;
   if (typeof id !== 'number') {
     throw new Error('Token does not contain a valid user ID');
   }

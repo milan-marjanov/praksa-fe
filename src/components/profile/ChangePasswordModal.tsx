@@ -11,7 +11,7 @@ import {
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { buttonStyle } from '../../styles/style';
+import { buttonStyle } from '../../styles/CommonStyles';
 
 const pwdStyle = {
   position: 'absolute' as const,

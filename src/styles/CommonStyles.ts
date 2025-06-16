@@ -1,3 +1,5 @@
+import { SxProps, Theme } from '@mui/material';
+
 export const avatarStyle = {
   m: 1,
   bgcolor: '#4B570E',
@@ -41,4 +43,12 @@ export const formButtonStyle = {
     backgroundColor: 'secondary.main',
   },
   fontWeight: 'bold',
+};
+
+export const buttonStyle: SxProps<Theme> = {
+  textTransform: 'none',
+  fontWeight: 500,
+  fontSize: '1rem',
+  padding: '8px 20px',
+  borderRadius: 1,
 };

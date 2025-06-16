@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Box, Typography, TextField, Button, Avatar, IconButton } from '@mui/material';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
-import { buttonStyle } from '../../styles/style';
+import { buttonStyle } from '../../styles/CommonStyles';
 
 const style = {
   position: 'absolute' as const,

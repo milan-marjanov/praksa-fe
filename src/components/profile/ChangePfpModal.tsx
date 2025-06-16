@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Box, Typography, Button, Avatar, IconButton } from '@mui/material';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
-import { buttonStyle } from '../../styles/style';
+import { buttonStyle } from '../../styles/CommonStyles';
 
 const style = {
   position: 'absolute' as const,
@@ -34,7 +34,6 @@ export function ChangePfpModal({
   const [removed, setRemoved] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // kad se otvori modal, podesi preview na trenutnu sliku
   useEffect(() => {
     if (open) {
       setPreview(initialPreview || null);
@@ -52,7 +51,6 @@ export function ChangePfpModal({
   };
 
   const handleRemove = () => {
-    // samo briše preview i označava removed; ne zove backend odmah
     setRemoved(true);
     setFile(null);
     setPreview(null);
@@ -99,7 +97,7 @@ export function ChangePfpModal({
 
         <Box display="flex" justifyContent="space-between" mt={2}>
           <Button sx={buttonStyle} onClick={handleRemove}>
-            Remove Picture
+            Remove
           </Button>
           <Box sx={{ flex: 1 }} />
           <Button sx={{ ...buttonStyle, mr: 1 }} onClick={onClose}>

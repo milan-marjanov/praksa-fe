@@ -1,6 +1,6 @@
 import { Container, Button, Stack } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { buttonStyle } from '../styles/style';
+import { buttonStyle } from '../styles/CommonStyles';
 
 export default function HomePage() {
   const navigate = useNavigate();

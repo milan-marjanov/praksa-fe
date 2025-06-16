@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { getAllUsers } from '../services/userService';
-import { User } from '../types/User';
-import { JwtDecoded } from '../types/JwtDecoded';
+import { UserDTO } from '../types/User';
+import { JwtDecoded } from '../types/User';
 
 export function UseSetupEventForm() {
-  const [creator, setCreator] = useState<User | undefined>(undefined);
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+  const [creator, setCreator] = useState<UserDTO | undefined>(undefined);
+  const [filteredUsers, setFilteredUsers] = useState<UserDTO[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

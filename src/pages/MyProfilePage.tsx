@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { UpdateProfileModal } from '../components/profile/UpdateProfileModal';
 import { ChangePasswordModal } from '../components/profile/ChangePasswordModal';
 import { ChangePfpModal } from '../components/profile/ChangePfpModal';
-import { buttonStyle } from '../styles/style';
+import { buttonStyle } from '../styles/CommonStyles';
 import {
   getMyProfile,
   getProfileImage,

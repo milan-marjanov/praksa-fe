@@ -20,8 +20,6 @@ export default function useProfile(userId?: number): Result {
       setLoading(true);
       try {
         const profile = userId ? await getUserProfile(userId) : await getMyProfile();
-        console.log('>>> PUBLIC PROFILE DATA:', profile);
-
         if (!ignore) {
           setData(profile);
           setError(null);

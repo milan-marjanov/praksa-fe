@@ -1,7 +1,7 @@
-import { TableRow, TableCell, Button } from '@mui/material';
+import { TableRow, TableCell, Button, Box } from '@mui/material';
 import { Link } from 'react-router-dom';
 import type { UserDTO } from '../../types/User';
-import { buttonStyle } from '../../styles/style';
+import { buttonStyle } from '../../styles/CommonStyles';
 
 export interface UserRowProps {
   user: UserDTO;
@@ -16,11 +16,20 @@ export default function UserRow({ user, onDelete }: UserRowProps) {
           {user.firstName} {user.lastName}
         </Link>
       </TableCell>
-      <TableCell>{user.email}</TableCell>
-      <TableCell align="right">
-        <Button sx={buttonStyle} onClick={onDelete}>
-          Delete
-        </Button>
+      <TableCell
+        sx={{
+          whiteSpace: 'normal',
+          wordBreak: 'break-word',
+        }}
+      >
+        {user.email}
+      </TableCell>
+      <TableCell align="center">
+        <Box display="inline-flex" gap={1}>
+          <Button sx={buttonStyle} onClick={onDelete}>
+            Delete
+          </Button>
+        </Box>
       </TableCell>
     </TableRow>
   );

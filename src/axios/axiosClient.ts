@@ -31,6 +31,7 @@ api.interceptors.response.use(
 
     const { status, data } = response;
     toast.error(data.message || `Error: ${status}`);
+
     return Promise.reject(error);
   },
 );
