@@ -12,20 +12,52 @@ import UpdateEventPage from './pages/events/UpdateEventPage';
 import CreateEventPage from './pages/events/CreateEventPage';
 import CreatedEventsPage from './pages/events/CreatedEventsPage';
 import { Update } from '@mui/icons-material';
+import HomePage from './pages/HomePage';
+import MyProfilePage from './pages/MyProfilePage';
+import ProfilePage from './pages/ProfilePage';
+
 
 export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+
       <div className="App">
         <Router>
           <Navbar />
 
           <Routes>
-            <Route path="/" element={<LoginPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/events/edit/:id" element={<CreateEventPage />} />
             <Route path="/updateEvent" element={<UpdateEventPage />} />
+            <Route path="/" element={<LoginPage />} />
+
+            <Route
+              path="/home"
+              element={
+                <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                  <HomePage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/myprofile"
+              element={
+                <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                  <MyProfilePage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/user/:userId"
+              element={
+                <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                  <ProfilePage />
+                </ProtectedRoute>
+              }
+            />
 
             <Route
               path="/admin"

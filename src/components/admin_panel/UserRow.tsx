@@ -1,23 +1,26 @@
-import { TableRow, TableCell, IconButton } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import type { User } from '../../types/User';
+import { TableRow, TableCell, Button } from '@mui/material';
+import { Link } from 'react-router-dom';
+import type { UserDTO } from '../../types/User';
+import { buttonStyle } from '../../styles/style';
 
-interface UserRowProps {
-  user: User;
-  onDelete: (id: number) => void;
+export interface UserRowProps {
+  user: UserDTO;
+  onDelete: () => void;
 }
 
 export default function UserRow({ user, onDelete }: UserRowProps) {
   return (
-    <TableRow>
+    <TableRow hover>
       <TableCell>
-        {user.firstName} {user.lastName}
+        <Link to={`/user/${user.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+          {user.firstName} {user.lastName}
+        </Link>
       </TableCell>
       <TableCell>{user.email}</TableCell>
       <TableCell align="right">
-        <IconButton onClick={() => onDelete(user.id)}>
-          <DeleteIcon />
-        </IconButton>
+        <Button sx={buttonStyle} onClick={onDelete}>
+          Delete
+        </Button>
       </TableCell>
     </TableRow>
   );

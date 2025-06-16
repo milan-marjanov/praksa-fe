@@ -7,6 +7,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { jwtDecode } from 'jwt-decode';
 import { JwtDecoded } from '../../types/JwtDecoded';
+import { buttonStyle } from '../../styles/style';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
@@ -14,18 +15,9 @@ export default function LoginForm() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const loginButtonStyle = {
-    padding: '5px 10px',
-    borderRadius: '15px',
-    fontSize: '1rem',
-    fontWeight: 'bold',
-    mt: 2,
-    mb: 2,
-    backgroundColor: '#95C11F',
-    '&:hover': {
-      backgroundColor: '#7A9717',
-    },
-  };
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError('');
 
   const validateForm = (email: string, password: string): string | null => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -64,15 +56,12 @@ export default function LoginForm() {
         return;
       }
 
-      switch (decoded.role) {
-        case 'USER':
-          navigate('/userHomepage');
-          break;
-        case 'ADMIN':
-          navigate('/admin');
-          break;
-        default:
-          setError('Unauthorized role.');
+      if (decoded.role === 'USER') {
+        navigate('/home');
+      } else if (decoded.role === 'ADMIN') {
+        navigate('/admin');
+      } else {
+        setError('Unauthorized role.');
       }
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Login failed. Please try again.');
@@ -105,7 +94,12 @@ export default function LoginForm() {
           {error}
         </Typography>
       )}
-      <Button type="submit" fullWidth variant="contained" sx={loginButtonStyle}>
+      <Button
+        type="submit"
+        fullWidth
+        variant="contained"
+        sx={{ ...buttonStyle, padding: '5px 10px', fontSize: '1rem', fontWeight: 'bold', mt: 2 }}
+      >
         Log in
       </Button>
     </Box>

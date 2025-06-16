@@ -1,4 +1,3 @@
-// components/common/ProtectedRoute.tsx
 import { Navigate, useLocation } from 'react-router-dom';
 import { JSX } from 'react';
 import { jwtDecode } from 'jwt-decode';
