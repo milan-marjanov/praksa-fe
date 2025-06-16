@@ -3,18 +3,12 @@ import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import LoginForm from '../components/login/LoginForm';
+import { containerStyle, avatarStyle } from '../styles/CommonStyles';
 
 export default function LoginPage() {
   return (
-    <Container
-      sx={{
-        marginTop: 8,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-      }}
-    >
-      <Avatar sx={{ m: 1, bgcolor: '#4B570E' }}>
+    <Container sx={containerStyle}>
+      <Avatar sx={avatarStyle}>
         <LockOutlinedIcon />
       </Avatar>
       <Typography component="h1" variant="h5">

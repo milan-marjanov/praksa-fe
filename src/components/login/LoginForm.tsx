@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login, decodeJwt } from '../../services/authService';
+import { login } from '../../services/authService';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import { jwtDecode } from 'jwt-decode';
+import { JwtDecoded } from '../../types/JwtDecoded';
 import { buttonStyle } from '../../styles/style';
 
 export default function LoginForm() {
@@ -17,13 +19,27 @@ export default function LoginForm() {
     event.preventDefault();
     setError('');
 
-    const emailRegex = /^[^\s@]+@[^\s@]+.[^\s@]+$/;
+  const validateForm = (email: string, password: string): string | null => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
     if (!emailRegex.test(email)) {
-      setError('Please enter a valid email address.');
-      return;
+      return 'Please enter a valid email address.';
     }
+
     if (password.length < 6) {
-      setError('Password must be at least 6 characters long.');
+      return 'Password must be at least 6 characters long.';
+    }
+
+    return null;
+  };
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError('');
+
+    const validationError = validateForm(email, password);
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
@@ -34,7 +50,7 @@ export default function LoginForm() {
         return;
       }
 
-      const decoded = await decodeJwt(token);
+      const decoded = jwtDecode<JwtDecoded>(token);
       if (!decoded) {
         setError('Failed to decode token.');
         return;
@@ -56,32 +72,25 @@ export default function LoginForm() {
     <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
       <TextField
         margin="normal"
-        required
         fullWidth
-        id="email"
         label="Email"
         name="email"
-        autoComplete="email"
-        autoFocus
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         error={Boolean(error)}
       />
       <TextField
         margin="normal"
-        required
         fullWidth
         name="password"
         label="Password"
         type="password"
-        id="password"
-        autoComplete="current-password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         error={Boolean(error)}
       />
       {error && (
-        <Typography variant="body2" color="error" align="center" sx={{ mt: 1 }}>
+        <Typography variant="body2" color="error" sx={{ mt: 1 }}>
           {error}
         </Typography>
       )}

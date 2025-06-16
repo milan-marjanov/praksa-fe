@@ -8,9 +8,14 @@ import Navbar from './components/common/Navbar';
 import theme from './theme';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import UnauthorizedPage from './pages/UnauthorizedPage';
+import UpdateEventPage from './pages/events/UpdateEventPage';
+import CreateEventPage from './pages/events/CreateEventPage';
+import CreatedEventsPage from './pages/events/CreatedEventsPage';
+import { Update } from '@mui/icons-material';
 import HomePage from './pages/HomePage';
 import MyProfilePage from './pages/MyProfilePage';
 import ProfilePage from './pages/ProfilePage';
+
 
 export default function App() {
   return (
@@ -23,6 +28,8 @@ export default function App() {
 
           <Routes>
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/events/edit/:id" element={<CreateEventPage />} />
+            <Route path="/updateEvent" element={<UpdateEventPage />} />
             <Route path="/" element={<LoginPage />} />
 
             <Route
@@ -61,6 +68,31 @@ export default function App() {
               }
             />
 
+            <Route
+              path="/createEvent"
+              element={
+                <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                  <CreateEventPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/updateEvent"
+              element={
+                <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                  <CreateEventPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/createdEvents"
+              element={
+                <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                  <CreatedEventsPage />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/unauthorized" element={<UnauthorizedPage />} />
           </Routes>
         </Router>
