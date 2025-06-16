@@ -1,22 +1,25 @@
-import { Avatar, Box, Button, CircularProgress, Container, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
+import { Avatar, Box, Button, CircularProgress, Container, Typography } from '@mui/material';
 import UserList from '../components/admin_panel/UserList';
 import AddUserModal from '../components/admin_panel/AddUserModal';
 import ConfirmDialog from '../components/admin_panel/ConfirmDialog';
-import type { UserDTO, CreateUserDTO } from '../types/User';
-import { getAllUsers, createUser, deleteUser } from '../services/userService';
+import type { UserDTO, CreateUserDTO, MyProfileDTO } from '../types/User';
+import { getAllUsers, createUser, deleteUser, getMyProfile } from '../services/userService';
 import { useNavigate } from 'react-router-dom';
-import buttonStyle from '../styles/buttonStyle';
+import { buttonStyle } from '../styles/style';
+import { toast } from 'react-toastify';
 
 export default function AdminHomePage() {
   const [users, setUsers] = useState<UserDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [addOpen, setAddOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [adminFirstName, setAdminFirstName] = useState('');
+  const [adminLastName, setAdminLastName] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchUsers = async () => {
       setLoading(true);
       try {
         const data = await getAllUsers();
@@ -27,22 +30,37 @@ export default function AdminHomePage() {
         setLoading(false);
       }
     };
-    fetchData();
+    fetchUsers();
+  }, []);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const profile = (await getMyProfile()) as MyProfileDTO;
+        setAdminFirstName(profile.firstName);
+        setAdminLastName(profile.lastName);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    fetchProfile();
   }, []);
 
   const handleAdd = async (u: CreateUserDTO) => {
     try {
       const created = await createUser(u);
-      setUsers(prev => [...prev, created]);
-    } catch (err) {
-      console.error(err);
+      setUsers((prev) => [...prev, created]);
+      toast.success('User created successfully');
+    } catch (err: any) {
+      const msg = err.response?.data?.message || 'Email already in use.';
+      toast.error(msg);
     }
   };
 
   const handleDelete = async (id: number) => {
     try {
       await deleteUser(id);
-      setUsers(prev => prev.filter(u => u.id !== id));
+      setUsers((prev) => prev.filter((u) => u.id !== id));
     } catch (err) {
       console.error(err);
     } finally {
@@ -50,20 +68,19 @@ export default function AdminHomePage() {
     }
   };
 
+  const initials =
+    (adminFirstName.charAt(0) || '').toUpperCase() + (adminLastName.charAt(0) || '').toUpperCase();
+
   return (
     <Container
       maxWidth="lg"
       sx={{
         mt: { xs: 2, md: 4 },
         px: { xs: 2, md: 3 },
-        pb: { xs: 4, md: 6 }
+        pb: { xs: 4, md: 6 },
       }}
     >
-      <Typography
-        variant="h4"
-        align="center"
-        sx={{ my: { xs: 3, md: 5 } }}
-      >
+      <Typography variant="h4" align="center" sx={{ my: { xs: 3, md: 5 } }}>
         Admin Panel
       </Typography>
 
@@ -75,19 +92,12 @@ export default function AdminHomePage() {
         mb={4}
         gap={{ xs: 2, md: 0 }}
       >
-        <Box
-          display="flex"
-          alignItems="center"
-          justifyContent={{ xs: 'center', md: 'flex-start' }}
-        >
+        <Box display="flex" alignItems="center" justifyContent={{ xs: 'center', md: 'flex-start' }}>
           <Avatar sx={{ bgcolor: 'secondary.main', width: 40, height: 40 }}>
-            A
+            {initials || 'A'}
           </Avatar>
-          <Typography
-            variant="h6"
-            sx={{ ml: 2, fontSize: { xs: '1.2rem', md: '1.4rem' } }}
-          >
-            Petar Subotić
+          <Typography variant="h6" sx={{ ml: 2, fontSize: { xs: '1.2rem', md: '1.4rem' } }}>
+            {adminFirstName} {adminLastName}
           </Typography>
         </Box>
         <Box display="flex" justifyContent={{ xs: 'center', md: 'flex-end' }}>
@@ -107,14 +117,10 @@ export default function AdminHomePage() {
           <CircularProgress />
         </Box>
       ) : (
-        <UserList users={users} onDelete={id => setDeleteId(id)} />
+        <UserList users={users} onDelete={(id) => setDeleteId(id)} />
       )}
 
-      <AddUserModal
-        open={addOpen}
-        onClose={() => setAddOpen(false)}
-        onAdd={handleAdd}
-      />
+      <AddUserModal open={addOpen} onClose={() => setAddOpen(false)} onAdd={handleAdd} />
 
       <ConfirmDialog
         open={deleteId !== null}
@@ -130,7 +136,7 @@ export default function AdminHomePage() {
           position: 'fixed',
           bottom: { xs: 20, md: 50 },
           left: '50%',
-          transform: 'translateX(-50%)'
+          transform: 'translateX(-50%)',
         }}
       >
         <Button

@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Box, Avatar, Typography, Button, CircularProgress } from '@mui/material';
 import useProfile from '../hooks/useProfile';
-import buttonStyle from '../styles/buttonStyle';
+import { buttonStyle } from '../styles/style';
 
 const ProfilePage: React.FC = () => {
   const { userId } = useParams<{ userId: string }>();
@@ -21,7 +21,9 @@ const ProfilePage: React.FC = () => {
     return (
       <Container sx={{ mt: 10 }}>
         <Typography color="error">Greška prilikom učitavanja profila.</Typography>
-        <Button sx={buttonStyle} onClick={() => navigate(-1)}>Nazad</Button>
+        <Button sx={buttonStyle} onClick={() => navigate(-1)}>
+          Nazad
+        </Button>
       </Container>
     );
   }
@@ -45,8 +47,12 @@ const ProfilePage: React.FC = () => {
           alt={`${firstName} ${lastName}`}
           sx={{ width: 120, height: 120 }}
         />
-        <Typography variant="h5">{firstName} {lastName}</Typography>
-        <Button sx={buttonStyle} onClick={() => navigate(-1)}>Nazad</Button>
+        <Typography variant="h5">
+          {firstName} {lastName}
+        </Typography>
+        <Button sx={buttonStyle} onClick={() => navigate(-1)}>
+          Nazad
+        </Button>
       </Box>
     </Container>
   );

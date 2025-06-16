@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Modal, Box, Typography, Button, Avatar, IconButton } from '@mui/material';
-import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
-import buttonStyle from '../../styles/buttonStyle';
+import React, { useState, useEffect } from 'react'
+import { Modal, Box, Typography, Button, Avatar, IconButton } from '@mui/material'
+import PhotoCameraIcon from '@mui/icons-material/PhotoCamera'
+import { buttonStyle } from '../../styles/style'
 
 const style = {
   position: 'absolute' as const,
@@ -12,38 +12,66 @@ const style = {
   p: 4,
   borderRadius: 2,
   boxShadow: 24,
-};
-
-export interface ChangePfpModalProps {
-  open: boolean;
-  onClose(): void;
-  onUpload(file: File): Promise<void>;
 }
 
-export function ChangePfpModal({ open, onClose, onUpload }: ChangePfpModalProps) {
-  const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+export interface ChangePfpModalProps {
+  open: boolean
+  initialPreview?: string
+  onClose(): void
+  onUpload(file: File): Promise<void>
+  onRemove(): Promise<void>
+}
+
+export function ChangePfpModal({
+  open,
+  initialPreview,
+  onClose,
+  onUpload,
+  onRemove,
+}: ChangePfpModalProps) {
+  const [file, setFile] = useState<File | null>(null)
+  const [preview, setPreview] = useState<string | null>(null)
+  const [removed, setRemoved] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  // kad se otvori modal, podesi preview na trenutnu sliku
+  useEffect(() => {
+    if (open) {
+      setPreview(initialPreview || null)
+      setFile(null)
+      setRemoved(false)
+      setError(null)
+    }
+  }, [open, initialPreview])
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0] ?? null;
-    setFile(f);
-    setPreview(f ? URL.createObjectURL(f) : null);
-  };
+    const f = e.target.files?.[0] ?? null
+    setRemoved(false)
+    setFile(f)
+    setPreview(f ? URL.createObjectURL(f) : null)
+  }
 
-  const handleUpload = async () => {
-    if (!file) {
-      setError('Izaberi fajl pre slanja');
-      return;
-    }
-    setError(null);
+  const handleRemove = () => {
+    // samo briše preview i označava removed; ne zove backend odmah
+    setRemoved(true)
+    setFile(null)
+    setPreview(null)
+    setError(null)
+  }
+
+  const handleSave = async () => {
+    setError(null)
     try {
-      await onUpload(file);
-      onClose();
+      if (removed) {
+        await onRemove()
+      } else if (file) {
+        await onUpload(file)
+      }
+      onClose()
     } catch (e: any) {
-      setError(e.message || 'Greška pri uploadu');
+      setError(e.message || 'Error saving changes')
     }
-  };
+  }
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -52,22 +80,16 @@ export function ChangePfpModal({ open, onClose, onUpload }: ChangePfpModalProps)
           Promeni profilnu sliku
         </Typography>
 
-        <Box display="flex" justifyContent="center" mb={2}>
+        <Box position="relative" display="flex" justifyContent="center" mb={2}>
           <Avatar src={preview || undefined} sx={{ width: 100, height: 100 }} />
-        </Box>
-
-        <input
-          accept="image/*"
-          style={{ display: 'none' }}
-          id="pfp-upload"
-          type="file"
-          onChange={handleFileChange}
-        />
-        <label htmlFor="pfp-upload">
-          <IconButton component="span">
+          <IconButton
+            component="label"
+            sx={{ position: 'absolute', bottom: 0, right: 'calc(50% - 50px)' }}
+          >
+            <input accept="image/*" type="file" hidden onChange={handleFileChange} />
             <PhotoCameraIcon />
           </IconButton>
-        </label>
+        </Box>
 
         {error && (
           <Typography color="error" variant="body2" sx={{ mb: 2 }}>
@@ -75,13 +97,19 @@ export function ChangePfpModal({ open, onClose, onUpload }: ChangePfpModalProps)
           </Typography>
         )}
 
-        <Box display="flex" justifyContent="flex-end" mt={2}>
-          <Button sx={{ ...buttonStyle, mr: 1 }} onClick={onClose}>Otkaži</Button>
-          <Button variant="contained" sx={buttonStyle} onClick={handleUpload}>
-            Sačuvaj
+        <Box display="flex" justifyContent="space-between" mt={2}>
+          <Button sx={buttonStyle} onClick={handleRemove}>
+            Remove Picture
+          </Button>
+          <Box sx={{ flex: 1 }} />
+          <Button sx={{ ...buttonStyle, mr: 1 }} onClick={onClose}>
+            Cancel
+          </Button>
+          <Button variant="contained" sx={buttonStyle} onClick={handleSave}>
+            Save
           </Button>
         </Box>
       </Box>
     </Modal>
-  );
+  )
 }

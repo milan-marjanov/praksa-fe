@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Modal, Box, Typography, TextField, Button } from '@mui/material';
 import type { CreateUserDTO } from '../../types/User';
-import { buttonStyle } from '../../styles/buttonStyle';
+import { buttonStyle } from '../../styles/style';
 
 const style = {
   position: 'absolute' as const,

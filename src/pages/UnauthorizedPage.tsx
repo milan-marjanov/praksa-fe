@@ -1,6 +1,6 @@
 import Button from '@mui/material/Button';
 import { Link } from 'react-router-dom';
-import buttonStyle from '../styles/buttonStyle';
+import { buttonStyle } from '../styles/style';
 
 const UnauthorizedPage = () => {
   return (

@@ -21,11 +21,36 @@ export default function App() {
           <Navbar />
 
           <Routes>
-            <Route path="/" element={<LoginPage />} />
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/home" element={<HomePage />} />
-            <Route path="/myprofile" element={<MyProfilePage />} />
-            <Route path="/user/:userId" element={<ProfilePage />} />
+            <Route path="/" element={<LoginPage />} />
+
+            <Route
+              path="/home"
+              element={
+                <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                  <HomePage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/myprofile"
+              element={
+                <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                  <MyProfilePage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/user/:userId"
+              element={
+                <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                  <ProfilePage />
+                </ProtectedRoute>
+              }
+            />
+
             <Route
               path="/admin"
               element={
@@ -34,6 +59,7 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
+
             <Route path="/unauthorized" element={<UnauthorizedPage />} />
           </Routes>
         </Router>

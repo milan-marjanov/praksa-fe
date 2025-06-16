@@ -33,31 +33,48 @@ export async function getUserProfile(id: number) {
   return response.data;
 }
 
-export async function updateProfile(data: UpdateProfileRequestDTO) {
-  const formData = new FormData();
-  Object.entries(data).forEach(([key, value]) => {
-    if (value != null) {
-      formData.append(key, value as any);
-    }
-  });
+export async function updateProfile(dto: UpdateProfileRequestDTO) {
+  const response = await api.patch<MyProfileDTO>('/api/user/update-profile', dto);
+  return response.data;
+}
 
-  await api.patch('/api/user/profile', formData, {
+export async function changePassword(dto: PasswordChangeRequestDTO) {
+  await api.post('/api/user/change-password', dto);
+}
+
+export async function uploadProfilePicture(dto: ChangeProfilePictureDTO) {
+  const formData = new FormData();
+  formData.append('image', dto.profilePicture);
+  await api.post('/api/user/upload-profile-picture', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
 }
 
-export async function changePassword(id: number, dto: PasswordChangeRequestDTO) {
-  await api.post(`/api/user/${id}/change-password`, dto);
+export async function getProfileImage(): Promise<string | null> {
+  try {
+    const response = await api.get<Blob>('/api/user/image', {
+      responseType: 'blob',
+      validateStatus: (status) => status === 200 || status === 404
+    })
+    if (response.status === 200) {
+      return URL.createObjectURL(response.data)
+    }
+    return null
+  } catch {
+    return null
+  }
 }
 
-export async function uploadProfilePicture(id: number, dto: ChangeProfilePictureDTO): Promise<string> {
-  const formData = new FormData();
-  formData.append('image', dto.profilePicture);
+export async function updateProfileWithPicture(
+  data: UpdateProfileRequestDTO & { profilePicture?: File },
+) {
+  const updated = await updateProfile(data);
+  if (data.profilePicture) {
+    await uploadProfilePicture({ profilePicture: data.profilePicture });
+  }
+  return updated;
+}
 
-  const response = await api.post<{ url: string }>(
-    `/api/user/${id}/upload-profile-picture`,
-    formData,
-    { headers: { 'Content-Type': 'multipart/form-data' } }
-  );
-  return response.data.url;
+export async function removeProfilePicture() {
+  await api.delete('/api/user/removeImage');
 }

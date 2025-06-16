@@ -5,7 +5,7 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import buttonStyle from '../../styles/buttonStyle';
+import { buttonStyle } from '../../styles/style';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');

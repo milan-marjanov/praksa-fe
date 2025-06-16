@@ -7,5 +7,3 @@ export const buttonStyle: SxProps<Theme> = {
   padding: '8px 20px',
   borderRadius: 1,
 };
-
-export default buttonStyle;
