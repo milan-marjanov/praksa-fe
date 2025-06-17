@@ -14,7 +14,6 @@ import AddUserModal from '../components/admin_panel/AddUserModal';
 import ConfirmDialog from '../components/admin_panel/ConfirmDialog';
 import type { UserDTO, CreateUserDTO, MyProfileDTO } from '../types/User';
 import { getAllUsers, createUser, deleteUser, getMyProfile } from '../services/userService';
-import { useNavigate } from 'react-router-dom';
 import { buttonStyle } from '../styles/CommonStyles';
 import { toast } from 'react-toastify';
 
@@ -27,7 +26,6 @@ export default function AdminHomePage() {
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [adminFirstName, setAdminFirstName] = useState('');
   const [adminLastName, setAdminLastName] = useState('');
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -111,14 +109,6 @@ export default function AdminHomePage() {
             {adminFirstName} {adminLastName}
           </Typography>
         </Box>
-        <Button
-          variant="contained"
-          sx={buttonStyle}
-          size={isSm ? 'medium' : 'large'}
-          onClick={() => setAddOpen(true)}
-        >
-          Add User
-        </Button>
       </Box>
 
       {loading ? (
@@ -152,11 +142,11 @@ export default function AdminHomePage() {
       >
         <Button
           variant="contained"
-          size={isSm ? 'medium' : 'large'}
           sx={buttonStyle}
-          onClick={() => navigate('/myprofile')}
+          size={isSm ? 'medium' : 'large'}
+          onClick={() => setAddOpen(true)}
         >
-          My Profile
+          Add User
         </Button>
       </Box>
     </Container>

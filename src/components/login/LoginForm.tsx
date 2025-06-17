@@ -13,29 +13,29 @@ export default function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [errors, setErrors] = useState({ email: false, password: false });
+
   const navigate = useNavigate();
 
-  const validateForm = (email: string, password: string): string | null => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const validate = (email: string, password: string) => {
+    const newErrors = {
+      email: email.trim() === '',
+      password: password.trim() === '',
+    };
 
-    if (!emailRegex.test(email)) {
-      return 'Please enter a valid email address.';
-    }
-
-    if (password.length < 6) {
-      return 'Password must be at least 6 characters long.';
-    }
-
-    return null;
+    const hasError = newErrors.email || newErrors.password;
+    return { hasError, newErrors };
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError('');
 
-    const validationError = validateForm(email, password);
-    if (validationError) {
-      setError(validationError);
+    const { hasError, newErrors } = validate(email, password);
+    setErrors(newErrors);
+
+    if (hasError) {
+      setError('Please fill in all required fields.');
       return;
     }
 
@@ -47,17 +47,16 @@ export default function LoginForm() {
       }
 
       const decoded = jwtDecode<JwtDecoded>(token);
-      if (!decoded) {
-        setError('Failed to decode token.');
-        return;
-      }
 
-      if (decoded.role === 'USER') {
-        navigate('/myprofile');
-      } else if (decoded.role === 'ADMIN') {
-        navigate('/admin');
-      } else {
-        setError('Unauthorized role.');
+      switch (decoded?.role) {
+        case 'USER':
+          navigate('/myprofile');
+          break;
+        case 'ADMIN':
+          navigate('/admin');
+          break;
+        default:
+          setError('Unauthorized role.');
       }
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Login failed. Please try again.');
@@ -69,21 +68,21 @@ export default function LoginForm() {
       <TextField
         margin="normal"
         fullWidth
-        label="Email"
+        label="Email *"
         name="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        error={Boolean(error)}
+        error={errors.email}
       />
       <TextField
         margin="normal"
         fullWidth
         name="password"
-        label="Password"
+        label="Password *"
         type="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        error={Boolean(error)}
+        error={errors.password}
       />
       {error && (
         <Typography variant="body2" color="error" sx={{ mt: 1 }}>

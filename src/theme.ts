@@ -4,10 +4,11 @@ const theme = createTheme({
   palette: {
     primary: { main: '#7FBC09' },
     secondary: { main: '#95C11F' },
-    background: { default: '#f0f2f5' },
+    background: { default: '#f5f5dc' },
   },
   shape: { borderRadius: 12 },
   typography: {
+    fontFamily: 'Poppins, sans-serif',
     h5: { fontWeight: 400, letterSpacing: '0.5px' },
     button: {
       textTransform: 'none',
