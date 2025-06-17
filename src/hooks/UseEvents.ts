@@ -26,7 +26,6 @@ export function UseEvents() {
         } else {
           setEvents([]);
         }
-
       } catch (error) {
         console.error('Failed to load events:', error);
       } finally {

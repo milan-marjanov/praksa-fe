@@ -58,11 +58,7 @@ export default function CreatedEventsPage() {
         My Created Events
       </Typography>
 
-      <Button
-        variant="contained"
-        sx={{ mb: 3 }}
-        onClick={() => navigate('/createEvent')}
-      >
+      <Button variant="contained" sx={{ mb: 3 }} onClick={() => navigate('/createEvent')}>
         Create Event
       </Button>
 

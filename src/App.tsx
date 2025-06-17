@@ -14,6 +14,7 @@ import CreatedEventsPage from './pages/events/CreatedEventsPage';
 import HomePage from './pages/HomePage';
 import MyProfilePage from './pages/MyProfilePage';
 import ProfilePage from './pages/ProfilePage';
+import { AuthProvider } from './contexts/AuthContext';
 
 export default function App() {
   return (
@@ -21,77 +22,79 @@ export default function App() {
       <CssBaseline />
 
       <div className="App">
-        <Router>
-          <Navbar />
+        <AuthProvider>
+          <Router>
+            <Navbar />
 
-          <Routes>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/" element={<LoginPage />} />
+            <Routes>
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/" element={<LoginPage />} />
 
-            <Route
-              path="/home"
-              element={
-                <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
-                  <HomePage />
-                </ProtectedRoute>
-              }
-            />
+              <Route
+                path="/home"
+                element={
+                  <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                    <HomePage />
+                  </ProtectedRoute>
+                }
+              />
 
-            <Route
-              path="/myprofile"
-              element={
-                <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
-                  <MyProfilePage />
-                </ProtectedRoute>
-              }
-            />
+              <Route
+                path="/myprofile"
+                element={
+                  <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                    <MyProfilePage />
+                  </ProtectedRoute>
+                }
+              />
 
-            <Route
-              path="/user/:userId"
-              element={
-                <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
-                  <ProfilePage />
-                </ProtectedRoute>
-              }
-            />
+              <Route
+                path="/user/:userId"
+                element={
+                  <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                    <ProfilePage />
+                  </ProtectedRoute>
+                }
+              />
 
-            <Route
-              path="/admin"
-              element={
-                <ProtectedRoute allowedRoles={['ADMIN']}>
-                  <AdminHomePage />
-                </ProtectedRoute>
-              }
-            />
+              <Route
+                path="/admin"
+                element={
+                  <ProtectedRoute allowedRoles={['ADMIN']}>
+                    <AdminHomePage />
+                  </ProtectedRoute>
+                }
+              />
 
-            <Route
-              path="/createEvent"
-              element={
-                <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
-                  <CreateEventPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/updateEvent"
-              element={
-                <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
-                  <UpdateEventPage />
-                </ProtectedRoute>
-              }
-            />
+              <Route
+                path="/createEvent"
+                element={
+                  <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                    <CreateEventPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/updateEvent"
+                element={
+                  <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                    <UpdateEventPage />
+                  </ProtectedRoute>
+                }
+              />
 
-            <Route
-              path="/createdEvents"
-              element={
-                <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
-                  <CreatedEventsPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/unauthorized" element={<UnauthorizedPage />} />
-          </Routes>
-        </Router>
+              <Route
+                path="/createdEvents"
+                element={
+                  <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                    <CreatedEventsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/unauthorized" element={<UnauthorizedPage />} />
+            </Routes>
+          </Router>
+        </AuthProvider>
       </div>
     </ThemeProvider>
   );

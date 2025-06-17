@@ -1,4 +1,4 @@
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Avatar from '@mui/material/Avatar';
@@ -7,8 +7,44 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import EventIcon from '@mui/icons-material/Event';
 import { avatarStyle } from '../../styles/CommonStyles';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function Navbar() {
+  const { user, loading } = useAuth();
+  const location = useLocation();
+
+  if (loading || location.pathname === '/login' || location.pathname === '/') {
+    return (
+      <AppBar position="static" sx={{ bgcolor: 'primary.main' }}>
+        <Toolbar>
+          <Box
+            sx={{
+              mr: 5,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '100%',
+              gap: 2,
+            }}
+          >
+            <Box
+              component={RouterLink}
+              to="/"
+              sx={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}
+            >
+              <Avatar sx={avatarStyle}>
+                <EventIcon />
+              </Avatar>
+              <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'black' }}>
+                SimpleEvent
+              </Typography>
+            </Box>
+          </Box>
+        </Toolbar>
+      </AppBar>
+    );
+  }
+
   return (
     <AppBar position="static" sx={{ bgcolor: 'primary.main' }}>
       <Toolbar>
@@ -22,18 +58,16 @@ export default function Navbar() {
             gap: 2,
           }}
         >
-          <Button component={RouterLink} to="/createdEvents" color="inherit">
-            Created Events
-          </Button>
+          {user && (
+            <Button component={RouterLink} to="/createdEvents" color="inherit">
+              My Events
+            </Button>
+          )}
 
           <Box
             component={RouterLink}
             to="/"
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              textDecoration: 'none',
-            }}
+            sx={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}
           >
             <Avatar sx={avatarStyle}>
               <EventIcon />
@@ -43,9 +77,11 @@ export default function Navbar() {
             </Typography>
           </Box>
 
-          <Button component={RouterLink} to="/myprofile" color="inherit">
-            My Profile
-          </Button>
+          {user && (
+            <Button component={RouterLink} to="/myprofile" color="inherit">
+              My Profile
+            </Button>
+          )}
         </Box>
       </Toolbar>
     </AppBar>

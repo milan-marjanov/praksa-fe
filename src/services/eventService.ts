@@ -2,20 +2,26 @@ import api from '../axios/AxiosClient';
 import { CreateEventDto, EventDTO, UpdateEventDTO } from '../types/Event';
 
 export const fetchAllEvents = async () => {
-  try {
-    const response = await api.get<EventDTO[]>('/api/events/fetchAllEvents');
-    return response.data;
-  } catch {
-    return undefined;
+  const response = await api.get<EventDTO[]>('/api/events/fetchAllEvents', {
+    validateStatus: (status) => (status >= 200 && status < 300) || status === 404,
+  });
+
+  if (response.status === 404) {
+    return [];
   }
+
+  return response.data;
 };
 
 export async function createEvent(eventData: CreateEventDto) {
   try {
     const response = await api.post<CreateEventDto>('/api/events/createEvent', eventData);
     return response.data;
-  } catch {
-    return undefined;
+  } catch (err: any) {
+    if (err.response?.status === 404) {
+      return [];
+    }
+    throw err;
   }
 }
 
