@@ -1,35 +1,101 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import { fetchHello } from './api/helloService'
+import './App.css';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import LoginPage from './pages/LoginPage';
+import AdminHomePage from './pages/AdminHomePage';
+import Navbar from './components/common/Navbar';
+import theme from './theme';
+import ProtectedRoute from './components/common/ProtectedRoute';
+import UnauthorizedPage from './pages/UnauthorizedPage';
+import UpdateEventPage from './pages/events/UpdateEventPage';
+import CreateEventPage from './pages/events/CreateEventPage';
+import CreatedEventsPage from './pages/events/CreatedEventsPage';
+import HomePage from './pages/HomePage';
+import MyProfilePage from './pages/MyProfilePage';
+import ProfilePage from './pages/ProfilePage';
+import { AuthProvider } from './contexts/AuthContext';
 
-function App() {
-
+export default function App() {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => fetchHello()}>
-          Button
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
 
-export default App
+      <div className="App">
+        <AuthProvider>
+          <Router>
+            <Navbar />
+
+            <Routes>
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/" element={<LoginPage />} />
+
+              <Route
+                path="/home"
+                element={
+                  <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                    <HomePage />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/myprofile"
+                element={
+                  <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                    <MyProfilePage />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/user/:userId"
+                element={
+                  <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                    <ProfilePage />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/admin"
+                element={
+                  <ProtectedRoute allowedRoles={['ADMIN']}>
+                    <AdminHomePage />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/createEvent"
+                element={
+                  <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                    <CreateEventPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/updateEvent"
+                element={
+                  <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                    <UpdateEventPage />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/createdEvents"
+                element={
+                  <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                    <CreatedEventsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/unauthorized" element={<UnauthorizedPage />} />
+            </Routes>
+          </Router>
+        </AuthProvider>
+      </div>
+    </ThemeProvider>
+  );
+}
