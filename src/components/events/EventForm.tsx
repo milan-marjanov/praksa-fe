@@ -14,8 +14,8 @@ import {
   Box,
 } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material/Select';
-import { CreateEventDto, UpdateEventDTO, EventFormProps } from '../../types/Event';
-import { formButtonStyle } from '../../styles/CommonStyles';
+import { CreateEventDto, UpdateEventDTO, EventFormProps, TimeOption } from '../../types/Event';
+import TimeOptionsForm from './TimeOptionsForm';
 
 export default function EventForm({ users, creator, event, onSubmit }: EventFormProps) {
   const [eventTitle, setEventTitle] = useState('');
@@ -25,7 +25,13 @@ export default function EventForm({ users, creator, event, onSubmit }: EventForm
   const maxDescriptionChars = 255;
 
   const isUpdate = !!event;
+  const [timeOptions, setTimeOptions] = useState<TimeOption[]>([]);
+  const [votingDeadline, setVotingDeadline] = useState<string | undefined>(undefined);
 
+  const handleTimeOptionsSubmit = (options: TimeOption[], deadline?: string) => {
+    setTimeOptions(options);
+    setVotingDeadline(deadline);
+  };
   useEffect(() => {
     if (event) {
       setEventTitle(event.title);
@@ -118,79 +124,127 @@ export default function EventForm({ users, creator, event, onSubmit }: EventForm
       };
       await onSubmit(createData, false);
     }
+        console.log("Event time options:", timeOptions);
+    console.log("Voting deadline:", votingDeadline);
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ width: '100%', marginTop: 24 }}>
-      <TextField
-        fullWidth
-        label="Event Title *"
-        value={eventTitle}
-        onChange={handleTitleChange}
-        margin="normal"
-        error={!!errors.title}
-        helperText={errors.title}
-      />
-
-      <Box position="relative" width="100%">
+    <Box
+  display="flex"
+  flexDirection="column"
+  width="100vw"
+  px={{ xs: 2, md: 6 }}
+  py={4}
+  gap={4}
+  boxSizing="border-box"
+>
+  {/* Top Row: Two Columns */}
+  <Box
+    display="flex"
+    flexDirection={{ xs: 'column', md: 'row' }}
+    gap={4}
+  >
+    {/* Left: Event Details Form */}
+    <Box
+      flex={1}
+      sx={{
+        backgroundColor: 'background.paper',
+        borderRadius: 2,
+        boxShadow: 2,
+        p: 3,
+      }}
+    >
+      <form onSubmit={handleSubmit} style={{ width: '100%' }}>
         <TextField
           fullWidth
-          label="Event Description (optional)"
-          value={description}
-          onChange={handleDescriptionChange}
+          label="Event Title *"
+          value={eventTitle}
+          onChange={handleTitleChange}
           margin="normal"
-          multiline
-          rows={3}
-          inputProps={{ maxLength: maxDescriptionChars }}
+          error={!!errors.title}
+          helperText={errors.title}
         />
-        <Typography
-          variant="caption"
-          color="text.secondary"
-          sx={{
-            position: 'absolute',
-            bottom: 8,
-            right: 16,
-            userSelect: 'none',
-          }}
-        >
-          {description.length}/{maxDescriptionChars}
-        </Typography>
-      </Box>
 
-      <FormControl fullWidth margin="normal" error={!!errors.participants}>
-        <InputLabel id="participants-label">Participants *</InputLabel>
-        <Select
-          labelId="participants-label"
-          multiple
-          value={selectedParticipants}
-          onChange={handleParticipantsChange}
-          input={<OutlinedInput label="Participants *" />}
-          renderValue={(selected) =>
-            selected
-              .map((id) => {
-                const user = users.find((u) => u.id === id);
-                return user ? `${user.firstName} ${user.lastName}` : '';
-              })
-              .join(', ')
-          }
-        >
-          <MenuItem value={-1}>
-            <Checkbox checked={isAllSelected} />
-            <ListItemText primary="Select All" />
-          </MenuItem>
-          {selectableUsers.map((user) => (
-            <MenuItem key={user.id} value={user.id}>
-              <Checkbox checked={selectedParticipants.includes(user.id)} />
-              <ListItemText primary={`${user.firstName} ${user.lastName}`} />
+        <Box position="relative" width="100%">
+          <TextField
+            fullWidth
+            label="Event Description (optional)"
+            value={description}
+            onChange={handleDescriptionChange}
+            margin="normal"
+            multiline
+            rows={3}
+            inputProps={{ maxLength: maxDescriptionChars }}
+          />
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{
+              position: 'absolute',
+              bottom: 8,
+              right: 16,
+              userSelect: 'none',
+            }}
+          >
+            {description.length}/{maxDescriptionChars}
+          </Typography>
+        </Box>
+
+        <FormControl fullWidth margin="normal" error={!!errors.participants}>
+          <InputLabel id="participants-label">Participants *</InputLabel>
+          <Select
+            labelId="participants-label"
+            multiple
+            value={selectedParticipants}
+            onChange={handleParticipantsChange}
+            input={<OutlinedInput label="Participants *" />}
+            renderValue={(selected) =>
+              selected
+                .map((id) => {
+                  const user = users.find((u) => u.id === id);
+                  return user ? `${user.firstName} ${user.lastName}` : '';
+                })
+                .join(', ')
+            }
+          >
+            <MenuItem value={-1}>
+              <Checkbox checked={isAllSelected} />
+              <ListItemText primary="Select All" />
             </MenuItem>
-          ))}
-        </Select>
-        <FormHelperText>{errors.participants}</FormHelperText>
-      </FormControl>
+            {selectableUsers.map((user) => (
+              <MenuItem key={user.id} value={user.id}>
+                <Checkbox checked={selectedParticipants.includes(user.id)} />
+                <ListItemText primary={`${user.firstName} ${user.lastName}`} />
+              </MenuItem>
+            ))}
+          </Select>
+          <FormHelperText>{errors.participants}</FormHelperText>
+        </FormControl>
+      </form>
+    </Box>
 
-      <Button type="submit" variant="contained" sx={formButtonStyle}>
-        {isUpdate ? 'Save Changes' : 'Create Event'}
-      </Button>
-    </form>
+    {/* Right: Time Options Form */}
+    <Box
+      flex={1}
+      sx={{
+        backgroundColor: 'background.paper',
+        borderRadius: 2,
+        boxShadow: 2,
+        p: 3,
+      }}
+    >
+      <TimeOptionsForm onSubmit={handleTimeOptionsSubmit} />
+    </Box>
+  </Box>
+
+  {/* Centered Button Below Both Forms */}
+  <Box display="flex" justifyContent="center">
+    <Button type="submit" variant="contained" onClick={handleSubmit}>
+      {isUpdate ? 'Save Changes' : 'Create Event'}
+    </Button>
+  </Box>
+</Box>
+
+
   );
 }
