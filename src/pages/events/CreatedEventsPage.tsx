@@ -4,7 +4,7 @@ import { useState } from 'react';
 import ConfirmDialog from '../../components/admin_panel/ConfirmDialog';
 import { EventDTO } from '../../types/Event';
 import { deleteEvent } from '../../services/eventService';
-import { useEvents } from '../../hooks/UseEvents';
+import { useEvents } from '../../hooks/useEvents';
 import {
   boxContainerStyle,
   cardActionsStyle,
