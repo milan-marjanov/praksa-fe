@@ -24,7 +24,7 @@ export default function CreateEventPage() {
       console.error('Error submitting event:', error);
     }
   };
-
+ 
   if (loading || !creator) {
     return (
       <Container maxWidth="sm" sx={{ ...containerStyle, marginTop: 5 }}>
