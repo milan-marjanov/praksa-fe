@@ -92,6 +92,7 @@ export default function Navbar() {
             <Avatar sx={avatarStyle}>
               <EventIcon />
             </Avatar>
+
             <Typography variant="h6" sx={{ ml: 1, fontWeight: 'bold', color: 'black' }}>
               SimpleEvent
             </Typography>
