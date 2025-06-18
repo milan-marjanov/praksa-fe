@@ -4,7 +4,7 @@ import { getAllUsers } from '../services/userService';
 import { UserDTO } from '../types/User';
 import { JwtDecoded } from '../types/User';
 
-export function UseSetupEventForm() {
+export function useSetupEventForm() {
   const [creator, setCreator] = useState<UserDTO | undefined>(undefined);
   const [filteredUsers, setFilteredUsers] = useState<UserDTO[]>([]);
   const [loading, setLoading] = useState(true);

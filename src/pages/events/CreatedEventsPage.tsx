@@ -4,7 +4,7 @@ import { useState } from 'react';
 import ConfirmDialog from '../../components/admin_panel/ConfirmDialog';
 import { EventDTO } from '../../types/Event';
 import { deleteEvent } from '../../services/eventService';
-import { UseEvents } from '../../hooks/useEvents';
+import { useEvents } from '../../hooks/useEvents';
 import {
   boxContainerStyle,
   cardActionsStyle,
@@ -16,7 +16,7 @@ import {
 
 export default function CreatedEventsPage() {
   const navigate = useNavigate();
-  const { events, setEvents, loading } = UseEvents();
+  const { events, setEvents, loading } = useEvents();
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
   const [selectedEventTitle, setSelectedEventTitle] = useState<string | null>(null);
