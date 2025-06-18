@@ -51,6 +51,11 @@ export default function CreatedEventsPage() {
     setSelectedEventTitle(null);
   };
 
+  const handleCardClick = (eventId: number) => {
+  navigate(`/eventDetails/${eventId}`);
+};
+
+
   const truncateText = (text: string, maxLength: number): string =>
     text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
 
@@ -78,7 +83,7 @@ export default function CreatedEventsPage() {
       ) : (
         <Box sx={boxContainerStyle}>
           {events.map((event) => (
-            <Card key={event.id} sx={eventCardStyle}>
+            <Card key={event.id} sx={eventCardStyle} onClick={() => handleCardClick(event.id)}>
               <CardContent sx={cardContentStyle}>
                 <Typography variant="h6" gutterBottom sx={eventTitleStyle}>
                   {event.title}

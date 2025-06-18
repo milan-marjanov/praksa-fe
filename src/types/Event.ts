@@ -62,3 +62,35 @@ export interface TimeOptionDTO {
   deadline: string;
   createdAt?: string;
 }*/
+
+export interface UserProfileDto {
+  id:number;
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
+export interface TimeOptionDto {
+  id: number;
+  maxCapacity: number | null;
+  startTime: string;
+  endTime: string;
+  deadline: string;
+  createdAt: string | null;
+}
+
+export interface RestaurantOptionDto {
+  id: number;
+  name: string;
+  menuImageUrl: string | null;
+  restaurantUrl: string;
+}
+
+export interface EventDetailsDto {
+  id: number;
+  title: string;
+  description: string;
+  participants: UserProfileDto[];
+  timeOptions: TimeOptionDto[];
+  restaurantOptions: RestaurantOptionDto[];
+}
