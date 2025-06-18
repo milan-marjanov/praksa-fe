@@ -4,12 +4,19 @@ import { useState } from 'react';
 import ConfirmDialog from '../../components/admin_panel/ConfirmDialog';
 import { EventDTO } from '../../types/Event';
 import { deleteEvent } from '../../services/eventService';
-import { boxContainerStyle, eventCardStyle } from '../../styles/CommonStyles';
-import { UseEvents } from '../../hooks/UseEvents';
+import { useEvents } from '../../hooks/UseEvents';
+import {
+  boxContainerStyle,
+  cardActionsStyle,
+  cardContentStyle,
+  eventCardStyle,
+  eventDescriptionStyle,
+  eventTitleStyle,
+} from '../../styles/CommonStyles';
 
 export default function CreatedEventsPage() {
   const navigate = useNavigate();
-  const { events, setEvents, loading } = UseEvents();
+  const { events, setEvents, loading } = useEvents();
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
   const [selectedEventTitle, setSelectedEventTitle] = useState<string | null>(null);
@@ -44,6 +51,9 @@ export default function CreatedEventsPage() {
     setSelectedEventTitle(null);
   };
 
+  const truncateText = (text: string, maxLength: number): string =>
+    text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
+
   if (loading) {
     return (
       <Container sx={{ mt: 4 }}>
@@ -54,35 +64,37 @@ export default function CreatedEventsPage() {
 
   return (
     <Container sx={{ mt: 4 }}>
-      <Typography variant="h4" mb={2}>
-        My Created Events
-      </Typography>
-
-      <Button variant="contained" sx={{ mb: 3 }} onClick={() => navigate('/createEvent')}>
+      <Button
+        variant="contained"
+        sx={{ fontWeight: 'bold', display: 'flex', mb: 3, ml: 1 }}
+        onClick={() => navigate('/createEvent')}
+      >
         Create Event
       </Button>
-
       {events.length === 0 ? (
-        <Typography variant="body1">You have no created events.</Typography>
+        <Typography variant="body1" align="center">
+          You haven’t created any events yet. Start by adding one!
+        </Typography>
       ) : (
         <Box sx={boxContainerStyle}>
           {events.map((event) => (
             <Card key={event.id} sx={eventCardStyle}>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
+              <CardContent sx={cardContentStyle}>
+                <Typography variant="h6" gutterBottom sx={eventTitleStyle}>
                   {event.title}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'justify' }}>
-                  {event.description}
+                <Typography variant="body2" color="text.secondary" sx={eventDescriptionStyle}>
+                  {truncateText(event.description, 180)}
                 </Typography>
               </CardContent>
-              <CardActions sx={{ mt: 'auto', justifyContent: 'flex-start' }}>
-                <Button variant="outlined" onClick={() => handleEditClick(event)}>
+              <CardActions sx={cardActionsStyle}>
+                <Button variant="outlined" size="medium" onClick={() => handleEditClick(event)}>
                   Edit
                 </Button>
                 <Button
                   variant="outlined"
                   color="error"
+                  size="medium"
                   onClick={() => handleDeleteClick(event.id, event.title)}
                 >
                   Delete

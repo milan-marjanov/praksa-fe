@@ -10,6 +10,8 @@ import {
   ListItemText,
   Button,
   FormHelperText,
+  Typography,
+  Box,
 } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material/Select';
 import { CreateEventDto, UpdateEventDTO, EventFormProps } from '../../types/Event';
@@ -20,6 +22,7 @@ export default function EventForm({ users, creator, event, onSubmit }: EventForm
   const [description, setDescription] = useState('');
   const [selectedParticipants, setSelectedParticipants] = useState<number[]>([]);
   const [errors, setErrors] = useState({ title: '', participants: '' });
+  const maxDescriptionChars = 255;
 
   const isUpdate = !!event;
 
@@ -42,6 +45,12 @@ export default function EventForm({ users, creator, event, onSubmit }: EventForm
     setEventTitle(e.target.value);
     if (e.target.value.trim() !== '') {
       setErrors((prev) => ({ ...prev, title: '' }));
+    }
+  };
+
+  const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value.length <= maxDescriptionChars) {
+      setDescription(e.target.value);
     }
   };
 
@@ -123,15 +132,30 @@ export default function EventForm({ users, creator, event, onSubmit }: EventForm
         helperText={errors.title}
       />
 
-      <TextField
-        fullWidth
-        label="Event Description (optional)"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        margin="normal"
-        multiline
-        rows={3}
-      />
+      <Box position="relative" width="100%">
+        <TextField
+          fullWidth
+          label="Event Description (optional)"
+          value={description}
+          onChange={handleDescriptionChange}
+          margin="normal"
+          multiline
+          rows={3}
+          inputProps={{ maxLength: maxDescriptionChars }}
+        />
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{
+            position: 'absolute',
+            bottom: 8,
+            right: 16,
+            userSelect: 'none',
+          }}
+        >
+          {description.length}/{maxDescriptionChars}
+        </Typography>
+      </Box>
 
       <FormControl fullWidth margin="normal" error={!!errors.participants}>
         <InputLabel id="participants-label">Participants *</InputLabel>

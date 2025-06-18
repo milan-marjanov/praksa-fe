@@ -5,14 +5,14 @@ import { containerStyle } from '../../styles/CommonStyles';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { updateEvent } from '../../services/eventService';
 import { useEffect, useState } from 'react';
-import { UseSetupEventForm } from '../../hooks/UseSetupEventForm';
+import { useSetupEventForm } from '../../hooks/UseSetupEventForm';
 
 export default function UpdateEventPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const [eventData, setEventData] = useState<EventDTO | null>(null);
 
-  const { creator, filteredUsers, loading } = UseSetupEventForm();
+  const { creator, filteredUsers, loading } = useSetupEventForm();
 
   useEffect(() => {
     if (location.state?.event) {

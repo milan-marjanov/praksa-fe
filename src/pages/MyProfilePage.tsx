@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Box, Avatar, Typography, Button, IconButton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { Container, Box, Avatar, Typography, Button, IconButton } from '@mui/material';
 import { UpdateProfileModal } from '../components/profile/UpdateProfileModal';
 import { ChangePasswordModal } from '../components/profile/ChangePasswordModal';
 import { ChangePfpModal } from '../components/profile/ChangePfpModal';
@@ -8,9 +8,9 @@ import { buttonStyle } from '../styles/CommonStyles';
 import {
   getMyProfile,
   getProfileImage,
-  updateProfileWithPicture,
-  changePassword,
+  updateProfile,
   uploadProfilePicture,
+  changePassword,
   removeProfilePicture,
 } from '../services/userService';
 import { PasswordChangeRequestDTO, UpdateProfileRequestDTO } from '../types/User';
@@ -41,36 +41,43 @@ const MyProfilePage: React.FC = () => {
     })();
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem('jwtToken');
-    navigate('/login', { replace: true });
-  };
-
   const handleUpdate = async (data: UpdateProfileRequestDTO & { profilePicture?: File }) => {
+    const oldEmail = email;
     try {
-      const updated = await updateProfileWithPicture(data);
-      setFirstName(updated.firstName);
-      setLastName(updated.lastName);
-      setEmail(updated.email);
-      if (data.profilePicture) {
+      if (data.email !== oldEmail && data.profilePicture) {
+        await uploadProfilePicture({ profilePicture: data.profilePicture });
         const newUrl = await getProfileImage();
         setProfilePictureUrl(newUrl || profilePictureUrl);
       }
+      const updated = await updateProfile({
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+      });
+      setFirstName(updated.firstName);
+      setLastName(updated.lastName);
+      setEmail(updated.email);
+      if (data.email === oldEmail && data.profilePicture) {
+        await uploadProfilePicture({ profilePicture: data.profilePicture });
+        const newUrl = await getProfileImage();
+        setProfilePictureUrl(newUrl || profilePictureUrl);
+      }
+      if (data.email !== oldEmail) {
+        localStorage.removeItem('jwtToken');
+        navigate('/login', { replace: true });
+        return;
+      }
+      setOpenUpdate(false);
     } catch (error) {
       console.error('Error updating profile', error);
-    } finally {
       setOpenUpdate(false);
     }
   };
 
   const handleChangePassword = async (dto: PasswordChangeRequestDTO) => {
-    try {
-      await changePassword(dto);
-    } catch (error) {
-      console.error('Error changing password', error);
-    } finally {
-      setOpenChangePwd(false);
-    }
+    await changePassword(dto);
+    localStorage.removeItem('jwtToken');
+    navigate('/login', { replace: true });
   };
 
   const handleUploadPfp = async (file: File) => {
@@ -87,14 +94,17 @@ const MyProfilePage: React.FC = () => {
 
   return (
     <Container
-      maxWidth="sm"
-      sx={{ my: 10, p: 3, bgcolor: 'background.paper', borderRadius: 2, boxShadow: 3 }}
+      disableGutters
+      sx={{
+        width: { xs: '70%', sm: 550 },
+        mx: 'auto',
+        my: 10,
+        p: { xs: 2, sm: 3 },
+        bgcolor: 'background.paper',
+        borderRadius: 2,
+        boxShadow: 3,
+      }}
     >
-      <Box display="flex" justifyContent="flex-end">
-        <Button variant="contained" sx={buttonStyle} onClick={handleLogout}>
-          Logout
-        </Button>
-      </Box>
       <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
         <IconButton onClick={() => setOpenChangePfp(true)} sx={{ p: 0 }}>
           <Avatar src={profilePictureUrl || undefined} sx={{ width: 120, height: 120 }} />
@@ -116,7 +126,12 @@ const MyProfilePage: React.FC = () => {
         open={openUpdate}
         onClose={() => setOpenUpdate(false)}
         onUpdate={handleUpdate}
-        initialValues={{ firstName, lastName, email, avatarUrl: profilePictureUrl || undefined }}
+        initialValues={{
+          firstName,
+          lastName,
+          email,
+          avatarUrl: profilePictureUrl || undefined,
+        }}
       />
       <ChangePasswordModal
         open={openChangePwd}

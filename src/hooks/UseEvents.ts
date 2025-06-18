@@ -4,7 +4,7 @@ import { fetchAllEvents } from '../services/eventService';
 import { jwtDecode } from 'jwt-decode';
 import { JwtDecoded } from '../types/User';
 
-export function UseEvents() {
+export function useEvents() {
   const [events, setEvents] = useState<EventDTO[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 

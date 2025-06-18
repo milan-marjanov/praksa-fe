@@ -13,7 +13,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { buttonStyle } from '../../styles/CommonStyles';
 
-const pwdStyle = {
+const modalStyle = {
   position: 'absolute' as const,
   top: '50%',
   left: '50%',
@@ -22,6 +22,7 @@ const pwdStyle = {
   p: 4,
   borderRadius: 2,
   boxShadow: 24,
+  width: { xs: '90%', sm: 400 },
 };
 
 export interface ChangePasswordModalProps {
@@ -38,7 +39,12 @@ export function ChangePasswordModal({ open, onClose, onChangePassword }: ChangeP
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [newPasswordConfirm, setNewPasswordConfirm] = useState('');
-  const [error, setError] = useState<string | null>(null);
+
+  const [errors, setErrors] = useState<{
+    oldPassword?: string;
+    newPassword?: string;
+    newPasswordConfirm?: string;
+  }>({});
 
   const [showOld, setShowOld] = useState(false);
   const [showNew, setShowNew] = useState(false);
@@ -49,95 +55,119 @@ export function ChangePasswordModal({ open, onClose, onChangePassword }: ChangeP
       setOldPassword('');
       setNewPassword('');
       setNewPasswordConfirm('');
-      setError(null);
+      setErrors({});
       setShowOld(false);
       setShowNew(false);
       setShowConfirm(false);
     }
   }, [open]);
 
-  const handleChange = async () => {
-    setError(null);
-    if (newPassword !== newPasswordConfirm) {
-      setError('New passwords do not match');
-      return;
+  const validate = () => {
+    const e: typeof errors = {};
+    if (!oldPassword) {
+      e.oldPassword = 'Current password is required';
     }
+    if (newPassword.length < 6) {
+      e.newPassword = 'New password must be at least 6 characters';
+    }
+    if (oldPassword && newPassword === oldPassword) {
+      e.newPassword = 'New password cannot be the same as the current password';
+    }
+    if (newPasswordConfirm !== newPassword) {
+      e.newPasswordConfirm = 'Passwords do not match';
+    }
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const handleConfirm = async () => {
+    if (!validate()) return;
+
     try {
       await onChangePassword({ oldPassword, newPassword, newPasswordConfirm });
       toast.success('Password changed successfully');
       onClose();
-    } catch (err: any) {
-      setError(err.message || 'Error changing password');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setErrors({ oldPassword: err.message });
+      } else {
+        setErrors({ oldPassword: 'Došlo je do nepoznate greške' });
+      }
     }
   };
 
   return (
     <Modal open={open} onClose={onClose}>
-      <Box sx={pwdStyle}>
+      <Box sx={modalStyle}>
         <Typography variant="h6" gutterBottom>
           Change Password
         </Typography>
+
         <TextField
           label="Current Password"
           type={showOld ? 'text' : 'password'}
           fullWidth
           value={oldPassword}
           onChange={(e) => setOldPassword(e.target.value)}
+          error={!!errors.oldPassword}
+          helperText={errors.oldPassword}
           sx={{ mb: 2 }}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
-                <IconButton edge="end" onClick={() => setShowOld((s) => !s)}>
+                <IconButton onClick={() => setShowOld((s) => !s)} edge="end">
                   {showOld ? <VisibilityOff /> : <Visibility />}
                 </IconButton>
               </InputAdornment>
             ),
           }}
         />
+
         <TextField
           label="New Password"
           type={showNew ? 'text' : 'password'}
           fullWidth
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
+          error={!!errors.newPassword}
+          helperText={errors.newPassword}
           sx={{ mb: 2 }}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
-                <IconButton edge="end" onClick={() => setShowNew((s) => !s)}>
+                <IconButton onClick={() => setShowNew((s) => !s)} edge="end">
                   {showNew ? <VisibilityOff /> : <Visibility />}
                 </IconButton>
               </InputAdornment>
             ),
           }}
         />
+
         <TextField
           label="Confirm New Password"
           type={showConfirm ? 'text' : 'password'}
           fullWidth
           value={newPasswordConfirm}
           onChange={(e) => setNewPasswordConfirm(e.target.value)}
-          sx={{ mb: 2 }}
+          error={!!errors.newPasswordConfirm}
+          helperText={errors.newPasswordConfirm}
+          sx={{ mb: 3 }}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
-                <IconButton edge="end" onClick={() => setShowConfirm((s) => !s)}>
+                <IconButton onClick={() => setShowConfirm((s) => !s)} edge="end">
                   {showConfirm ? <VisibilityOff /> : <Visibility />}
                 </IconButton>
               </InputAdornment>
             ),
           }}
         />
-        {error && (
-          <Typography color="error" variant="body2" sx={{ mb: 2 }}>
-            {error}
-          </Typography>
-        )}
+
         <Box display="flex" justifyContent="flex-end">
           <Button sx={{ ...buttonStyle, mr: 1 }} onClick={onClose}>
             Cancel
           </Button>
-          <Button variant="contained" sx={buttonStyle} onClick={handleChange}>
+          <Button variant="contained" sx={buttonStyle} onClick={handleConfirm}>
             Change
           </Button>
         </Box>

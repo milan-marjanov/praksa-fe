@@ -1,3 +1,9 @@
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background-color: #f5f5dc;
+}
+
 #root {
   max-width: 100%;
   margin: 0 auto;

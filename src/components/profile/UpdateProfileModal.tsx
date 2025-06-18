@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Box, Typography, TextField, Button, Avatar, IconButton } from '@mui/material';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import { buttonStyle } from '../../styles/CommonStyles';
+import { LoadingButton } from '@mui/lab';
 
 const style = {
   position: 'absolute' as const,
@@ -43,6 +44,7 @@ export function UpdateProfileModal({
   const [profileFile, setProfileFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (open) {
@@ -52,6 +54,7 @@ export function UpdateProfileModal({
       setAvatarPreview(initialValues.avatarUrl);
       setProfileFile(null);
       setError(null);
+      setLoading(false);
     }
   }, [open, initialValues]);
 
@@ -70,6 +73,7 @@ export function UpdateProfileModal({
 
   const handleUpdate = async () => {
     setError(null);
+    setLoading(true);
     try {
       await onUpdate({
         firstName,
@@ -78,8 +82,12 @@ export function UpdateProfileModal({
         profilePicture: profileFile || undefined,
       });
       onClose();
-    } catch (err: any) {
-      setError(err.message || 'Error updating profile');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || 'Error updating profile');
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -127,9 +135,14 @@ export function UpdateProfileModal({
           <Button sx={{ ...buttonStyle, mr: 1 }} onClick={onClose}>
             Cancel
           </Button>
-          <Button variant="contained" sx={buttonStyle} onClick={handleUpdate}>
+          <LoadingButton
+            onClick={handleUpdate}
+            loading={loading}
+            variant="contained"
+            sx={buttonStyle}
+          >
             Update
-          </Button>
+          </LoadingButton>
         </Box>
       </Box>
     </Modal>

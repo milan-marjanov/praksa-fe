@@ -17,22 +17,6 @@ export const linkStyle = {
   color: 'inherit',
 };
 
-export const boxContainerStyle = {
-  display: 'flex',
-  flexWrap: 'wrap',
-  gap: 2,
-  justifyContent: 'center',
-  mb: 2,
-};
-
-export const eventCardStyle = {
-  width: 330,
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  minHeight: 220,
-};
-
 export const formButtonStyle = {
   mt: 3,
   mb: 2,
@@ -51,4 +35,57 @@ export const buttonStyle: SxProps<Theme> = {
   fontSize: '1rem',
   padding: '8px 20px',
   borderRadius: 1,
+};
+
+export const eventCardStyle = {
+  display: 'flex',
+  flexDirection: 'column',
+  height: '250px',
+  borderRadius: 2,
+  boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+  transition: 'transform 0.2s, box-shadow 0.2s',
+  '&:hover': {
+    transform: 'translateY(-4px)',
+    boxShadow: '0 6px 16px rgba(0,0,0,0.15)',
+  },
+};
+
+export const boxContainerStyle = {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+  gap: 3,
+  mb: 5,
+};
+export const cardContentStyle = {
+  flex: '1 1 auto',
+  overflowY: 'auto',
+  padding: '16px 16px 0 16px',
+  scrollbarWidth: 'thin',
+};
+
+export const cardActionsStyle = {
+  justifyContent: 'center',
+  gap: 1,
+  pb: 2,
+  mt: 'auto',
+};
+
+export const eventTitleStyle = {
+  color: 'black',
+  fontWeight: 700,
+  fontSize: '1.25rem',
+  letterSpacing: '0.05em',
+  textTransform: 'capitalize',
+  mb: 1,
+  mx: 1,
+  borderBottom: '2px solid black',
+  paddingBottom: '4px',
+};
+
+export const eventDescriptionStyle = {
+  textAlign: 'justify',
+  overflowWrap: 'break-word',
+  wordBreak: 'break-word',
+  whiteSpace: 'normal',
+  mx: 1,
 };

@@ -22,7 +22,8 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (res) => res,
   (error) => {
-    const { response } = error;
+    const { response, config } = error;
+
     if (!response) {
       console.error('Network error:', error);
       toast.error('Network error - please check your connection.');
@@ -30,6 +31,11 @@ api.interceptors.response.use(
     }
 
     const { status, data } = response;
+
+    if (status === 403 && config.url?.endsWith('/user/profile')) {
+      return Promise.reject(error);
+    }
+
     toast.error(data.message || `Error: ${status}`);
 
     return Promise.reject(error);

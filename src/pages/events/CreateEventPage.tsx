@@ -2,12 +2,12 @@ import { Container, Typography } from '@mui/material';
 import EventForm from '../../components/events/EventForm';
 import { CreateEventDto, UpdateEventDTO } from '../../types/Event';
 import { containerStyle } from '../../styles/CommonStyles';
-import { UseSetupEventForm } from '../../hooks/UseSetupEventForm';
+import { useSetupEventForm } from '../../hooks/useSetupEventForm';
 import { createEvent } from '../../services/eventService';
 import { useNavigate } from 'react-router-dom';
 
 export default function CreateEventPage() {
-  const { creator, filteredUsers, loading } = UseSetupEventForm();
+  const { creator, filteredUsers, loading } = useSetupEventForm();
   const navigate = useNavigate();
 
   const handleSubmit = async (eventData: CreateEventDto | UpdateEventDTO, isUpdate: boolean) => {
