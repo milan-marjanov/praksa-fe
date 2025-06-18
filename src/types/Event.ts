@@ -1,3 +1,5 @@
+import { ParticipantProfileDto } from "./User";
+
 export interface ParticipantDto {
   id: number;
   firstName: string;
@@ -59,3 +61,27 @@ export interface UserEventsResponseDTO {
   participantEvents: EventDTO[];
 }
 
+export interface TimeOptionDto {
+  id: number;
+  maxCapacity: number | null;
+  startTime: string;
+  endTime: string;
+  deadline: string;
+  createdAt: string | null;
+}
+
+export interface RestaurantOptionDto {
+  id: number;
+  name: string;
+  menuImageUrl: string | null;
+  restaurantUrl: string;
+}
+
+export interface EventDetailsDto {
+  id: number;
+  title: string;
+  description: string;
+  participants: ParticipantProfileDto[];
+  timeOptions: TimeOptionDto[];
+  restaurantOptions: RestaurantOptionDto[];
+}

@@ -15,6 +15,7 @@ import HomePage from './pages/HomePage';
 import MyProfilePage from './pages/MyProfilePage';
 import ProfilePage from './pages/ProfilePage';
 import { AuthProvider } from './contexts/AuthContext';
+import EventDetailsPage  from './pages/events/EventDetailsPage'
 
 export default function App() {
   return (
@@ -82,6 +83,16 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
+
+            <Route
+            path="/eventDetails/:id"
+            element={
+              <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                <EventDetailsPage />
+              </ProtectedRoute>
+            }
+          />
+
 
               <Route
                 path="/createdEvents"

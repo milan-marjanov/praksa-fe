@@ -1,3 +1,4 @@
+import { Margin } from '@mui/icons-material';
 import { SxProps, Theme } from '@mui/material';
 
 export const avatarStyle = {
@@ -89,3 +90,83 @@ export const eventDescriptionStyle = {
   whiteSpace: 'normal',
   mx: 1,
 };
+
+
+export const eventContainerStyle = {
+  padding: '40px 16px',
+  boxSizing: 'border-box',
+  minHeight: '100vh'
+};
+
+export const eventBoxStyle = {
+  maxWidth: '100%',
+  width: '100%',
+};
+
+
+export const eventHeaderStyle = {
+  paddingBottom: '20px',
+  marginBottom: '20px',
+  textAlign: 'center',
+};
+
+export const eventTitleCenterStyle = {
+  fontWeight: 'bold',
+  fontSize: '45px',
+};
+
+export const eventBodyStyle = {
+  display: 'flex',
+  justifyContent: 'space-between',
+  gap: '24px',
+};
+
+export const leftBoxStyle = {
+  flex: 1,
+  maxWidth: '700px',   
+  height: '400px', 
+  padding: '6px',        
+  marginLeft: '200px'
+};
+
+
+export const rightBoxStyle = {
+
+  marginRight: '200px',
+  width: '300px',      
+  height: '500px',
+  borderRadius: '8px',
+  backgroundColor: 'white',
+  overflowY: 'auto',    
+  overflowX: 'hidden', 
+  padding: '3px'
+};
+
+
+export const sectionLabelStyle = {
+  fontWeight: 600,
+  marginBottom: '8px',
+  fontSize: '30px',
+};
+
+export const descriptionBoxStyle = {
+  border: '1px solid #ddd',
+  borderRadius: '6px',
+  padding: '12px',
+  backgroundColor: '#fff',
+  whiteSpace: 'pre-wrap',
+  overflowWrap: 'break-word',
+  wordBreak: 'break-word',
+  
+  
+
+};
+
+export const participStyle = {
+  fontWeight: 'bold',
+  mb: 2,border:0.5,
+  padding :1,
+  margin:1 ,
+  borderRadius: '8px',
+  fontSize: '20px',
+}

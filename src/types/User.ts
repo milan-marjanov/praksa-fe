@@ -26,6 +26,13 @@ export interface UserProfileDTO {
   profilePictureUrl: string | null;
 }
 
+export interface ParticipantProfileDto {
+  id:number;
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
 export interface MyProfileDTO extends UserProfileDTO {
   email: string;
 }

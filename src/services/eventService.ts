@@ -1,6 +1,7 @@
 import api from '../axios/AxiosClient';
 import axios from 'axios';
-import { CreateEventDto, UserEventsResponseDTO, UpdateEventDTO } from '../types/Event';
+import { CreateEventDto, UserEventsResponseDTO, UpdateEventDTO, EventDetailsDto } from '../types/Event';
+
 
 export const fetchUserEvents = async (userId: number): Promise<UserEventsResponseDTO> => {
   const response = await api.get<UserEventsResponseDTO>(
@@ -38,4 +39,16 @@ export const deleteEvent = async (eventId: number) => {
   } catch {
     return undefined;
   }
+};
+
+export const getEventDetails = async (eventId: number) => {
+  const response = await api.get<EventDetailsDto>(`/api/events/${eventId}`, {
+    validateStatus: (status) => (status >= 200 && status < 300) || status === 404,
+  });
+
+  if (response.status === 404) {
+    return null;
+  }
+
+  return response.data;
 };
