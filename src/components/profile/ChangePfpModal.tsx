@@ -66,8 +66,10 @@ export function ChangePfpModal({
         await onUpload(file);
       }
       onClose();
-    } catch (e: any) {
-      setError(e.message || 'Error saving changes');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || 'Error saving changes');
+      }
     }
   };
 

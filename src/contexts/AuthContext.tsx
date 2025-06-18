@@ -1,4 +1,3 @@
-// src/contexts/AuthContext.tsx
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { getMyProfile } from '../services/userService';
 import type { MyProfileDTO } from '../types/User';

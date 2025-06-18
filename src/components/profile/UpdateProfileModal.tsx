@@ -82,8 +82,10 @@ export function UpdateProfileModal({
         profilePicture: profileFile || undefined,
       });
       onClose();
-    } catch (err: any) {
-      setError(err.message || 'Error updating profile');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || 'Error updating profile');
+      }
     } finally {
       setLoading(false);
     }

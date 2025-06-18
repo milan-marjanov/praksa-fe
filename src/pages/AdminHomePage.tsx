@@ -16,6 +16,7 @@ import type { UserDTO, CreateUserDTO, MyProfileDTO } from '../types/User';
 import { getAllUsers, createUser, deleteUser, getMyProfile } from '../services/userService';
 import { buttonStyle } from '../styles/CommonStyles';
 import { toast } from 'react-toastify';
+import { AxiosError } from 'axios';
 
 export default function AdminHomePage() {
   const theme = useTheme();
@@ -57,11 +58,12 @@ export default function AdminHomePage() {
 
   const handleAdd = async (u: CreateUserDTO) => {
     try {
-      const created = await createUser(u);
+      const created: UserDTO = await createUser(u);
       setUsers((prev) => [...prev, created]);
       toast.success('User created successfully');
-    } catch (err: any) {
-      const msg = err.response?.data?.message || 'Email already in use.';
+    } catch (err) {
+      const error = err as AxiosError<{ message?: string }>;
+      const msg = error.response?.data?.message || 'Email already in use.';
       toast.error(msg);
     }
   };

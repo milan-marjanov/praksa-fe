@@ -34,8 +34,10 @@ export default function AddUserModal({ open, onClose, onAdd }: AddUserModalProps
       setLastName('');
       setEmail('');
       onClose();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      }
     }
   };
 
