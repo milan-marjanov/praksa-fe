@@ -1,4 +1,5 @@
 import api from '../axios/AxiosClient';
+import axios from 'axios';
 import { CreateEventDto, EventDTO, UpdateEventDTO } from '../types/Event';
 
 export const fetchAllEvents = async () => {
@@ -17,8 +18,8 @@ export async function createEvent(eventData: CreateEventDto) {
   try {
     const response = await api.post<CreateEventDto>('/api/events/createEvent', eventData);
     return response.data;
-  } catch (err: any) {
-    if (err.response?.status === 404) {
+  } catch (err) {
+    if (axios.isAxiosError(err) && err.response?.status === 404) {
       return [];
     }
     throw err;

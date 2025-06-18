@@ -35,11 +35,7 @@ export interface ChangePasswordModalProps {
   }): Promise<unknown>;
 }
 
-export function ChangePasswordModal({
-  open,
-  onClose,
-  onChangePassword,
-}: ChangePasswordModalProps) {
+export function ChangePasswordModal({ open, onClose, onChangePassword }: ChangePasswordModalProps) {
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [newPasswordConfirm, setNewPasswordConfirm] = useState('');
@@ -85,20 +81,20 @@ export function ChangePasswordModal({
   };
 
   const handleConfirm = async () => {
-  if (!validate()) return;
+    if (!validate()) return;
 
-  try {
-    await onChangePassword({ oldPassword, newPassword, newPasswordConfirm });
-    toast.success('Password changed successfully');
-    onClose();
-  } catch (err: unknown) {
-    if (err instanceof Error) {
-      setErrors({ oldPassword: err.message });
-    } else {
-      setErrors({ oldPassword: 'Došlo je do nepoznate greške' });
+    try {
+      await onChangePassword({ oldPassword, newPassword, newPasswordConfirm });
+      toast.success('Password changed successfully');
+      onClose();
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setErrors({ oldPassword: err.message });
+      } else {
+        setErrors({ oldPassword: 'Došlo je do nepoznate greške' });
+      }
     }
-  }
-}
+  };
 
   return (
     <Modal open={open} onClose={onClose}>

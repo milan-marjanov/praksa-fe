@@ -46,7 +46,6 @@ export function UpdateProfileModal({
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-
   useEffect(() => {
     if (open) {
       setFirstName(initialValues.firstName);

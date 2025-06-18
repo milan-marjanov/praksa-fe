@@ -28,13 +28,10 @@ api.interceptors.response.use(
       toast.error('Network error - please check your connection.');
       return Promise.reject(error);
     }
-    
+
     const { status, data } = response;
 
-    if (
-      status === 403 &&
-      config.url?.endsWith('/user/profile')
-    ) {
+    if (status === 403 && config.url?.endsWith('/user/profile')) {
       return Promise.reject(error);
     }
     toast.error(data.message || `Error: ${status}`);

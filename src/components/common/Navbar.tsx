@@ -29,11 +29,11 @@ export default function Navbar() {
   if (token) {
     try {
       const parts = token.split('.');
-      const decodedJson = JSON.parse(
-        atob(parts[1].replace(/-/g, '+').replace(/_/g, '/'))
-      );
+      const decodedJson = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
       isAdmin = decodedJson.role === 'ADMIN';
-    } catch {}
+    } catch {
+      console.log('No jwtToken found.');
+    }
   }
 
   const navItems = [
@@ -94,10 +94,7 @@ export default function Navbar() {
             <Avatar sx={avatarStyle}>
               <EventIcon />
             </Avatar>
-            <Typography
-              variant="h6"
-              sx={{ ml: 1, fontWeight: 'bold', color: 'black' }}
-            >
+            <Typography variant="h6" sx={{ ml: 1, fontWeight: 'bold', color: 'black' }}>
               SimpleEvent
             </Typography>
           </Box>
@@ -118,15 +115,10 @@ export default function Navbar() {
                     Logout
                   </Button>
                 ) : (
-                  <Button
-                    key={to}
-                    component={RouterLink}
-                    to={to}
-                    sx={linkStyle(to)}
-                  >
+                  <Button key={to} component={RouterLink} to={to} sx={linkStyle(to)}>
                     {text}
                   </Button>
-                )
+                ),
               )}
             </Box>
           )}
@@ -172,10 +164,7 @@ export default function Navbar() {
                   primaryTypographyProps={{
                     variant: 'subtitle1',
                     fontWeight: location.pathname === to ? 'bold' : 'normal',
-                    color:
-                      location.pathname === to
-                        ? 'text.primary'
-                        : 'text.secondary',
+                    color: location.pathname === to ? 'text.primary' : 'text.secondary',
                   }}
                 />
               </ListItemButton>
