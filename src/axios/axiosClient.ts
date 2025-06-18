@@ -31,6 +31,7 @@ api.interceptors.response.use(
     }
 
     const { status, data } = response;
+
     if (status === 403 && config.url?.endsWith('/user/profile')) {
       return Promise.reject(error);
     }

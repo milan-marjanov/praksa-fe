@@ -1,6 +1,18 @@
-import { Container, Box, Card, CardContent, Typography, Button, CardActions } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import {
+  Container,
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  Button,
+  CardActions,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import ConfirmDialog from '../../components/admin_panel/ConfirmDialog';
 import { EventDTO } from '../../types/Event';
 import { deleteEvent } from '../../services/eventService';
@@ -14,9 +26,18 @@ import {
   eventTitleStyle,
 } from '../../styles/CommonStyles';
 
-export default function CreatedEventsPage() {
+export default function EventsPage() {
   const navigate = useNavigate();
-  const { events, setEvents, loading } = useEvents();
+  const {
+    createdEvents,
+    participantEvents,
+    allEvents,
+    loading,
+    setCreatedEvents,
+    userId,
+  } = useEvents();
+
+  const [filter, setFilter] = useState<'all' | 'created' | 'invited'>('all');
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
   const [selectedEventTitle, setSelectedEventTitle] = useState<string | null>(null);
@@ -35,7 +56,7 @@ export default function CreatedEventsPage() {
     if (selectedEventId !== null) {
       try {
         await deleteEvent(selectedEventId);
-        setEvents((prev) => prev.filter((event) => event.id !== selectedEventId));
+        setCreatedEvents(prev => prev.filter(e => e.id !== selectedEventId));
       } catch (error) {
         console.error('Error deleting event:', error);
       }
@@ -62,46 +83,94 @@ export default function CreatedEventsPage() {
     );
   }
 
+  let eventsToShow: EventDTO[];
+  switch (filter) {
+    case 'created':
+      eventsToShow = createdEvents;
+      break;
+    case 'invited':
+      eventsToShow = participantEvents.filter(
+        e => !createdEvents.some(c => c.id === e.id)
+      );
+      break;
+    default:
+      eventsToShow = allEvents;
+  }
+
   return (
     <Container sx={{ mt: 4 }}>
-      <Button
-        variant="contained"
-        sx={{ fontWeight: 'bold', display: 'flex', mb: 3, ml: 1 }}
-        onClick={() => navigate('/createEvent')}
-      >
-        Create Event
-      </Button>
-      {events.length === 0 ? (
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
+        <Button
+          variant="contained"
+          sx={{ fontWeight: 'bold' }}
+          onClick={() => navigate('/createEvent')}
+        >
+          Create Event
+        </Button>
+
+        <FormControl variant="outlined" size="small">
+          <InputLabel id="event-filter-label">Filter</InputLabel>
+          <Select
+            labelId="event-filter-label"
+            value={filter}
+            label="Filter"
+            onChange={e => setFilter(e.target.value as 'all' | 'created' | 'invited')}
+          >
+            <MenuItem value="all">All</MenuItem>
+            <MenuItem value="created">Created</MenuItem>
+            <MenuItem value="invited">Invited</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
+
+      {eventsToShow.length === 0 ? (
         <Typography variant="body1" align="center">
-          You haven’t created any events yet. Start by adding one!
+          {filter === 'created'
+            ? "You haven’t created any events yet."
+            : filter === 'invited'
+            ? "You’re not invited to any events yet."
+            : "No events to display."}
         </Typography>
       ) : (
         <Box sx={boxContainerStyle}>
-          {events.map((event) => (
-            <Card key={event.id} sx={eventCardStyle}>
-              <CardContent sx={cardContentStyle}>
-                <Typography variant="h6" gutterBottom sx={eventTitleStyle}>
-                  {event.title}
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={eventDescriptionStyle}>
-                  {truncateText(event.description, 180)}
-                </Typography>
-              </CardContent>
-              <CardActions sx={cardActionsStyle}>
-                <Button variant="outlined" size="medium" onClick={() => handleEditClick(event)}>
-                  Edit
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="error"
-                  size="medium"
-                  onClick={() => handleDeleteClick(event.id, event.title)}
-                >
-                  Delete
-                </Button>
-              </CardActions>
-            </Card>
-          ))}
+          {eventsToShow.map(event => {
+            const isCreator = userId === event.creator.id;
+            return (
+              <Card key={event.id} sx={eventCardStyle}>
+                <CardContent sx={cardContentStyle}>
+                  <Typography variant="h6" gutterBottom sx={eventTitleStyle}>
+                    {event.title}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={eventDescriptionStyle}
+                  >
+                    {truncateText(event.description, 180)}
+                  </Typography>
+                </CardContent>
+                <CardActions sx={cardActionsStyle}>
+                  <Button
+                    variant="outlined"
+                    size="medium"
+                    onClick={() => handleEditClick(event)}
+                    disabled={!isCreator}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    size="medium"
+                    onClick={() => handleDeleteClick(event.id, event.title)}
+                    disabled={!isCreator}
+                  >
+                    Delete
+                  </Button>
+                </CardActions>
+              </Card>
+            );
+          })}
         </Box>
       )}
 
@@ -111,7 +180,8 @@ export default function CreatedEventsPage() {
         onCancel={handleCancelDelete}
         onConfirm={handleConfirmDelete}
       >
-        Are you sure you want to delete the event <strong>{selectedEventTitle}</strong>?
+        Are you sure you want to delete the event{' '}
+        <strong>{selectedEventTitle}</strong>?
       </ConfirmDialog>
     </Container>
   );

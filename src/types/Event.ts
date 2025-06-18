@@ -53,12 +53,9 @@ export interface UpdateEventDTO {
   timeOptions: TimeOption[];
   restaurantOptions: RestaurantOption[];
 }
-/*
-export interface TimeOptionDTO {
-  id?: number;
-  maxCapacity: number;
-  startTime: string;
-  endTime: string;
-  deadline: string;
-  createdAt?: string;
-}*/
+
+export interface UserEventsResponseDTO {
+  createdEvents: EventDTO[];
+  participantEvents: EventDTO[];
+}
+

@@ -1,31 +1,33 @@
 import { useEffect, useState } from 'react';
-import { EventDTO } from '../types/Event';
-import { fetchAllEvents } from '../services/eventService';
-import { jwtDecode } from 'jwt-decode';
+import { EventDTO, UserEventsResponseDTO } from '../types/Event';
+import { fetchUserEvents } from '../services/eventService';
+import { jwtDecode  } from 'jwt-decode';
 import { JwtDecoded } from '../types/User';
 
 export function useEvents() {
-  const [events, setEvents] = useState<EventDTO[]>([]);
+  const [createdEvents, setCreatedEvents] = useState<EventDTO[]>([]);
+  const [participantEvents, setParticipantEvents] = useState<EventDTO[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [userId, setUserId] = useState<number | null>(null);
+
+  const allEvents = [
+    ...createdEvents,
+    ...participantEvents.filter(e => !createdEvents.find(c => c.id === e.id)),
+  ];
 
   useEffect(() => {
     const loadEvents = async () => {
+      setLoading(true);
       try {
         const token = localStorage.getItem('jwtToken');
-        let creatorId: number | undefined;
+        if (!token) return;
 
-        if (token) {
-          const decoded = jwtDecode<JwtDecoded>(token);
-          creatorId = decoded.id;
-        }
+        const { id } = jwtDecode<JwtDecoded>(token);
+        setUserId(id);
 
-        const data = await fetchAllEvents();
-        if (data && creatorId !== undefined) {
-          const userEvents = data.filter((event) => event.creator.id === creatorId);
-          setEvents(userEvents);
-        } else {
-          setEvents([]);
-        }
+        const data: UserEventsResponseDTO = await fetchUserEvents(id);
+        setCreatedEvents(data.createdEvents);
+        setParticipantEvents(data.participantEvents);
       } catch (error) {
         console.error('Failed to load events:', error);
       } finally {
@@ -36,5 +38,12 @@ export function useEvents() {
     loadEvents();
   }, []);
 
-  return { events, setEvents, loading };
+  return {
+    createdEvents,
+    participantEvents,
+    allEvents,
+    loading,
+    setCreatedEvents,
+    userId,
+  };
 }
