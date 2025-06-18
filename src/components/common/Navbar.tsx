@@ -78,8 +78,6 @@ export default function Navbar() {
           }}
         >
           <Box
-            component={RouterLink}
-            to="/"
             sx={{
               display: 'flex',
               alignItems: 'center',
