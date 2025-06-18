@@ -2,7 +2,7 @@ import { Container, Typography } from '@mui/material';
 import EventForm from '../../components/events/EventForm';
 import { CreateEventDto, UpdateEventDTO } from '../../types/Event';
 import { containerStyle } from '../../styles/CommonStyles';
-import { UseSetupEventForm } from '../../hooks/UseSetupEventForm';
+import { UseSetupEventForm } from '../../hooks/useSetupEventForm';
 import { createEvent } from '../../services/eventService';
 import { useNavigate } from 'react-router-dom';
 

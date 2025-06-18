@@ -5,7 +5,7 @@ import { containerStyle } from '../../styles/CommonStyles';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { updateEvent } from '../../services/eventService';
 import { useEffect, useState } from 'react';
-import { UseSetupEventForm } from '../../hooks/UseSetupEventForm';
+import { UseSetupEventForm } from '../../hooks/useSetupEventForm';
 
 export default function UpdateEventPage() {
   const location = useLocation();

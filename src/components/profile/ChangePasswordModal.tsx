@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Modal,
   Box,
@@ -85,27 +85,23 @@ export function ChangePasswordModal({
   };
 
   const handleConfirm = async () => {
-    if (!validate()) return;
+  if (!validate()) return;
 
-    try {
-      await onChangePassword({ oldPassword, newPassword, newPasswordConfirm });
-      toast.success('Password changed successfully');
-      onClose();
-    } catch (err: any) {
-      const msg = err.response?.data || err.message;
-      if (typeof msg === 'string') {
-        setErrors({ oldPassword: msg });
-      }
+  try {
+    await onChangePassword({ oldPassword, newPassword, newPasswordConfirm });
+    toast.success('Password changed successfully');
+    onClose();
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      setErrors({ oldPassword: err.message });
+    } else {
+      setErrors({ oldPassword: 'Došlo je do nepoznate greške' });
     }
-  };
-
-  const handleModalClose = (
-    _event: React.SyntheticEvent  
-  ) => {
-  };
+  }
+}
 
   return (
-    <Modal open={open} onClose={handleModalClose}>
+    <Modal open={open} onClose={onClose}>
       <Box sx={modalStyle}>
         <Typography variant="h6" gutterBottom>
           Change Password

@@ -8,9 +8,9 @@ import { buttonStyle } from '../styles/CommonStyles';
 import {
   getMyProfile,
   getProfileImage,
-  updateProfileWithPicture,
-  changePassword,
+  updateProfile,
   uploadProfilePicture,
+  changePassword,
   removeProfilePicture,
 } from '../services/userService';
 import { PasswordChangeRequestDTO, UpdateProfileRequestDTO } from '../types/User';
@@ -42,18 +42,34 @@ const MyProfilePage: React.FC = () => {
   }, []);
 
   const handleUpdate = async (data: UpdateProfileRequestDTO & { profilePicture?: File }) => {
+    const oldEmail = email;
     try {
-      const updated = await updateProfileWithPicture(data);
-      setFirstName(updated.firstName);
-      setLastName(updated.lastName);
-      setEmail(updated.email);
-      if (data.profilePicture) {
+      if (data.email !== oldEmail && data.profilePicture) {
+        await uploadProfilePicture({ profilePicture: data.profilePicture });
         const newUrl = await getProfileImage();
         setProfilePictureUrl(newUrl || profilePictureUrl);
       }
+      const updated = await updateProfile({
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+      });
+      setFirstName(updated.firstName);
+      setLastName(updated.lastName);
+      setEmail(updated.email);
+      if (data.email === oldEmail && data.profilePicture) {
+        await uploadProfilePicture({ profilePicture: data.profilePicture });
+        const newUrl = await getProfileImage();
+        setProfilePictureUrl(newUrl || profilePictureUrl);
+      }
+      if (data.email !== oldEmail) {
+        localStorage.removeItem('jwtToken');
+        navigate('/login', { replace: true });
+        return;
+      }
+      setOpenUpdate(false);
     } catch (error) {
       console.error('Error updating profile', error);
-    } finally {
       setOpenUpdate(false);
     }
   };
@@ -110,7 +126,12 @@ const MyProfilePage: React.FC = () => {
         open={openUpdate}
         onClose={() => setOpenUpdate(false)}
         onUpdate={handleUpdate}
-        initialValues={{ firstName, lastName, email, avatarUrl: profilePictureUrl || undefined }}
+        initialValues={{
+          firstName,
+          lastName,
+          email,
+          avatarUrl: profilePictureUrl || undefined,
+        }}
       />
       <ChangePasswordModal
         open={openChangePwd}
