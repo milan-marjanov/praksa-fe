@@ -1,10 +1,10 @@
 import { Container, Typography } from '@mui/material';
-import EventForm from '../../components/events/EventForm';
 import { CreateEventDto, UpdateEventDTO } from '../../types/Event';
 import { containerStyle } from '../../styles/CommonStyles';
 import { useSetupEventForm } from '../../hooks/useSetupEventForm';
 import { createEvent } from '../../services/eventService';
 import { useNavigate } from 'react-router-dom';
+import EventModal from '../../components/events/EventModal';
 
 export default function CreateEventPage() {
   const { creator, filteredUsers, loading } = useSetupEventForm();
@@ -38,7 +38,7 @@ export default function CreateEventPage() {
       <Typography component="h1" variant="h5" gutterBottom>
         Create New Event
       </Typography>
-      <EventForm users={filteredUsers} creator={creator} onSubmit={handleSubmit} />
+      <EventModal users={filteredUsers} creator={creator} onSubmit={handleSubmit} />
     </Container>
   );
 }

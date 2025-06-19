@@ -1,11 +1,11 @@
 import { Container, Typography } from '@mui/material';
-import EventForm from '../../components/events/EventForm';
 import { UpdateEventDTO, EventDTO, CreateEventDto } from '../../types/Event';
 import { containerStyle } from '../../styles/CommonStyles';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { updateEvent } from '../../services/eventService';
 import { useEffect, useState } from 'react';
 import { useSetupEventForm } from '../../hooks/useSetupEventForm';
+import EventModal from '../../components/events/EventModal';
 
 export default function UpdateEventPage() {
   const location = useLocation();
@@ -62,7 +62,7 @@ export default function UpdateEventPage() {
       <Typography variant="h5" gutterBottom>
         Edit Event
       </Typography>
-      <EventForm
+      <EventModal
         users={filteredUsers}
         creator={creator}
         event={updateEventDto}

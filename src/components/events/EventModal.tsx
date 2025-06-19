@@ -8,30 +8,21 @@ import {
   OutlinedInput,
   Checkbox,
   ListItemText,
-  Button,
   FormHelperText,
   Typography,
   Box,
 } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material/Select';
-import { CreateEventDto, UpdateEventDTO, EventFormProps, TimeOption } from '../../types/Event';
-import TimeOptionsForm from './TimeOptionsForm';
+import { CreateEventDto, UpdateEventDTO, EventFormProps } from '../../types/Event';
 
-export default function EventForm({ users, creator, event, onSubmit }: EventFormProps) {
+export default function EventModal({ users, creator, event, onSubmit }: EventFormProps) {
   const [eventTitle, setEventTitle] = useState('');
   const [description, setDescription] = useState('');
   const [selectedParticipants, setSelectedParticipants] = useState<number[]>([]);
-  const [errors, setErrors] = useState({ title: '', participants: '' });
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const maxDescriptionChars = 255;
-
   const isUpdate = !!event;
-  const [timeOptions, setTimeOptions] = useState<TimeOption[]>([]);
-  const [votingDeadline, setVotingDeadline] = useState<string | undefined>(undefined);
 
-  const handleTimeOptionsSubmit = (options: TimeOption[], deadline?: string) => {
-    setTimeOptions(options);
-    setVotingDeadline(deadline);
-  };
   useEffect(() => {
     if (event) {
       setEventTitle(event.title);
@@ -124,34 +115,15 @@ export default function EventForm({ users, creator, event, onSubmit }: EventForm
       };
       await onSubmit(createData, false);
     }
-        console.log("Event time options:", timeOptions);
-    console.log("Voting deadline:", votingDeadline);
   };
 
   return (
     <Box
-  display="flex"
-  flexDirection="column"
-  width="100vw"
-  px={{ xs: 2, md: 6 }}
-  py={4}
-  gap={4}
-  boxSizing="border-box"
->
-  {/* Top Row: Two Columns */}
-  <Box
-    display="flex"
-    flexDirection={{ xs: 'column', md: 'row' }}
-    gap={4}
-  >
-    {/* Left: Event Details Form */}
-    <Box
-      flex={1}
+      display="flex"
+      width="100%"
       sx={{
-        backgroundColor: 'background.paper',
-        borderRadius: 2,
-        boxShadow: 2,
-        p: 3,
+        backgroundColor: '#f5f5dc',
+        p: 1,
       }}
     >
       <form onSubmit={handleSubmit} style={{ width: '100%' }}>
@@ -160,12 +132,12 @@ export default function EventForm({ users, creator, event, onSubmit }: EventForm
           label="Event Title *"
           value={eventTitle}
           onChange={handleTitleChange}
-          margin="normal"
+          sx={{ mt: 0, mb: 1 }}
           error={!!errors.title}
           helperText={errors.title}
         />
 
-        <Box position="relative" width="100%">
+        <Box position="relative">
           <TextField
             fullWidth
             label="Event Description (optional)"
@@ -206,6 +178,13 @@ export default function EventForm({ users, creator, event, onSubmit }: EventForm
                 })
                 .join(', ')
             }
+            MenuProps={{
+              PaperProps: {
+                sx: {
+                  backgroundColor: '#f5f5dc', // same color as the form
+                },
+              },
+            }}
           >
             <MenuItem value={-1}>
               <Checkbox checked={isAllSelected} />
@@ -222,29 +201,5 @@ export default function EventForm({ users, creator, event, onSubmit }: EventForm
         </FormControl>
       </form>
     </Box>
-
-    {/* Right: Time Options Form */}
-    <Box
-      flex={1}
-      sx={{
-        backgroundColor: 'background.paper',
-        borderRadius: 2,
-        boxShadow: 2,
-        p: 3,
-      }}
-    >
-      <TimeOptionsForm onSubmit={handleTimeOptionsSubmit} />
-    </Box>
-  </Box>
-
-  {/* Centered Button Below Both Forms */}
-  <Box display="flex" justifyContent="center">
-    <Button type="submit" variant="contained" onClick={handleSubmit}>
-      {isUpdate ? 'Save Changes' : 'Create Event'}
-    </Button>
-  </Box>
-</Box>
-
-
   );
 }

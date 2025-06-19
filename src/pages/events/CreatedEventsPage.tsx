@@ -13,6 +13,7 @@ import {
   eventDescriptionStyle,
   eventTitleStyle,
 } from '../../styles/CommonStyles';
+import CreateEventModal from '../../components/events/CreateEventModal';
 
 export default function CreatedEventsPage() {
   const navigate = useNavigate();
@@ -20,6 +21,7 @@ export default function CreatedEventsPage() {
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
   const [selectedEventTitle, setSelectedEventTitle] = useState<string | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const handleEditClick = (event: EventDTO) => {
     navigate('/updateEvent', { state: { event } });
@@ -67,10 +69,12 @@ export default function CreatedEventsPage() {
       <Button
         variant="contained"
         sx={{ fontWeight: 'bold', display: 'flex', mb: 3, ml: 1 }}
-        onClick={() => navigate('/createEvent')}
+        onClick={() => setModalOpen(true)}
       >
         Create Event
       </Button>
+      <CreateEventModal open={modalOpen} onClose={() => setModalOpen(false)} />
+
       {events.length === 0 ? (
         <Typography variant="body1" align="center">
           You haven’t created any events yet. Start by adding one!
