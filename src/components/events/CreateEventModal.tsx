@@ -1,7 +1,12 @@
 import { useRef, useState } from 'react';
 import { Button, Modal, Box, Typography, Stack, Divider } from '@mui/material';
 import EventModal, { EventModalRef } from './EventModal';
-import { CreateEventDto, CreateEventModalProps, RestaurantOption, UpdateEventDTO } from '../../types/Event';
+import {
+  CreateEventDto,
+  CreateEventModalProps,
+  RestaurantOption,
+  UpdateEventDTO,
+} from '../../types/Event';
 import RestaurantOptionsModal from './RestaurantOptionsModal';
 
 export default function CreateEventModal({
@@ -14,14 +19,8 @@ export default function CreateEventModal({
   const [slideIndex, setSlideIndex] = useState(0);
   const formRef = useRef<EventModalRef>(null);
   const [voteDeadline, setVoteDeadline] = useState('');
-
-  const [votingEnabled, setVotingEnabled] = useState(false);
   const [restaurantOptions, setRestaurantOptions] = useState<RestaurantOption[]>([]);
- const [errors, setErrors] = useState<{ [key: string]: string }>({});
-   const handleVotingToggle = () => {
-    setVotingEnabled((prev) => !prev);
-    setRestaurantOptions([]); // Optional: reset when toggled off
-  };
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const handleAddRestaurantOption = () => {
     setRestaurantOptions((prev) => [...prev, { id: Date.now(), name: '' }]);
@@ -40,7 +39,38 @@ export default function CreateEventModal({
       prev.map((opt) => (opt.id === id ? { ...opt, [field]: value } : opt)),
     );
   };
-  
+  const handleVoteDeadlineChange = (value: string) => {
+    setVoteDeadline(value);
+
+    const validationError = validateVotingDeadline(value);
+
+    // Set the error object with key for voteDeadline field
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      voteDeadline: validationError || '', // empty string means no error
+    }));
+  };
+
+  function validateVotingDeadline(voteDeadline: string): string | null {
+    if (!voteDeadline) {
+      return 'Voting deadline is required.';
+    }
+
+    const deadlineDate = new Date(voteDeadline);
+    if (isNaN(deadlineDate.getTime())) {
+      return 'Invalid date/time format.';
+    }
+
+    const now = new Date();
+    now.setSeconds(0, 0); // zero seconds and ms to match input granularity
+
+    if (deadlineDate < now) {
+      return 'Voting deadline cannot be in the past.';
+    }
+
+    return null; // no error
+  }
+
   const handleFormSubmit = async (data: CreateEventDto | UpdateEventDTO, isUpdate: boolean) => {
     if (event) {
       console.log('Event not null');
@@ -49,7 +79,7 @@ export default function CreateEventModal({
     setSlideIndex(1);
   };
 
-  const slideTitles = ['Event Info', 'Date & Time', 'Confirmation'];
+  const slideTitles = ['Event Info', 'Date & Time', 'Restaurant Options'];
 
   const slides = [
     <EventModal
@@ -60,18 +90,18 @@ export default function CreateEventModal({
       ref={formRef}
     />,
     <Typography key="slide2">Step 2: Date & Time (Coming Soon)</Typography>,
-<RestaurantOptionsModal
+    <RestaurantOptionsModal
       key="slide3"
-      votingEnabled={votingEnabled}
-      onVotingToggle={handleVotingToggle}
       restaurantOptions={restaurantOptions}
+      setRestaurantOptions={setRestaurantOptions}
       onAddOption={handleAddRestaurantOption}
       onRemoveOption={handleRemoveRestaurantOption}
       onChangeOption={handleRestaurantOptionChange}
       voteDeadline={voteDeadline}
-      onChangeVoteDeadline={setVoteDeadline}
+      onChangeVoteDeadline={handleVoteDeadlineChange}
       errorMap={errors}
-    />,  ];
+    />,
+  ];
 
   const handleClose = () => {
     setSlideIndex(0);
@@ -120,10 +150,10 @@ export default function CreateEventModal({
             p: 4,
             display: 'flex',
             flexDirection: 'column',
-            overflowY:'auto',
+            overflowY: 'auto',
             '&::-webkit-scrollbar': {
-      display: 'none',
-    },
+              display: 'none',
+            },
           }}
         >
           <Box sx={{ mb: 2 }}>

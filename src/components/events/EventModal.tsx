@@ -134,7 +134,6 @@ const EventModal = forwardRef<EventModalRef, EventModalProps>(
           backgroundColor: '#f5f5dc',
           p: 1,
         }}
-        
       >
         <form onSubmit={handleSubmit} style={{ width: '100%' }}>
           <TextField
