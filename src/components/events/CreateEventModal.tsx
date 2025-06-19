@@ -1,7 +1,8 @@
 import { useRef, useState } from 'react';
 import { Button, Modal, Box, Typography, Stack, Divider } from '@mui/material';
 import EventModal, { EventModalRef } from './EventModal';
-import { CreateEventDto, CreateEventModalProps, UpdateEventDTO } from '../../types/Event';
+import { CreateEventDto, CreateEventModalProps, RestaurantOption, UpdateEventDTO } from '../../types/Event';
+import RestaurantOptionsModal from './RestaurantOptionsModal';
 
 export default function CreateEventModal({
   users,
@@ -12,7 +13,34 @@ export default function CreateEventModal({
 }: CreateEventModalProps) {
   const [slideIndex, setSlideIndex] = useState(0);
   const formRef = useRef<EventModalRef>(null);
+  const [voteDeadline, setVoteDeadline] = useState('');
 
+  const [votingEnabled, setVotingEnabled] = useState(false);
+  const [restaurantOptions, setRestaurantOptions] = useState<RestaurantOption[]>([]);
+ const [errors, setErrors] = useState<{ [key: string]: string }>({});
+   const handleVotingToggle = () => {
+    setVotingEnabled((prev) => !prev);
+    setRestaurantOptions([]); // Optional: reset when toggled off
+  };
+
+  const handleAddRestaurantOption = () => {
+    setRestaurantOptions((prev) => [...prev, { id: Date.now(), name: '' }]);
+  };
+
+  const handleRemoveRestaurantOption = (id: number) => {
+    setRestaurantOptions((prev) => prev.filter((r) => r.id !== id));
+  };
+
+  const handleRestaurantOptionChange = (
+    id: number,
+    field: keyof RestaurantOption,
+    value: string,
+  ) => {
+    setRestaurantOptions((prev) =>
+      prev.map((opt) => (opt.id === id ? { ...opt, [field]: value } : opt)),
+    );
+  };
+  
   const handleFormSubmit = async (data: CreateEventDto | UpdateEventDTO, isUpdate: boolean) => {
     if (event) {
       console.log('Event not null');
@@ -32,8 +60,18 @@ export default function CreateEventModal({
       ref={formRef}
     />,
     <Typography key="slide2">Step 2: Date & Time (Coming Soon)</Typography>,
-    <Typography key="slide3">Step 3: Confirmation (Coming Soon)</Typography>,
-  ];
+<RestaurantOptionsModal
+      key="slide3"
+      votingEnabled={votingEnabled}
+      onVotingToggle={handleVotingToggle}
+      restaurantOptions={restaurantOptions}
+      onAddOption={handleAddRestaurantOption}
+      onRemoveOption={handleRemoveRestaurantOption}
+      onChangeOption={handleRestaurantOptionChange}
+      voteDeadline={voteDeadline}
+      onChangeVoteDeadline={setVoteDeadline}
+      errorMap={errors}
+    />,  ];
 
   const handleClose = () => {
     setSlideIndex(0);
@@ -43,7 +81,14 @@ export default function CreateEventModal({
   const next = () => {
     if (slideIndex === 0) {
       const result = formRef.current?.validate();
-      if (result?.hasError) return; // ❗ Don't proceed if there are errors
+      if (result?.hasError) return;
+    }
+
+    if (slideIndex === 2) {
+      //const errors = validateRestaurantOptions();
+      //setErrorMap(errors);
+      //if (Object.keys(errors).length > 0) return;
+      setErrors(errors);
     }
 
     if (slideIndex < slides.length - 1) {
@@ -67,7 +112,7 @@ export default function CreateEventModal({
             left: '50%',
             transform: 'translate(-50%, -50%)',
             width: '90vw',
-            maxWidth: 800,
+            maxWidth: 750,
             maxHeight: '90vh',
             bgcolor: '#f5f5dc',
             borderRadius: 3,
@@ -75,6 +120,10 @@ export default function CreateEventModal({
             p: 4,
             display: 'flex',
             flexDirection: 'column',
+            overflowY:'auto',
+            '&::-webkit-scrollbar': {
+      display: 'none',
+    },
           }}
         >
           <Box sx={{ mb: 2 }}>
