@@ -15,6 +15,7 @@ import HomePage from './pages/HomePage';
 import MyProfilePage from './pages/MyProfilePage';
 import ProfilePage from './pages/ProfilePage';
 import { AuthProvider } from './contexts/AuthContext';
+import Notifications from './pages/notifications/NotificationPage';
 
 export default function App() {
   return (
@@ -44,6 +45,15 @@ export default function App() {
                 element={
                   <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
                     <MyProfilePage />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/notifications"
+                element={
+                  <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                    <Notifications />
                   </ProtectedRoute>
                 }
               />
