@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import EventModal from '../../components/events/EventModal';
 
 export default function CreateEventPage() {
-  const { creator, filteredUsers, loading } = useSetupEventForm();
+  const { creator, filteredUsers, loadingUsers } = useSetupEventForm();
   const navigate = useNavigate();
 
   const handleSubmit = async (eventData: CreateEventDto | UpdateEventDTO, isUpdate: boolean) => {
@@ -25,7 +25,7 @@ export default function CreateEventPage() {
     }
   };
 
-  if (loading || !creator) {
+  if (loadingUsers || !creator) {
     return (
       <Container maxWidth="sm" sx={{ ...containerStyle, marginTop: 5 }}>
         <Typography>Loading users...</Typography>

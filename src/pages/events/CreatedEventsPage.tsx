@@ -14,6 +14,7 @@ import {
   eventTitleStyle,
 } from '../../styles/CommonStyles';
 import CreateEventModal from '../../components/events/CreateEventModal';
+import { useSetupEventForm } from '../../hooks/useSetupEventForm';
 
 export default function CreatedEventsPage() {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ export default function CreatedEventsPage() {
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
   const [selectedEventTitle, setSelectedEventTitle] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const { creator, filteredUsers, loadingUsers } = useSetupEventForm();
 
   const handleEditClick = (event: EventDTO) => {
     navigate('/updateEvent', { state: { event } });
@@ -56,7 +58,7 @@ export default function CreatedEventsPage() {
   const truncateText = (text: string, maxLength: number): string =>
     text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
 
-  if (loading) {
+  if (loading || !creator || loadingUsers) {
     return (
       <Container sx={{ mt: 4 }}>
         <Typography>Loading events...</Typography>
@@ -73,7 +75,12 @@ export default function CreatedEventsPage() {
       >
         Create Event
       </Button>
-      <CreateEventModal open={modalOpen} onClose={() => setModalOpen(false)} />
+      <CreateEventModal
+        users={filteredUsers}
+        creator={creator}
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+      />
 
       {events.length === 0 ? (
         <Typography variant="body1" align="center">

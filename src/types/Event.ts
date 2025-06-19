@@ -39,11 +39,19 @@ export interface CreateEventDto {
   participantIds: number[];
 }
 
-export interface EventFormProps {
+export interface EventModalProps {
   users: ParticipantDto[];
   creator: ParticipantDto;
   event?: UpdateEventDTO;
   onSubmit: (event: UpdateEventDTO | CreateEventDto, isUpdate: boolean) => Promise<void>;
+}
+
+export interface CreateEventModalProps {
+  users: ParticipantDto[];
+  creator: ParticipantDto;
+  event?: UpdateEventDTO;
+  open: boolean;
+  onClose: () => void;
 }
 
 export interface UpdateEventDTO {

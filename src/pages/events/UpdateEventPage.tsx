@@ -12,7 +12,7 @@ export default function UpdateEventPage() {
   const navigate = useNavigate();
   const [eventData, setEventData] = useState<EventDTO | null>(null);
 
-  const { creator, filteredUsers, loading } = useSetupEventForm();
+  const { creator, filteredUsers, loadingUsers } = useSetupEventForm();
 
   useEffect(() => {
     if (location.state?.event) {
@@ -22,7 +22,7 @@ export default function UpdateEventPage() {
     }
   }, [location.state, navigate]);
 
-  if (!eventData || loading || !creator) {
+  if (!eventData || loadingUsers || !creator) {
     return (
       <Container sx={{ ...containerStyle, marginTop: 5 }}>
         <Typography>Loading event data...</Typography>

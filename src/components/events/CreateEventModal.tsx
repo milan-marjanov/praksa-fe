@@ -1,38 +1,22 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Button, Modal, Box, Typography, Stack, Divider } from '@mui/material';
-import EventModal from './EventModal';
-import { CreateEventDto, UpdateEventDTO } from '../../types/Event';
-import { UserDTO } from '../../types/User';
+import EventModal, { EventModalRef } from './EventModal';
+import { CreateEventDto, CreateEventModalProps, UpdateEventDTO } from '../../types/Event';
 
-type CreateEventModalProps = {
-  open: boolean;
-  onClose: () => void;
-};
-
-export default function CreateEventModal({ open, onClose }: CreateEventModalProps) {
+export default function CreateEventModal({
+  users,
+  creator,
+  event,
+  open,
+  onClose,
+}: CreateEventModalProps) {
   const [slideIndex, setSlideIndex] = useState(0);
-
-  const users: UserDTO[] = [
-    {
-      id: 1,
-      firstName: 'Alice',
-      lastName: 'Smith',
-      email: 'alice@example.com',
-      profilePictureUrl: '',
-    },
-    { id: 2, firstName: 'Bob', lastName: 'Jones', email: 'bob@example.com', profilePictureUrl: '' },
-    {
-      id: 3,
-      firstName: 'Charlie',
-      lastName: 'Brown',
-      email: 'charlie@example.com',
-      profilePictureUrl: '',
-    },
-  ];
-
-  const creator = users[0];
+  const formRef = useRef<EventModalRef>(null);
 
   const handleFormSubmit = async (data: CreateEventDto | UpdateEventDTO, isUpdate: boolean) => {
+    if (event) {
+      console.log('Event not null');
+    }
     console.log('Submitted data:', data, 'Is update:', isUpdate);
     setSlideIndex(1);
   };
@@ -40,16 +24,28 @@ export default function CreateEventModal({ open, onClose }: CreateEventModalProp
   const slideTitles = ['Event Info', 'Date & Time', 'Confirmation'];
 
   const slides = [
-    <EventModal key="form" users={users} creator={creator} onSubmit={handleFormSubmit} />,
+    <EventModal
+      key="form"
+      users={users}
+      creator={creator}
+      onSubmit={handleFormSubmit}
+      ref={formRef}
+    />,
     <Typography key="slide2">Step 2: Date & Time (Coming Soon)</Typography>,
     <Typography key="slide3">Step 3: Confirmation (Coming Soon)</Typography>,
   ];
 
   const handleClose = () => {
     setSlideIndex(0);
-    onClose(); // Use the passed in onClose
+    onClose();
   };
+
   const next = () => {
+    if (slideIndex === 0) {
+      const result = formRef.current?.validate();
+      if (result?.hasError) return; // ❗ Don't proceed if there are errors
+    }
+
     if (slideIndex < slides.length - 1) {
       setSlideIndex(slideIndex + 1);
     }
