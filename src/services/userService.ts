@@ -39,6 +39,16 @@ export async function getUserNotifications() {
   return response.data;
 }
 
+export async function markNotificationAsRead(id: number) {
+  const response = await api.put<void>(`/api/notifications/mark-as-read/${id}`);
+  return response.data; 
+}
+
+export async function deleteNotification(id: number) {
+  const response = await api.delete<void>(`/api/notifications/notifications/${id}`);
+  return response.data;  
+}
+
 export async function updateProfile(dto: UpdateProfileRequestDTO) {
   const response = await api.patch<MyProfileDTO>('/api/user/update-profile', dto);
   return response.data;
