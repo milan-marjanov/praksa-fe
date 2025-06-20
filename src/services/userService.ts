@@ -1,4 +1,5 @@
 import api from '../axios/AxiosClient';
+import { NotificationDto } from '../types/Notification';
 import {
   UserDTO,
   CreateUserDTO,
@@ -30,6 +31,11 @@ export async function getMyProfile() {
 
 export async function getUserProfile(id: number) {
   const response = await api.get<UserProfileDTO>(`/api/user/${id}/public-profile`);
+  return response.data;
+}
+
+export async function getUserNotifications() {
+  const response = await api.get<NotificationDto[]>(`/api/notification/user`);
   return response.data;
 }
 
