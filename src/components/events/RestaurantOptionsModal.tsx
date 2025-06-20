@@ -150,6 +150,7 @@ const RestaurantOptionsModal: React.FC<RestaurantOptionsFormProps> = () => {
 
       {optionType === 2 && (
         <>
+        
           <TextField
             label="Voting Deadline *"
             type="datetime-local"
@@ -192,9 +193,16 @@ const RestaurantOptionsModal: React.FC<RestaurantOptionsFormProps> = () => {
             </Box>
           ))}
 
-          <Button variant="outlined" startIcon={<Add />} onClick={handleAddRestaurantOption}>
-            Add Restaurant Option
-          </Button>
+          <Box textAlign="center">
+            <Button
+              variant="outlined"
+              sx={{ width: '50%' }}
+              startIcon={<Add />}
+              onClick={handleAddRestaurantOption}
+            >
+              Add Restaurant Option
+            </Button>
+          </Box>
         </>
       )}
     </Box>

@@ -3,6 +3,7 @@ import { Button, Modal, Box, Typography, Stack, Divider } from '@mui/material';
 import EventModal, { EventModalRef } from './EventModal';
 import { CreateEventDto, CreateEventModalProps, UpdateEventDTO } from '../../types/Event';
 import RestaurantOptionsModal from './RestaurantOptionsModal';
+import TimeOptionsModal from './TimeOptionsModal';
 
 export default function CreateEventModal({
   users,
@@ -33,7 +34,7 @@ export default function CreateEventModal({
       onSubmit={handleFormSubmit}
       ref={formRef}
     />,
-    <Typography key="slide2">Step 2: Date & Time (Coming Soon)</Typography>,
+    <TimeOptionsModal key="slide2" />,
     <RestaurantOptionsModal key="slide3" />,
   ];
 
@@ -75,9 +76,10 @@ export default function CreateEventModal({
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            width: '90vw',
-            maxWidth: 750,
-            maxHeight: '90vh',
+            width: 850,
+            height:'90vh',
+           // maxWidth: 750,
+            //maxHeight: '90vh',
             bgcolor: '#f5f5dc',
             borderRadius: 3,
             boxShadow: 24,

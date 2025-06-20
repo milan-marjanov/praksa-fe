@@ -154,7 +154,7 @@ const EventModal = forwardRef<EventModalRef, EventModalProps>(
               onChange={handleDescriptionChange}
               margin="normal"
               multiline
-              rows={3}
+              rows={6}
               inputProps={{ maxLength: maxDescriptionChars }}
             />
             <Typography
