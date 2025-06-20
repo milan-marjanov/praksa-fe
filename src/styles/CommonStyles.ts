@@ -161,7 +161,7 @@ export const descriptionBoxStyle = {
 
 };
 
-export const participStyle = {
+export const participantStyle = {
   fontWeight: 'bold',
   mb: 2,border:0.5,
   padding :1,
