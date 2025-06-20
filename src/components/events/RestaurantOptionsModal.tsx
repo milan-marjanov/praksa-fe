@@ -9,38 +9,39 @@ import {
   Radio,
 } from '@mui/material';
 import { Add, Delete } from '@mui/icons-material';
-import { RestaurantOption } from './RestaurantOptionsForm';
 import RestaurantFieldsForm from './RestaurantFieldsForm';
+import { RestaurantOption } from '../../types/Event';
 
 interface RestaurantOptionsFormProps {
-  restaurantOptions: RestaurantOption[];
-  setRestaurantOptions: React.Dispatch<React.SetStateAction<RestaurantOption[]>>;
-  onAddOption: () => void;
-  onRemoveOption: (id: number) => void;
-  onChangeOption: (id: number, field: keyof RestaurantOption, value: string) => void;
-  voteDeadline: string;
-  onChangeVoteDeadline: (value: string) => void;
-  errorMap?: Record<string, string>;
   eventStartTime?: string;
 }
 
-const RestaurantOptionsModal: React.FC<RestaurantOptionsFormProps> = ({
-  restaurantOptions,
-  setRestaurantOptions,
-
-  onAddOption,
-  onRemoveOption,
-  onChangeOption,
-  voteDeadline,
-  onChangeVoteDeadline,
-  errorMap = {},
-}) => {
+const RestaurantOptionsModal: React.FC<RestaurantOptionsFormProps> = () => {
   const [optionType, setOptionType] = useState<1 | 2 | 3>(1);
+
+  function getCurrentDatetimeLocal() {
+    const now = new Date();
+
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  }
+
+  const [voteDeadline, setVoteDeadline] = useState(getCurrentDatetimeLocal());
+  const [restaurantOptions, setRestaurantOptions] = useState<RestaurantOption[]>([
+    { id: Date.now(), name: '' },
+  ]);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
   const tomorrowMidnightISO = useMemo(() => {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(0, 0, 0, 0); // set to 00:00 of next day
-    return tomorrow.toISOString().slice(0, 16); // "YYYY-MM-DDTHH:mm"
+    tomorrow.setHours(0, 0, 0, 0);
+    return tomorrow.toISOString().slice(0, 16);
   }, []);
 
   useEffect(() => {
@@ -48,6 +49,54 @@ const RestaurantOptionsModal: React.FC<RestaurantOptionsFormProps> = ({
       setRestaurantOptions([{ id: Date.now(), name: '' }]);
     }
   }, [optionType, restaurantOptions.length, setRestaurantOptions]);
+
+  const handleAddRestaurantOption = () => {
+    setRestaurantOptions((prev) => [...prev, { id: Date.now(), name: '' }]);
+  };
+
+  const handleRemoveRestaurantOption = (id: number) => {
+    setRestaurantOptions((prev) => prev.filter((r) => r.id !== id));
+  };
+
+  const handleRestaurantOptionChange = (
+    id: number,
+    field: keyof RestaurantOption,
+    value: string,
+  ) => {
+    setRestaurantOptions((prev) =>
+      prev.map((opt) => (opt.id === id ? { ...opt, [field]: value } : opt)),
+    );
+  };
+  const handleVoteDeadlineChange = (value: string) => {
+    setVoteDeadline(value);
+
+    const validationError = validateVotingDeadline(value);
+    console.log(errors);
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      voteDeadline: validationError || '',
+    }));
+  };
+
+  function validateVotingDeadline(voteDeadline: string): string | null {
+    if (!voteDeadline) {
+      return 'Voting deadline is required.';
+    }
+
+    const deadlineDate = new Date(voteDeadline);
+    if (isNaN(deadlineDate.getTime())) {
+      return 'Invalid date/time format.';
+    }
+
+    const now = new Date();
+    now.setSeconds(0, 0); // zero seconds and ms to match input granularity
+
+    if (deadlineDate < now) {
+      return 'Voting deadline cannot be in the past.';
+    }
+
+    return null; // no error
+  }
 
   return (
     <Box display="flex" flexDirection="column" gap={3} marginLeft={1}>
@@ -93,8 +142,8 @@ const RestaurantOptionsModal: React.FC<RestaurantOptionsFormProps> = ({
           <RestaurantFieldsForm
             index={0}
             option={restaurantOptions[0] || {}}
-            onChangeOption={onChangeOption}
-            errorMap={errorMap}
+            onChangeOption={handleRestaurantOptionChange}
+            errorMap={errors}
           />
         </Box>
       )}
@@ -105,9 +154,9 @@ const RestaurantOptionsModal: React.FC<RestaurantOptionsFormProps> = ({
             label="Voting Deadline *"
             type="datetime-local"
             value={voteDeadline}
-            onChange={(e) => onChangeVoteDeadline(e.target.value)}
-            error={!!errorMap.voteDeadline}
-            helperText={errorMap.voteDeadline}
+            onChange={(e) => handleVoteDeadlineChange(e.target.value)}
+            error={!!errors.voteDeadline}
+            helperText={errors.voteDeadline}
             sx={{ width: '50%' }}
             inputProps={{
               min: tomorrowMidnightISO,
@@ -128,22 +177,22 @@ const RestaurantOptionsModal: React.FC<RestaurantOptionsFormProps> = ({
               <Box display="flex" alignItems="center" justifyContent="space-between">
                 <Typography variant="subtitle1">Option {i + 1}</Typography>
                 <IconButton
-                  onClick={() => onRemoveOption(option.id)}
+                  onClick={() => handleRemoveRestaurantOption(option.id)}
                   disabled={restaurantOptions.length === 1}
                 >
                   <Delete />
                 </IconButton>
               </Box>
               <RestaurantFieldsForm
-                index={0}
-                option={restaurantOptions[0] || {}}
-                onChangeOption={onChangeOption}
-                errorMap={errorMap}
+                index={i}
+                option={option}
+                onChangeOption={handleRestaurantOptionChange}
+                errorMap={errors}
               />
             </Box>
           ))}
 
-          <Button variant="outlined" startIcon={<Add />} onClick={onAddOption}>
+          <Button variant="outlined" startIcon={<Add />} onClick={handleAddRestaurantOption}>
             Add Restaurant Option
           </Button>
         </>

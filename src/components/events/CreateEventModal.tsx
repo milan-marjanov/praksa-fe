@@ -1,12 +1,7 @@
 import { useRef, useState } from 'react';
 import { Button, Modal, Box, Typography, Stack, Divider } from '@mui/material';
 import EventModal, { EventModalRef } from './EventModal';
-import {
-  CreateEventDto,
-  CreateEventModalProps,
-  RestaurantOption,
-  UpdateEventDTO,
-} from '../../types/Event';
+import { CreateEventDto, CreateEventModalProps, UpdateEventDTO } from '../../types/Event';
 import RestaurantOptionsModal from './RestaurantOptionsModal';
 
 export default function CreateEventModal({
@@ -18,58 +13,7 @@ export default function CreateEventModal({
 }: CreateEventModalProps) {
   const [slideIndex, setSlideIndex] = useState(0);
   const formRef = useRef<EventModalRef>(null);
-  const [voteDeadline, setVoteDeadline] = useState('');
-  const [restaurantOptions, setRestaurantOptions] = useState<RestaurantOption[]>([]);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-
-  const handleAddRestaurantOption = () => {
-    setRestaurantOptions((prev) => [...prev, { id: Date.now(), name: '' }]);
-  };
-
-  const handleRemoveRestaurantOption = (id: number) => {
-    setRestaurantOptions((prev) => prev.filter((r) => r.id !== id));
-  };
-
-  const handleRestaurantOptionChange = (
-    id: number,
-    field: keyof RestaurantOption,
-    value: string,
-  ) => {
-    setRestaurantOptions((prev) =>
-      prev.map((opt) => (opt.id === id ? { ...opt, [field]: value } : opt)),
-    );
-  };
-  const handleVoteDeadlineChange = (value: string) => {
-    setVoteDeadline(value);
-
-    const validationError = validateVotingDeadline(value);
-
-    // Set the error object with key for voteDeadline field
-    setErrors((prevErrors) => ({
-      ...prevErrors,
-      voteDeadline: validationError || '', // empty string means no error
-    }));
-  };
-
-  function validateVotingDeadline(voteDeadline: string): string | null {
-    if (!voteDeadline) {
-      return 'Voting deadline is required.';
-    }
-
-    const deadlineDate = new Date(voteDeadline);
-    if (isNaN(deadlineDate.getTime())) {
-      return 'Invalid date/time format.';
-    }
-
-    const now = new Date();
-    now.setSeconds(0, 0); // zero seconds and ms to match input granularity
-
-    if (deadlineDate < now) {
-      return 'Voting deadline cannot be in the past.';
-    }
-
-    return null; // no error
-  }
 
   const handleFormSubmit = async (data: CreateEventDto | UpdateEventDTO, isUpdate: boolean) => {
     if (event) {
@@ -90,17 +34,7 @@ export default function CreateEventModal({
       ref={formRef}
     />,
     <Typography key="slide2">Step 2: Date & Time (Coming Soon)</Typography>,
-    <RestaurantOptionsModal
-      key="slide3"
-      restaurantOptions={restaurantOptions}
-      setRestaurantOptions={setRestaurantOptions}
-      onAddOption={handleAddRestaurantOption}
-      onRemoveOption={handleRemoveRestaurantOption}
-      onChangeOption={handleRestaurantOptionChange}
-      voteDeadline={voteDeadline}
-      onChangeVoteDeadline={handleVoteDeadlineChange}
-      errorMap={errors}
-    />,
+    <RestaurantOptionsModal key="slide3" />,
   ];
 
   const handleClose = () => {
