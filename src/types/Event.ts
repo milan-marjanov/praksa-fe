@@ -7,7 +7,7 @@ export interface ParticipantDto {
 
 export interface TimeOption {
   id: number;
-  maxCapacity?: number;
+  maxCapacity: number;
   startTime: string;
   endTime: string;
   deadline: string;
@@ -20,6 +20,8 @@ export interface RestaurantOption {
   menuImageUrl?: string;
   restaurantUrl?: string;
 }
+
+export type TimeOptionType = 'FIXED' | 'VOTING' | 'CAPACITY_BASED';
 
 export interface EventDTO {
   id: number;
@@ -37,6 +39,9 @@ export interface CreateEventDto {
   description: string;
   creatorId: number;
   participantIds: number[];
+  timeOptionType: TimeOptionType;
+  timeOptions: TimeOption[];
+  restaurantOptions: RestaurantOption[];
 }
 
 export interface EventModalProps {

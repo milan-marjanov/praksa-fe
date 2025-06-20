@@ -4,6 +4,7 @@ import EventModal, { EventModalRef } from './EventModal';
 import { CreateEventDto, CreateEventModalProps, UpdateEventDTO } from '../../types/Event';
 import RestaurantOptionsModal from './RestaurantOptionsModal';
 import TimeOptionsModal from './TimeOptionsModal';
+import { EventFormProvider } from '../../contexts/EventContext';
 
 export default function CreateEventModal({
   users,
@@ -68,70 +69,72 @@ export default function CreateEventModal({
   };
 
   return (
-    <div style={{ padding: 40 }}>
-      <Modal open={open} onClose={handleClose}>
-        <Box
-          sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: '90vw',
-            maxWidth: 800,
-            maxHeight: '90vh',
-            bgcolor: '#f5f5dc',
-            borderRadius: 3,
-            boxShadow: 24,
-            p: 4,
-            display: 'flex',
-            flexDirection: 'column',
-            overflowY: 'auto',
-            '&::-webkit-scrollbar': {
-              display: 'none',
-            },
-          }}
-        >
-          <Box sx={{ mb: 2 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-              <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>
-                Create New Event
+    <EventFormProvider>
+      <div style={{ padding: 40 }}>
+        <Modal open={open} onClose={handleClose}>
+          <Box
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '90vw',
+              maxWidth: 800,
+              maxHeight: '90vh',
+              bgcolor: '#f5f5dc',
+              borderRadius: 3,
+              boxShadow: 24,
+              p: 4,
+              display: 'flex',
+              flexDirection: 'column',
+              overflowY: 'auto',
+              '&::-webkit-scrollbar': {
+                display: 'none',
+              },
+            }}
+          >
+            <Box sx={{ mb: 2 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>
+                  Create New Event
+                </Typography>
+              </Box>
+
+              <Typography variant="subtitle1" color="text.secondary" marginLeft={1} marginTop={1}>
+                Step {slideIndex + 1}: {slideTitles[slideIndex]}
               </Typography>
+
+              <Divider sx={{ my: 2 }} />
             </Box>
 
-            <Typography variant="subtitle1" color="text.secondary" marginLeft={1} marginTop={1}>
-              Step {slideIndex + 1}: {slideTitles[slideIndex]}
-            </Typography>
+            <Box>{slides[slideIndex]}</Box>
 
-            <Divider sx={{ my: 2 }} />
-          </Box>
+            <Stack direction="row" justifyContent="space-between" alignItems="center" mt={4}>
+              <Button onClick={back} disabled={slideIndex === 0}>
+                Back
+              </Button>
 
-          <Box>{slides[slideIndex]}</Box>
+              <Stack direction="row" spacing={1}>
+                {slides.map((_, index) => (
+                  <Box
+                    key={index}
+                    sx={{
+                      width: 10,
+                      height: 10,
+                      borderRadius: '50%',
+                      bgcolor: index === slideIndex ? 'primary.main' : 'grey.400',
+                    }}
+                  />
+                ))}
+              </Stack>
 
-          <Stack direction="row" justifyContent="space-between" alignItems="center" mt={4}>
-            <Button onClick={back} disabled={slideIndex === 0}>
-              Back
-            </Button>
-
-            <Stack direction="row" spacing={1}>
-              {slides.map((_, index) => (
-                <Box
-                  key={index}
-                  sx={{
-                    width: 10,
-                    height: 10,
-                    borderRadius: '50%',
-                    bgcolor: index === slideIndex ? 'primary.main' : 'grey.400',
-                  }}
-                />
-              ))}
+              <Button onClick={next} disabled={slideIndex === slides.length - 1}>
+                Next
+              </Button>
             </Stack>
-
-            <Button onClick={next} disabled={slideIndex === slides.length - 1}>
-              Next
-            </Button>
-          </Stack>
-        </Box>
-      </Modal>
-    </div>
+          </Box>
+        </Modal>
+      </div>
+    </EventFormProvider>
   );
 }

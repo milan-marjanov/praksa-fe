@@ -4,32 +4,36 @@ import { Add, Delete } from '@mui/icons-material';
 import RestaurantFieldsForm from './RestaurantFieldsForm';
 import { RestaurantOption } from '../../types/Event';
 import DateTimeForm from './DateTimeForm';
+import { useEventForm } from '../../contexts/EventContext';
 
-interface RestaurantOptionsFormProps {
-  eventStartTime?: string;
-}
+const RestaurantOptionsModal: React.FC = () => {
+  const { eventData, setEventData } = useEventForm();
+  const restaurantOptions = eventData.restaurantOptions;
 
-const RestaurantOptionsModal: React.FC<RestaurantOptionsFormProps> = () => {
   const [optionType, setOptionType] = useState<1 | 2 | 3>(1);
 
   const [voteDeadline, setVoteDeadline] = useState('');
-  const [restaurantOptions, setRestaurantOptions] = useState<RestaurantOption[]>([
-    { id: Date.now(), name: '' },
-  ]);
 
   useEffect(() => {
-    if (optionType === 2 && restaurantOptions.length === 0) {
-      setRestaurantOptions([{ id: Date.now(), name: '' }]);
+    console.log(eventData);
+    if (optionType === 2 && (!restaurantOptions || restaurantOptions.length === 0)) {
+      setEventData({
+        restaurantOptions: [{ id: Date.now(), name: '' }],
+      });
     }
-  }, [optionType, restaurantOptions.length, setRestaurantOptions]);
+  }, [eventData, optionType, restaurantOptions, setEventData]);
 
   const handleAddRestaurantOption = () => {
-    setRestaurantOptions((prev) => [...prev, { id: Date.now(), name: '' }]);
+    setEventData({
+      restaurantOptions: [...(restaurantOptions || []), { id: Date.now(), name: '' }],
+    });
     console.log(voteDeadline);
   };
 
   const handleRemoveRestaurantOption = (id: number) => {
-    setRestaurantOptions((prev) => prev.filter((r) => r.id !== id));
+    setEventData({
+      restaurantOptions: (restaurantOptions ?? []).filter((r) => r.id !== id),
+    });
   };
 
   const handleRestaurantOptionChange = (
@@ -37,9 +41,11 @@ const RestaurantOptionsModal: React.FC<RestaurantOptionsFormProps> = () => {
     field: keyof RestaurantOption,
     value: string,
   ) => {
-    setRestaurantOptions((prev) =>
-      prev.map((opt) => (opt.id === id ? { ...opt, [field]: value } : opt)),
-    );
+    setEventData({
+      restaurantOptions: (restaurantOptions ?? []).map((opt) =>
+        opt.id === id ? { ...opt, [field]: value } : opt,
+      ),
+    });
   };
 
   return (
@@ -85,7 +91,7 @@ const RestaurantOptionsModal: React.FC<RestaurantOptionsFormProps> = () => {
           </Typography>
           <RestaurantFieldsForm
             index={0}
-            option={restaurantOptions[0] || {}}
+            option={(restaurantOptions ?? [{ id: Date.now(), name: '' }])[0]}
             onChangeOption={handleRestaurantOptionChange}
           />
         </Box>
@@ -99,7 +105,7 @@ const RestaurantOptionsModal: React.FC<RestaurantOptionsFormProps> = () => {
             onValidChange={(e) => setVoteDeadline(e)}
           />
 
-          {restaurantOptions.map((option, i) => (
+          {(restaurantOptions ?? []).map((option, i) => (
             <Box
               key={option.id}
               display="flex"
@@ -114,7 +120,7 @@ const RestaurantOptionsModal: React.FC<RestaurantOptionsFormProps> = () => {
                 <Typography variant="subtitle1">Option {i + 1}</Typography>
                 <IconButton
                   onClick={() => handleRemoveRestaurantOption(option.id)}
-                  disabled={restaurantOptions.length === 1}
+                  disabled={(restaurantOptions ?? []).length === 1}
                 >
                   <Delete />
                 </IconButton>

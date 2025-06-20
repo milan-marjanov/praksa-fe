@@ -13,7 +13,8 @@ import {
   Box,
 } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material/Select';
-import { CreateEventDto, UpdateEventDTO, EventModalProps } from '../../types/Event';
+import { CreateEventDto, EventModalProps, UpdateEventDTO } from '../../types/Event';
+import { useEventForm } from '../../contexts/EventContext';
 
 export type EventModalRef = {
   validate: () => { hasError: boolean };
@@ -21,22 +22,14 @@ export type EventModalRef = {
 
 const EventModal = forwardRef<EventModalRef, EventModalProps>(
   ({ users, creator, event, onSubmit }, ref) => {
-    const [eventTitle, setEventTitle] = useState('');
-    const [description, setDescription] = useState('');
-    const [selectedParticipants, setSelectedParticipants] = useState<number[]>([]);
+    const { eventData, setEventData } = useEventForm();
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const maxDescriptionChars = 255;
     const isUpdate = !!event;
 
     useEffect(() => {
-      if (event) {
-        setEventTitle(event.title);
-        setDescription(event.description);
-        setSelectedParticipants(
-          'participantIds' in event ? event.participantIds.filter((id) => id !== creator.id) : [],
-        );
-      }
-    }, [event, creator.id]);
+      console.log('eventData changed:', eventData);
+    }, [eventData]);
 
     useImperativeHandle(ref, () => ({
       validate,
@@ -45,10 +38,10 @@ const EventModal = forwardRef<EventModalRef, EventModalProps>(
     const selectableUsers = users.filter((u) => u.id !== creator.id);
     const allParticipantIds = selectableUsers.map((user) => user.id);
     const isAllSelected =
-      selectedParticipants.length === selectableUsers.length && selectableUsers.length > 0;
+      eventData.participantIds?.length === selectableUsers.length && selectableUsers.length > 0;
 
     const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      setEventTitle(e.target.value);
+      setEventData({ title: e.target.value });
       if (e.target.value.trim() !== '') {
         setErrors((prev) => ({ ...prev, title: '' }));
       }
@@ -56,11 +49,11 @@ const EventModal = forwardRef<EventModalRef, EventModalProps>(
 
     const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.value.length <= maxDescriptionChars) {
-        setDescription(e.target.value);
+        setEventData({ description: e.target.value });
       }
     };
 
-    const handleParticipantsChange = (event: SelectChangeEvent<typeof selectedParticipants>) => {
+    const handleParticipantsChange = (event: SelectChangeEvent<number[]>) => {
       const value = event.target.value as number[];
       let updated: number[];
 
@@ -70,7 +63,7 @@ const EventModal = forwardRef<EventModalRef, EventModalProps>(
         updated = value;
       }
 
-      setSelectedParticipants(updated);
+      setEventData({ participantIds: updated });
 
       if (updated.length > 0) {
         setErrors((prev) => ({ ...prev, participants: '' }));
@@ -81,15 +74,16 @@ const EventModal = forwardRef<EventModalRef, EventModalProps>(
       const newErrors = { title: '', participants: '' };
       let hasError = false;
 
-      if (eventTitle.trim() === '') {
+      if (!eventData.title?.trim()) {
         newErrors.title = 'Event title is required';
         hasError = true;
       }
 
-      if (selectedParticipants.length === 0) {
+      if (!eventData.participantIds || eventData.participantIds.length === 0) {
         newErrors.participants = 'Please select at least one participant';
         hasError = true;
       }
+
       setErrors(newErrors);
       return { hasError, newErrors };
     };
@@ -101,45 +95,45 @@ const EventModal = forwardRef<EventModalRef, EventModalProps>(
       setErrors(newErrors);
       if (hasError) return;
 
-      const allParticipantIds = selectedParticipants.includes(creator.id)
-        ? selectedParticipants
-        : [...selectedParticipants, creator.id];
+      // Ensure creator is in the participants
+      const participantSet = new Set(eventData.participantIds || []);
+      participantSet.add(creator.id);
+      const allParticipantIds = Array.from(participantSet);
 
-      if (isUpdate) {
+      const title = eventData.title?.trim() || '';
+      const description = eventData.description?.trim() || '';
+
+      if (isUpdate && event) {
         const updateData: UpdateEventDTO = {
-          title: eventTitle,
+          title,
           description,
           participantIds: allParticipantIds,
-          timeOptions: event?.timeOptions ?? [],
-          restaurantOptions: event?.restaurantOptions ?? [],
+          timeOptions: event.timeOptions ?? [],
+          restaurantOptions: event.restaurantOptions ?? [],
         };
         await onSubmit(updateData, true);
       } else {
         const createData: CreateEventDto = {
           id: 0,
-          title: eventTitle,
+          title,
           description,
-          creatorId: creator.id,
           participantIds: allParticipantIds,
+          creatorId: creator.id,
+          timeOptionType: eventData.timeOptionType ?? 'FIXED',
+          timeOptions: eventData.timeOptions ?? [],
+          restaurantOptions: eventData.restaurantOptions ?? [],
         };
         await onSubmit(createData, false);
       }
     };
 
     return (
-      <Box
-        display="flex"
-        width="100%"
-        sx={{
-          backgroundColor: '#f5f5dc',
-          p: 1,
-        }}
-      >
+      <Box display="flex" width="100%" sx={{ backgroundColor: '#f5f5dc', p: 1 }}>
         <form onSubmit={handleSubmit} style={{ width: '100%' }}>
           <TextField
             fullWidth
             label="Event Title *"
-            value={eventTitle}
+            value={eventData.title}
             onChange={handleTitleChange}
             sx={{ mt: 0, mb: 1 }}
             error={!!errors.title}
@@ -150,7 +144,7 @@ const EventModal = forwardRef<EventModalRef, EventModalProps>(
             <TextField
               fullWidth
               label="Event Description (optional)"
-              value={description}
+              value={eventData.description}
               onChange={handleDescriptionChange}
               margin="normal"
               multiline
@@ -167,7 +161,7 @@ const EventModal = forwardRef<EventModalRef, EventModalProps>(
                 userSelect: 'none',
               }}
             >
-              {description.length}/{maxDescriptionChars}
+              {eventData.description?.length ?? 0}/{maxDescriptionChars}
             </Typography>
           </Box>
 
@@ -176,7 +170,7 @@ const EventModal = forwardRef<EventModalRef, EventModalProps>(
             <Select
               labelId="participants-label"
               multiple
-              value={selectedParticipants}
+              value={eventData.participantIds || []}
               onChange={handleParticipantsChange}
               input={<OutlinedInput label="Participants *" />}
               renderValue={(selected) =>
@@ -190,7 +184,7 @@ const EventModal = forwardRef<EventModalRef, EventModalProps>(
               MenuProps={{
                 PaperProps: {
                   sx: {
-                    backgroundColor: '#f5f5dc', // same color as the form
+                    backgroundColor: '#f5f5dc',
                   },
                 },
               }}
@@ -201,7 +195,7 @@ const EventModal = forwardRef<EventModalRef, EventModalProps>(
               </MenuItem>
               {selectableUsers.map((user) => (
                 <MenuItem key={user.id} value={user.id}>
-                  <Checkbox checked={selectedParticipants.includes(user.id)} />
+                  <Checkbox checked={eventData.participantIds?.includes(user.id)} />
                   <ListItemText primary={`${user.firstName} ${user.lastName}`} />
                 </MenuItem>
               ))}
@@ -213,4 +207,5 @@ const EventModal = forwardRef<EventModalRef, EventModalProps>(
     );
   },
 );
+
 export default EventModal;
