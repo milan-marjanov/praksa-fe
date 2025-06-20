@@ -1,19 +1,33 @@
 import { useEffect, useState } from 'react';
 import { EventDTO, UserEventsResponseDTO } from '../types/Event';
 import { fetchUserEvents } from '../services/eventService';
-import { jwtDecode  } from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 import { JwtDecoded } from '../types/User';
 
-export function useEvents() {
+export interface UseEventsResult {
+  createdEvents: EventDTO[];
+  setCreatedEvents: React.Dispatch<React.SetStateAction<EventDTO[]>>;
+  participantEvents: EventDTO[];
+  setParticipantEvents: React.Dispatch<React.SetStateAction<EventDTO[]>>;
+  allEvents: EventDTO[];
+  setAllEvents: React.Dispatch<React.SetStateAction<EventDTO[]>>;
+  loading: boolean;
+  userId: number | null;
+}
+
+export function useEvents(): UseEventsResult {
   const [createdEvents, setCreatedEvents] = useState<EventDTO[]>([]);
   const [participantEvents, setParticipantEvents] = useState<EventDTO[]>([]);
+  const [allEvents, setAllEvents] = useState<EventDTO[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [userId, setUserId] = useState<number | null>(null);
 
-  const allEvents = [
-    ...createdEvents,
-    ...participantEvents.filter(e => !createdEvents.find(c => c.id === e.id)),
-  ];
+  useEffect(() => {
+    setAllEvents([
+      ...createdEvents,
+      ...participantEvents.filter(e => !createdEvents.some(c => c.id === e.id)),
+    ]);
+  }, [createdEvents, participantEvents]);
 
   useEffect(() => {
     const loadEvents = async () => {
@@ -40,10 +54,12 @@ export function useEvents() {
 
   return {
     createdEvents,
-    participantEvents,
-    allEvents,
-    loading,
     setCreatedEvents,
+    participantEvents,
+    setParticipantEvents,
+    allEvents,
+    setAllEvents,
+    loading,
     userId,
   };
 }

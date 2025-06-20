@@ -34,6 +34,7 @@ export default function EventsPage() {
     allEvents,
     loading,
     setCreatedEvents,
+    setParticipantEvents,
     userId,
   } = useEvents();
 
@@ -56,7 +57,9 @@ export default function EventsPage() {
     if (selectedEventId !== null) {
       try {
         await deleteEvent(selectedEventId);
+        // Remove from both created and participant lists
         setCreatedEvents(prev => prev.filter(e => e.id !== selectedEventId));
+        setParticipantEvents(prev => prev.filter(e => e.id !== selectedEventId));
       } catch (error) {
         console.error('Error deleting event:', error);
       }
@@ -73,9 +76,8 @@ export default function EventsPage() {
   };
 
   const handleCardClick = (eventId: number) => {
-  navigate(`/eventDetails/${eventId}`);
-};
-
+    navigate(`/eventDetails/${eventId}`);
+  };
 
   const truncateText = (text: string, maxLength: number): string =>
     text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
@@ -138,50 +140,56 @@ export default function EventsPage() {
         </Typography>
       ) : (
         <Box sx={boxContainerStyle}>
-          {eventsToShow.map((event: EventDTO) => (
-            <Card
-              key={event.id}
-              sx={eventCardStyle}
-              onClick={() => handleCardClick(event.id)}
-              style={{ cursor: 'pointer' }}
-            >
-              <CardContent sx={cardContentStyle}>
-                <Typography variant="h6" gutterBottom sx={eventTitleStyle}>
-                  {event.title}
-                </Typography>
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={eventDescriptionStyle}
-                >
-                  {truncateText(event.description, 180)}
-                </Typography>
-              </CardContent>
-              <CardActions sx={cardActionsStyle}>
-                <Button
-                  variant="outlined"
-                  size="medium"
-                  onClick={e => {
-                    e.stopPropagation();
-                    handleEditClick(event);
-                  }}
-                >
-                  Edit
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="error"
-                  size="medium"
-                  onClick={e => {
-                    e.stopPropagation();
-                    handleDeleteClick(event.id, event.title);
-                  }}
-                >
-                  Delete
-                </Button>
-              </CardActions>
-            </Card>
-          ))}
+          {eventsToShow.map((event: EventDTO) => {
+            const isCreator = event.creator.id === userId;
+
+            return (
+              <Card
+                key={event.id}
+                sx={eventCardStyle}
+                onClick={() => handleCardClick(event.id)}
+                style={{ cursor: 'pointer' }}
+              >
+                <CardContent sx={cardContentStyle}>
+                  <Typography variant="h6" gutterBottom sx={eventTitleStyle}>
+                    {event.title}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={eventDescriptionStyle}
+                  >
+                    {truncateText(event.description, 180)}
+                  </Typography>
+                </CardContent>
+                <CardActions sx={cardActionsStyle}>
+                  <Button
+                    variant="outlined"
+                    size="medium"
+                    disabled={!isCreator}
+                    onClick={e => {
+                      e.stopPropagation();
+                      if (isCreator) handleEditClick(event);
+                    }}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    size="medium"
+                    disabled={!isCreator}
+                    onClick={e => {
+                      e.stopPropagation();
+                      if (isCreator) handleDeleteClick(event.id, event.title);
+                    }}
+                  >
+                    Delete
+                  </Button>
+                </CardActions>
+              </Card>
+            );
+          })}
         </Box>
       )}
 

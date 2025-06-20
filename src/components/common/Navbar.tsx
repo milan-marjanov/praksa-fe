@@ -24,20 +24,17 @@ export default function Navbar() {
   const isSm = useMediaQuery(theme.breakpoints.down('sm'));
   const location = useLocation();
 
-  // Sakrij navigaciju na login i root stranicama
   const hidePaths = ['/', '/login'];
   const token = localStorage.getItem('jwtToken');
   const isLoggedIn = Boolean(token);
   const showNav = isLoggedIn && !hidePaths.includes(location.pathname);
 
-  // Provera da li je korisnik admin
   let isAdmin = false;
   if (token) {
     try {
       const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
       isAdmin = payload.role === 'ADMIN';
     } catch {
-      // nevalidan token
     }
   }
 
@@ -83,7 +80,6 @@ export default function Navbar() {
             position: 'relative',
           }}
         >
-          {/* Logo i naziv */}
           <Box
             sx={{
               display: 'flex',
@@ -104,7 +100,6 @@ export default function Navbar() {
             </Typography>
           </Box>
 
-          {/* Desktop navigacija */}
           {showNav && !isSm && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
               {navItems.map(({ text, to }) =>
@@ -130,7 +125,6 @@ export default function Navbar() {
             </Box>
           )}
 
-          {/* Hamburger za mobile */}
           {showNav && isSm && (
             <IconButton color="inherit" onClick={toggleOpen}>
               <MenuIcon />
@@ -139,7 +133,6 @@ export default function Navbar() {
         </Toolbar>
       </AppBar>
 
-      {/* Mobile dropdown meni */}
       {showNav && isSm && open && (
         <Box
           sx={{

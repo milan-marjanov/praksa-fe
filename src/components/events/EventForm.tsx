@@ -10,7 +10,6 @@ import {
   ListItemText,
   Button,
   FormHelperText,
-  Typography,
   Box,
 } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material/Select';
@@ -22,7 +21,7 @@ export default function EventForm({ users, creator, event, onSubmit }: EventForm
   const [description, setDescription] = useState('');
   const [selectedParticipants, setSelectedParticipants] = useState<number[]>([]);
   const [errors, setErrors] = useState({ title: '', participants: '' });
-  const maxDescriptionChars = 255;
+  const maxDescriptionChars = 1000;
 
   const isUpdate = !!event;
 
@@ -143,7 +142,7 @@ export default function EventForm({ users, creator, event, onSubmit }: EventForm
           rows={3}
           inputProps={{ maxLength: maxDescriptionChars }}
         />
-        <Typography
+        {/* <Typography
           variant="caption"
           color="text.secondary"
           sx={{
@@ -154,7 +153,7 @@ export default function EventForm({ users, creator, event, onSubmit }: EventForm
           }}
         >
           {description.length}/{maxDescriptionChars}
-        </Typography>
+        </Typography> */}
       </Box>
 
       <FormControl fullWidth margin="normal" error={!!errors.participants}>

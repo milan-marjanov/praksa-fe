@@ -1,4 +1,3 @@
-import { Margin } from '@mui/icons-material';
 import { SxProps, Theme } from '@mui/material';
 
 export const avatarStyle = {

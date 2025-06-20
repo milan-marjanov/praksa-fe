@@ -1,4 +1,4 @@
-import api from '../axios/AxiosClient';
+import api from '../axios/axiosClient';
 import axios from 'axios';
 import { CreateEventDto, UserEventsResponseDTO, UpdateEventDTO, EventDetailsDto } from '../types/Event';
 

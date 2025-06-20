@@ -1,4 +1,4 @@
-import api from '../axios/AxiosClient';
+import api from '../axios/axiosClient';
 import { jwtDecode } from 'jwt-decode';
 import type { JwtDecoded } from '../types/User';
 

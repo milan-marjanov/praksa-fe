@@ -74,6 +74,8 @@ export default function UserList({ users, onDelete }: UserListProps) {
         width: '100%',
         overflowX: 'auto',
         boxShadow: 1,
+        border: 1,
+        borderColor: 'divider',
         borderRadius: 1,
       }}
     >
