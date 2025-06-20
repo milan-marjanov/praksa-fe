@@ -6,10 +6,9 @@ interface Props {
   index: number;
   option: RestaurantOption;
   onChangeOption: (id: number, field: keyof RestaurantOption, value: string) => void;
-  errorMap: Record<string, string | undefined>;
 }
 
-const RestaurantFieldsForm: React.FC<Props> = ({ index, option, onChangeOption, errorMap }) => {
+const RestaurantFieldsForm: React.FC<Props> = ({ option, onChangeOption }) => {
   return (
     <>
       <TextField
@@ -18,8 +17,6 @@ const RestaurantFieldsForm: React.FC<Props> = ({ index, option, onChangeOption, 
         fullWidth
         value={option?.name || ''}
         onChange={(e) => onChangeOption(option.id, 'name', e.target.value)}
-        error={!!errorMap[`restaurant-${index}-name`]}
-        helperText={errorMap[`restaurant-${index}-name`]}
         margin="dense"
       />
       <TextField

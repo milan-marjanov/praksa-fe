@@ -1,16 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import {
-  Box,
-  TextField,
-  IconButton,
-  Button,
-  Typography,
-  FormControlLabel,
-  Radio,
-} from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Box, IconButton, Button, Typography, FormControlLabel, Radio } from '@mui/material';
 import { Add, Delete } from '@mui/icons-material';
 import RestaurantFieldsForm from './RestaurantFieldsForm';
 import { RestaurantOption } from '../../types/Event';
+import DateTimeForm from './DateTimeForm';
 
 interface RestaurantOptionsFormProps {
   eventStartTime?: string;
@@ -19,30 +12,10 @@ interface RestaurantOptionsFormProps {
 const RestaurantOptionsModal: React.FC<RestaurantOptionsFormProps> = () => {
   const [optionType, setOptionType] = useState<1 | 2 | 3>(1);
 
-  function getCurrentDatetimeLocal() {
-    const now = new Date();
-
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
-  }
-
-  const [voteDeadline, setVoteDeadline] = useState(getCurrentDatetimeLocal());
+  const [voteDeadline, setVoteDeadline] = useState('');
   const [restaurantOptions, setRestaurantOptions] = useState<RestaurantOption[]>([
     { id: Date.now(), name: '' },
   ]);
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
-
-  const tomorrowMidnightISO = useMemo(() => {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(0, 0, 0, 0);
-    return tomorrow.toISOString().slice(0, 16);
-  }, []);
 
   useEffect(() => {
     if (optionType === 2 && restaurantOptions.length === 0) {
@@ -52,6 +25,7 @@ const RestaurantOptionsModal: React.FC<RestaurantOptionsFormProps> = () => {
 
   const handleAddRestaurantOption = () => {
     setRestaurantOptions((prev) => [...prev, { id: Date.now(), name: '' }]);
+    console.log(voteDeadline);
   };
 
   const handleRemoveRestaurantOption = (id: number) => {
@@ -67,36 +41,6 @@ const RestaurantOptionsModal: React.FC<RestaurantOptionsFormProps> = () => {
       prev.map((opt) => (opt.id === id ? { ...opt, [field]: value } : opt)),
     );
   };
-  const handleVoteDeadlineChange = (value: string) => {
-    setVoteDeadline(value);
-
-    const validationError = validateVotingDeadline(value);
-    console.log(errors);
-    setErrors((prevErrors) => ({
-      ...prevErrors,
-      voteDeadline: validationError || '',
-    }));
-  };
-
-  function validateVotingDeadline(voteDeadline: string): string | null {
-    if (!voteDeadline) {
-      return 'Voting deadline is required.';
-    }
-
-    const deadlineDate = new Date(voteDeadline);
-    if (isNaN(deadlineDate.getTime())) {
-      return 'Invalid date/time format.';
-    }
-
-    const now = new Date();
-    now.setSeconds(0, 0); // zero seconds and ms to match input granularity
-
-    if (deadlineDate < now) {
-      return 'Voting deadline cannot be in the past.';
-    }
-
-    return null; // no error
-  }
 
   return (
     <Box display="flex" flexDirection="column" gap={3} marginLeft={1}>
@@ -143,25 +87,16 @@ const RestaurantOptionsModal: React.FC<RestaurantOptionsFormProps> = () => {
             index={0}
             option={restaurantOptions[0] || {}}
             onChangeOption={handleRestaurantOptionChange}
-            errorMap={errors}
           />
         </Box>
       )}
 
       {optionType === 2 && (
         <>
-        
-          <TextField
-            label="Voting Deadline *"
-            type="datetime-local"
-            value={voteDeadline}
-            onChange={(e) => handleVoteDeadlineChange(e.target.value)}
-            error={!!errors.voteDeadline}
-            helperText={errors.voteDeadline}
-            sx={{ width: '50%' }}
-            inputProps={{
-              min: tomorrowMidnightISO,
-            }}
+          <DateTimeForm
+            label="Voting Deadline"
+            required
+            onValidChange={(e) => setVoteDeadline(e)}
           />
 
           {restaurantOptions.map((option, i) => (
@@ -188,7 +123,6 @@ const RestaurantOptionsModal: React.FC<RestaurantOptionsFormProps> = () => {
                 index={i}
                 option={option}
                 onChangeOption={handleRestaurantOptionChange}
-                errorMap={errors}
               />
             </Box>
           ))}
@@ -196,7 +130,7 @@ const RestaurantOptionsModal: React.FC<RestaurantOptionsFormProps> = () => {
           <Box textAlign="center">
             <Button
               variant="outlined"
-              sx={{ width: '50%' }}
+              sx={{ width: '70%' }}
               startIcon={<Add />}
               onClick={handleAddRestaurantOption}
             >

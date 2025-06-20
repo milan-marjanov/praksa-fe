@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { TimeOption } from '../../types/Event';
-import { Box, Button, FormControlLabel, Radio, TextField, Typography } from '@mui/material';
+import { Box, Button, FormControlLabel, Radio, Typography } from '@mui/material';
 import TimeOptionFieldsForm from './TimeOptionFieldsForm';
 import { Add } from '@mui/icons-material';
+import DateTimeForm from './DateTimeForm';
 
 interface TimeOptionFormProps {
   onSubmit?: (timeOptions: TimeOption[], votingDeadline?: string) => void;
@@ -16,8 +17,80 @@ const generateId = (() => {
 const TimeOptionsModal: React.FC<TimeOptionFormProps> = () => {
   const [optionType, setOptionType] = useState<1 | 2 | 3>(1);
   const [votingDeadline, setVotingDeadline] = useState('');
-  const [singleOption, setSingleOption] = useState({ startTime: '', endTime: '' });
+  const [singleOption, setSingleOption] = useState<TimeOption>({
+    id: 0,
+    startTime: '',
+    endTime: '',
+    maxCapacity: 0,
+    deadline: '',
+    createdAt: '',
+    // add other TimeOption required fields as needed
+  });
   const [multipleOptions, setMultipleOptions] = useState<TimeOption[]>([]);
+  //const [errors, setErrors] = React.useState<{ startTime?: string; endTime?: string }>({});
+  /*function validateDateTime(value: string): string | null {
+    if (!value) {
+      return 'This field is required.';
+    }
+    const date = new Date(value);
+    if (isNaN(date.getTime())) {
+      return 'Invalid date/time format.';
+    }
+    const now = new Date();
+    now.setSeconds(0, 0); // match input granularity
+    if (date < now) {
+      return 'Date/time cannot be in the past.';
+    }
+    return null;
+  }
+
+  const tomorrowMidnightISO = useMemo(() => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+    return tomorrow.toISOString().slice(0, 16);
+  }, []);
+
+  function validateStartEndTimes(start: string, end: string): string | null {
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    if (start && end && endDate <= startDate) {
+      return 'End Time must be after Start Time.';
+    }
+    return null;
+  }
+  const handleStartTimeChange = (value: string) => {
+    setSingleOption({ ...singleOption, startTime: value });
+
+    const error = validateDateTime(value);
+    let endError = null;
+
+    if (!error && singleOption.endTime) {
+      endError = validateStartEndTimes(value, singleOption.endTime);
+    }
+
+    setErrors((prev) => ({
+      ...prev,
+      startTime: error || undefined,
+      endTime: endError || undefined,
+    }));
+  };
+
+  const handleEndTimeChange = (value: string) => {
+    setSingleOption((prev) => ({ ...prev, endTime: value }));
+
+    const error = validateDateTime(value);
+    let endError = null;
+
+    if (!error && singleOption.startTime) {
+      endError = validateStartEndTimes(singleOption.startTime, value);
+    }
+
+    setErrors((prev) => ({
+      ...prev,
+      endTime: error || endError || undefined,
+    }));
+  };*/
 
   useEffect(() => {
     if ((optionType === 2 || optionType === 3) && multipleOptions.length === 0) {
@@ -32,7 +105,7 @@ const TimeOptionsModal: React.FC<TimeOptionFormProps> = () => {
         },
       ]);
     }
-  }, [optionType]);
+  }, [multipleOptions.length, optionType]);
 
   const addOption = () => {
     if (multipleOptions.length >= 6) return;
@@ -51,6 +124,7 @@ const TimeOptionsModal: React.FC<TimeOptionFormProps> = () => {
 
   const removeOption = (id: number) => {
     setMultipleOptions((prevOptions) => prevOptions.filter((opt) => opt.id !== id));
+    console.log(votingDeadline);
   };
 
   const updateOption = (
@@ -127,7 +201,7 @@ const TimeOptionsModal: React.FC<TimeOptionFormProps> = () => {
             control={
               <Radio checked={optionType === 1} onChange={() => setOptionType(1)} value={1} />
             }
-            label="Schedule One Specific Time (Single start and end)"
+            label="Schedule One Specific Time"
           />
           <FormControlLabel
             control={
@@ -147,45 +221,29 @@ const TimeOptionsModal: React.FC<TimeOptionFormProps> = () => {
       <hr style={styles.divider} />
 
       {optionType === 1 && (
-        <Box style={styles.singleOptionContainer}>
-            
-          <Box style={styles.labelGroup}>
-            <Typography style={styles.labelAbove}>Event Start Time</Typography>
-            <TextField
-              type="datetime-local"
-              value={singleOption.startTime}
-              onChange={(e) => setSingleOption({ ...singleOption, startTime: e.target.value })}
-              required
-            />
-          </Box>
-          <Box style={styles.labelGroup}>
-            <Typography style={styles.labelAbove}>Event End Time</Typography>
-            <TextField
-              type="datetime-local"
-              value={singleOption.endTime}
-              onChange={(e) => setSingleOption({ ...singleOption, endTime: e.target.value })}
-              required
-            />
-          </Box>
-        </Box>
+        <TimeOptionFieldsForm
+          opt={singleOption}
+          index={0}
+          optionType={optionType}
+          updateOption={(id, field, value) => {
+            setSingleOption((prev) => ({ ...prev, [field]: value }));
+          }}
+          removeOption={() => {
+            // No remove for single option - can be noop or no button shown in form
+          }}
+          multipleOptionsLength={1} // single option count is 1
+        />
       )}
 
       {(optionType === 2 || optionType === 3) && (
         <>
           <Box style={styles.labelGroup}>
             <Typography style={styles.labelAbove}>Voting Deadline</Typography>
-            <TextField
-              type="datetime-local"
-              value={votingDeadline}
-              onChange={(e) => setVotingDeadline(e.target.value)}
-              required
-            />
-            <Typography style={{ color: '#777', fontSize: 10, marginTop: 5, textAlign: 'center' }}>
-              Set the date and time when voting will close
-            </Typography>
+
+            <DateTimeForm label="" required onValidChange={(e) => setVotingDeadline(e)} />
           </Box>
 
-          <Typography sx={{ mt: 3, textAlign: 'center', fontWeight: 'bold', mb: 2 }}>
+          <Typography sx={{ mt: 1, textAlign: 'center', fontWeight: 'bold', mb: 2 }}>
             Time Options (You can add up to 6)
           </Typography>
           {multipleOptions.map((opt, i) => (
@@ -203,7 +261,7 @@ const TimeOptionsModal: React.FC<TimeOptionFormProps> = () => {
           <Box textAlign="center" mt={2}>
             <Button
               variant="outlined"
-              sx={{ width: '50%' }}
+              sx={{ width: '70%' }}
               startIcon={<Add />}
               onClick={addOption}
               disabled={multipleOptions.length >= 6}
@@ -222,9 +280,9 @@ const styles: { [key: string]: React.CSSProperties } = {
     maxWidth: '100%',
     margin: '0 auto',
     paddingLeft: 10,
-        paddingRight: 10,
+    paddingRight: 10,
 
-    paddingTop:0,
+    paddingTop: 0,
     borderRadius: 12,
     backgroundColor: '#f5f5dc',
   },
@@ -261,7 +319,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     maxWidth: '100%',
     marginLeft: 'auto', // horizontal centering
     marginRight: 'auto',
-    marginTop:16
+    marginTop: 16,
   },
 
   labelAbove: {
