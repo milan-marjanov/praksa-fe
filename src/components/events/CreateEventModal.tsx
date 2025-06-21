@@ -4,6 +4,9 @@ import EventModal, { EventModalRef } from './EventModal';
 import { CreateEventDto, CreateEventModalProps, UpdateEventDTO } from '../../types/Event';
 import RestaurantOptionsModal from './RestaurantOptionsModal';
 import TimeOptionsModal from './TimeOptionsModal';
+import { createEvent } from '../../services/eventService';
+import { useEventForm } from '../../contexts/EventContext';
+import { toast } from 'react-toastify';
 
 export default function CreateEventModal({
   users,
@@ -15,6 +18,7 @@ export default function CreateEventModal({
   const [slideIndex, setSlideIndex] = useState(0);
   const formRef = useRef<EventModalRef>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const { eventData} = useEventForm();
 
   const handleFormSubmit = async (data: CreateEventDto | UpdateEventDTO, isUpdate: boolean) => {
     if (event) {
@@ -66,6 +70,27 @@ export default function CreateEventModal({
       setSlideIndex(slideIndex - 1);
     }
   };
+
+const handleCreateEvent = async () => {
+  try {
+    const dataToSubmit: CreateEventDto = {
+      ...eventData as CreateEventDto,
+      creatorId: creator.id,
+    };
+
+    console.log('Submitted eventData: ', dataToSubmit);
+
+    const response = await createEvent(dataToSubmit);
+    console.log('Event created successfully:', response);
+    toast.success("Event created successfully");
+    handleClose();
+  } catch (error) {
+    console.error('Error creating event:', error);
+  }
+};
+
+
+
 
   return (
     <div style={{ padding: 40 }}>
@@ -126,9 +151,13 @@ export default function CreateEventModal({
               ))}
             </Stack>
 
-            <Button onClick={next} disabled={slideIndex === slides.length - 1}>
-              Next
-            </Button>
+            {slideIndex === slides.length - 1 ? (
+    <Button variant="contained" onClick={handleCreateEvent}>
+      Create Event
+    </Button>
+  ) : (
+    <Button onClick={next}>Next</Button>
+  )}
           </Stack>
         </Box>
       </Modal>

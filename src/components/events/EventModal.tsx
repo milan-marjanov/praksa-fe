@@ -26,6 +26,7 @@ const EventModal = forwardRef<EventModalRef, EventModalProps>(
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const maxDescriptionChars = 255;
     const isUpdate = !!event;
+    
 
     useEffect(() => {
       console.log('eventData changed:', eventData);
