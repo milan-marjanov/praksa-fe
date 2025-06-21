@@ -12,11 +12,19 @@ function generateId(min = 1, max = 10000): number {
 }
 
 const TimeOptionsModal: React.FC = () => {
+
+  
   const { eventData, setEventData } = useEventForm();
     const timeOptions = eventData.timeOptions;
 
-  const [optionType, setOptionType] = useState<1 | 2 | 3>(1);
-
+  const [optionType, setOptionType] = useState<1 | 2 | 3>(() => {
+    switch (eventData.timeOptionType) {
+      case 'FIXED': return 1;
+      case 'VOTING': return 2;
+      case 'CAPACITY_BASED': return 3;
+      default: return 1;
+    }
+  });
   const [votingDeadline, setVotingDeadline] = useState('');
 
   useEffect(() => {
