@@ -13,8 +13,10 @@ const defaultData: CreateEventDto = {
   description: '',
   creatorId: 0,
   participantIds: [],
+  votingDeadline: '',
   timeOptionType: 'FIXED',
   timeOptions: [],
+  restaurantOptionType: 'FIXED',
   restaurantOptions: [],
 };
 

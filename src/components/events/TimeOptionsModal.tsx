@@ -5,27 +5,27 @@ import { Add } from '@mui/icons-material';
 import DateTimeForm from './DateTimeForm';
 import { useEventForm } from '../../contexts/EventContext';
 
-
-
 function generateId(min = 1, max = 10000): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 const TimeOptionsModal: React.FC = () => {
-
-  
   const { eventData, setEventData } = useEventForm();
-    const timeOptions = eventData.timeOptions;
+  const timeOptions = eventData.timeOptions;
 
   const [optionType, setOptionType] = useState<1 | 2 | 3>(() => {
     switch (eventData.timeOptionType) {
-      case 'FIXED': return 1;
-      case 'VOTING': return 2;
-      case 'CAPACITY_BASED': return 3;
-      default: return 1;
+      case 'FIXED':
+        return 1;
+      case 'VOTING':
+        return 2;
+      case 'CAPACITY_BASED':
+        return 3;
+      default:
+        return 1;
     }
   });
-  const [votingDeadline, setVotingDeadline] = useState('');
+  const votingDeadline = eventData.votingDeadline;
 
   useEffect(() => {
     if (eventData.timeOptions?.length === 0) {
@@ -36,7 +36,6 @@ const TimeOptionsModal: React.FC = () => {
             startTime: '',
             endTime: '',
             maxCapacity: 1,
-            deadline: '',
             createdAt: new Date().toISOString(),
           },
         ],
@@ -45,82 +44,78 @@ const TimeOptionsModal: React.FC = () => {
     console.log(eventData);
   }, [optionType, eventData.timeOptions, setEventData, eventData]);
 
-const handleOptionType = (value: 1 | 2 | 3) => {
-  const typeMap = {
-    1: 'FIXED',
-    2: 'VOTING',
-    3: 'CAPACITY_BASED',
-  } as const;
+  const handleOptionTypeChange = (value: 1 | 2 | 3) => {
+    const typeMap = {
+      1: 'FIXED',
+      2: 'VOTING',
+      3: 'CAPACITY_BASED',
+    } as const;
 
-  const initialTimeOption = {
-    id: generateId(),
-    startTime: '',
-    endTime: '',
-    maxCapacity: 0,
-    deadline: votingDeadline,
-    createdAt: new Date().toISOString(),
+    const initialTimeOption = {
+      id: generateId(),
+      startTime: '',
+      endTime: '',
+      maxCapacity: 0,
+      createdAt: new Date().toISOString(),
+    };
+
+    setOptionType(value);
+
+    setEventData({
+      ...eventData,
+      timeOptionType: typeMap[value],
+      timeOptions: [initialTimeOption],
+    });
   };
-
-  setOptionType(value);
-
-  setEventData({
-    ...eventData,
-    timeOptionType: typeMap[value],
-    timeOptions: [initialTimeOption],
-  });
-};
-
 
   const addOption = () => {
     if ((eventData.timeOptions?.length ?? 0) >= 6) return;
-        setEventData({
-      timeOptions: [...(timeOptions || []), {
-        id: generateId(),
-        startTime: '',
-        endTime: '',
-        maxCapacity: 0,
-        deadline: votingDeadline,
-        createdAt: new Date().toISOString(),
-      },],
+    setEventData({
+      timeOptions: [
+        ...(timeOptions || []),
+        {
+          id: generateId(),
+          startTime: '',
+          endTime: '',
+          maxCapacity: 0,
+          createdAt: new Date().toISOString(),
+        },
+      ],
     });
   };
 
   const removeOption = (id: number) => {
-        console.log(votingDeadline);
+    console.log(votingDeadline);
     setEventData({
       timeOptions: (timeOptions ?? []).filter((opt) => opt.id !== id),
     });
   };
 
   const handleVotingDeadlineChange = (newDeadline: string) => {
-  setVotingDeadline(newDeadline);
 
-  setEventData({
-    ...eventData,
-    timeOptions: (eventData.timeOptions ?? []).map((opt) => ({
-      ...opt,
-      deadline: newDeadline,
-    })),
-  });
-};
+    setEventData({
+      ...eventData,
 
-const updateOption = (
-  id: number,
-  field: 'startTime' | 'endTime' | 'maxCapacity',
-  value: string,
-) => {
-  setEventData({
-    timeOptions: (timeOptions ?? []).map((opt) =>
-      opt.id === id
-        ? {
-            ...opt,
-            [field]: field === 'maxCapacity' ? (value ? Number(value) : undefined) : value,
-          }
-        : opt,
-    ),
-  });
-};
+    votingDeadline: newDeadline,
+    });
+  };
 
+  const updateOption = (
+    id: number,
+    field: 'startTime' | 'endTime' | 'maxCapacity',
+    value: string,
+  ) => {
+    setEventData({
+      timeOptions: (timeOptions ?? []).map((opt) =>
+        opt.id === id
+          ? {
+              ...opt,
+              [field]: field === 'maxCapacity' ? (value ? Number(value) : undefined) : value,
+            }
+          : opt,
+      ),
+    });
+  };
 
   return (
     <Box component="form" style={styles.form}>
@@ -131,57 +126,52 @@ const updateOption = (
         <Box display="flex" flexDirection="column">
           <FormControlLabel
             control={
-      <Radio
-        checked={optionType === 1}
-        onChange={() => handleOptionType(1)}
-        value={1}
-      />            }
+              <Radio checked={optionType === 1} onChange={() => handleOptionTypeChange(1)} value={1} />
+            }
             label="Schedule One Specific Time"
           />
           <FormControlLabel
             control={
-      <Radio
-        checked={optionType === 2}
-        onChange={() => handleOptionType(2)}
-        value={2}
-      />            }
+              <Radio checked={optionType === 2} onChange={() => handleOptionTypeChange(2)} value={2} />
+            }
             label="Let Participants Vote on the Best Time (Up to 6 options)"
           />
           <FormControlLabel
             control={
-      <Radio
-        checked={optionType === 3}
-        onChange={() => handleOptionType(3)}
-        value={3}
-      />            }
+              <Radio checked={optionType === 3} onChange={() => handleOptionTypeChange(3)} value={3} />
+            }
             label="Create Multiple Time Slots with Capacity Limits"
           />
         </Box>
       </Box>
 
       <hr style={{ margin: '16px 0' }} />
-{optionType === 1 && eventData.timeOptions && eventData.timeOptions[0] && (
-  <TimeOptionFieldsForm
-    key={eventData.timeOptions[0].id}
-    opt={eventData.timeOptions[0]}
-    index={0}
-    optionType={optionType}
-    updateOption={updateOption}
-    removeOption={() => {}}
-    multipleOptionsLength={1}
-  />
-)}
-
+      {optionType === 1 && eventData.timeOptions && eventData.timeOptions[0] && (
+        <TimeOptionFieldsForm
+          key={eventData.timeOptions[0].id}
+          opt={eventData.timeOptions[0]}
+          index={0}
+          optionType={optionType}
+          updateOption={updateOption}
+          removeOption={() => {}}
+          multipleOptionsLength={1}
+        />
+      )}
 
       {(optionType === 2 || optionType === 3) && (
         <>
           <Box style={{ marginTop: 16 }}>
-          <Box style={styles.labelGroup}>
-            <Typography style={styles.labelAbove}>Voting Deadline</Typography>
+            <Box style={styles.labelGroup}>
+              <Typography style={styles.labelAbove}>Voting Deadline</Typography>
 
-            <DateTimeForm label="" required     onValidChange={(e) => handleVotingDeadlineChange(e)}
- />
-          </Box>
+              <DateTimeForm
+                label=""
+                required
+                  initialValue={votingDeadline}
+
+                onValidChange={(e) => handleVotingDeadlineChange(e)}
+              />
+            </Box>
           </Box>
 
           <Typography sx={{ mt: 1, textAlign: 'center', fontWeight: 'bold', mb: 2 }}>
@@ -215,7 +205,6 @@ const updateOption = (
     </Box>
   );
 };
-
 
 const styles: { [key: string]: React.CSSProperties } = {
   form: {
@@ -330,6 +319,5 @@ const styles: { [key: string]: React.CSSProperties } = {
     transition: 'background 0.3s',
   },
 };
-
 
 export default TimeOptionsModal;

@@ -10,13 +10,24 @@ const RestaurantOptionsModal: React.FC = () => {
   const { eventData, setEventData } = useEventForm();
   const restaurantOptions = eventData.restaurantOptions;
 
-  const [optionType, setOptionType] = useState<1 | 2 | 3>(1);
+  const [optionType, setOptionType] = useState<1 | 2 | 3>(() => {
+    switch (eventData.restaurantOptionType) {
+      case 'FIXED':
+        return 1;
+      case 'VOTING':
+        return 2;
+      case 'NONE':
+        return 3;
+      default:
+        return 1;
+    }
+  });
 
-  const [voteDeadline, setVoteDeadline] = useState('');
+  const votingDeadline = eventData.votingDeadline;
 
   useEffect(() => {
     console.log(eventData);
-    if (!restaurantOptions || restaurantOptions.length === 0) {
+    if ((!restaurantOptions || restaurantOptions.length === 0) && optionType !== 3) {
       setEventData({
         restaurantOptions: [{ id: Date.now(), name: '' }],
       });
@@ -27,7 +38,7 @@ const RestaurantOptionsModal: React.FC = () => {
     setEventData({
       restaurantOptions: [...(restaurantOptions || []), { id: Date.now(), name: '' }],
     });
-    console.log(voteDeadline);
+    console.log(votingDeadline);
   };
 
   const handleRemoveRestaurantOption = (id: number) => {
@@ -48,15 +59,43 @@ const RestaurantOptionsModal: React.FC = () => {
     });
   };
 
-  const handleOptionType = (value: 1 | 2 | 3) => {
-setOptionType(value);
-  const initialRestaurantOption = { id: Date.now(), name: '' };
+  const handleOptionTypeChange = (value: 1 | 2 | 3) => {
+    const typeMap = {
+      1: 'FIXED',
+      2: 'VOTING',
+      3: 'NONE',
+    } as const;
 
-  setEventData({
-    ...eventData,
-    restaurantOptions: [initialRestaurantOption],
-  });
-};
+    const initialRestaurantOption = { id: Date.now(), name: '' };
+
+
+    setOptionType(value);
+
+    if (value === 3) {
+    setEventData({
+      ...eventData,
+      restaurantOptionType: typeMap[value],
+      restaurantOptions: [],
+    });
+    } else {
+          setEventData({
+      ...eventData,
+      restaurantOptionType: typeMap[value],
+      restaurantOptions: [initialRestaurantOption],
+    });
+    }
+
+  };
+
+  
+  const handleVotingDeadlineChange = (newDeadline: string) => {
+
+    setEventData({
+      ...eventData,
+
+    votingDeadline: newDeadline,
+    });
+  };
 
   return (
     <Box display="flex" flexDirection="column" gap={3} marginLeft={1}>
@@ -67,29 +106,20 @@ setOptionType(value);
         <Box display="flex" flexDirection="column" mt={1}>
           <FormControlLabel
             control={
-      <Radio
-        checked={optionType === 1}
-        onChange={() => handleOptionType(1)}
-        value={1}
-      />            }
+              <Radio checked={optionType === 1} onChange={() => handleOptionTypeChange(1)} value={1} />
+            }
             label="Choose One Restaurant"
           />
           <FormControlLabel
             control={
-      <Radio
-        checked={optionType === 2}
-        onChange={() => handleOptionType(2)}
-        value={2}
-      />            }
+              <Radio checked={optionType === 2} onChange={() => handleOptionTypeChange(2)} value={2} />
+            }
             label="Let Participants Vote on Restaurants"
           />
           <FormControlLabel
             control={
-      <Radio
-        checked={optionType === 3}
-        onChange={() => handleOptionType(3)}
-        value={3}
-      />            }
+              <Radio checked={optionType === 3} onChange={() => handleOptionTypeChange(3)} value={3} />
+            }
             label="Skip Restaurant Selection"
           />
         </Box>
@@ -118,17 +148,21 @@ setOptionType(value);
 
       {optionType === 2 && (
         <>
-                    <Typography style={{    fontSize: 14,
-    color: '#555',
-    marginBottom: -10,
-    marginLeft:8,
-    fontWeight: '600',}}>Voting Deadline</Typography>
-        
-          <DateTimeForm
-            label=""
-            required
-            onValidChange={(e) => setVoteDeadline(e)}
-          />
+          <Typography
+            style={{
+              fontSize: 14,
+              color: '#555',
+              marginBottom: -10,
+              marginLeft: 8,
+              fontWeight: '600',
+            }}
+          >
+            Voting Deadline
+          </Typography>
+
+          <DateTimeForm label="" required initialValue={votingDeadline}
+
+                onValidChange={(e) => handleVotingDeadlineChange(e)} />
 
           {(restaurantOptions ?? []).map((option, i) => (
             <Box

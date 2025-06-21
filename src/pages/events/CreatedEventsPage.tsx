@@ -57,10 +57,10 @@ export default function CreatedEventsPage() {
     setSelectedEventTitle(null);
   };
 
-const handleCreateClick = () => {
-  resetEventData(); // synchronous
-  setModalOpen(true); // synchronous
-};
+  const handleCreateClick = () => {
+    resetEventData(); 
+    setModalOpen(true); 
+  };
 
   const truncateText = (text: string, maxLength: number): string =>
     text.length > maxLength ? text.slice(0, maxLength) + '...' : text;

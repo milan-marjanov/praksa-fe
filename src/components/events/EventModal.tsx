@@ -119,8 +119,10 @@ const EventModal = forwardRef<EventModalRef, EventModalProps>(
           description,
           participantIds: allParticipantIds,
           creatorId: creator.id,
+          votingDeadline: '',
           timeOptionType: eventData.timeOptionType ?? 'FIXED',
           timeOptions: eventData.timeOptions ?? [],
+          restaurantOptionType: eventData.restaurantOptionType ?? 'FIXED',
           restaurantOptions: eventData.restaurantOptions ?? [],
         };
         await onSubmit(createData, false);

@@ -18,7 +18,6 @@ import { AuthProvider } from './contexts/AuthContext';
 import { EventFormProvider } from './contexts/EventContext';
 
 export default function App() {
-
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -88,11 +87,11 @@ export default function App() {
               <Route
                 path="/createdEvents"
                 element={
- <EventFormProvider>
-  <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
-    <CreatedEventsPage />
-  </ProtectedRoute>
-</EventFormProvider>
+                  <EventFormProvider>
+                    <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                      <CreatedEventsPage />
+                    </ProtectedRoute>
+                  </EventFormProvider>
                 }
               />
               <Route path="/unauthorized" element={<UnauthorizedPage />} />

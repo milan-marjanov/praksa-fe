@@ -1,13 +1,14 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { TextField } from '@mui/material';
 
 type DateTimeFormProps = {
   label: string;
   required?: boolean;
+  initialValue?: string;
   onValidChange?: (value: string) => void;
 };
 
-const DateTimeForm: React.FC<DateTimeFormProps> = ({ label, required = false, onValidChange }) => {
+const DateTimeForm: React.FC<DateTimeFormProps> = ({ label, initialValue, required = false, onValidChange }) => {
   /*function getCurrentDatetimeLocal() {
     const now = new Date();
 
@@ -19,8 +20,13 @@ const DateTimeForm: React.FC<DateTimeFormProps> = ({ label, required = false, on
 
     return `${year}-${month}-${day}T${hours}:${minutes}`;
   }*/
-  const [value, setValue] = useState('');
   const [error, setError] = useState<string | null>(null);
+const [value, setValue] = useState<string>(initialValue || '');
+
+useEffect(() => {
+  setValue(initialValue || '');
+}, [initialValue]);
+
 
   const minISO = useMemo(() => {
     const min = new Date();

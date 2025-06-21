@@ -35,7 +35,7 @@ export default function CreateEventModal({
       ref={formRef}
     />,
     <TimeOptionsModal key="slide2" />,
-    <RestaurantOptionsModal key="slide3"/>,
+    <RestaurantOptionsModal key="slide3" />,
   ];
 
   const handleClose = () => {
@@ -68,7 +68,6 @@ export default function CreateEventModal({
   };
 
   return (
-
     <div style={{ padding: 40 }}>
       <Modal open={open} onClose={handleClose}>
         <Box
@@ -134,6 +133,5 @@ export default function CreateEventModal({
         </Box>
       </Modal>
     </div>
-
   );
 }
