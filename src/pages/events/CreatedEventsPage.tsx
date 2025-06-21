@@ -15,6 +15,7 @@ import {
 } from '../../styles/CommonStyles';
 import CreateEventModal from '../../components/events/CreateEventModal';
 import { useSetupEventForm } from '../../hooks/useSetupEventForm';
+import { useEventForm } from '../../contexts/EventContext';
 
 export default function CreatedEventsPage() {
   const navigate = useNavigate();
@@ -24,6 +25,7 @@ export default function CreatedEventsPage() {
   const [selectedEventTitle, setSelectedEventTitle] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const { creator, filteredUsers, loadingUsers } = useSetupEventForm();
+  const { resetEventData } = useEventForm();
 
   const handleEditClick = (event: EventDTO) => {
     navigate('/updateEvent', { state: { event } });
@@ -55,6 +57,11 @@ export default function CreatedEventsPage() {
     setSelectedEventTitle(null);
   };
 
+const handleCreateClick = () => {
+  resetEventData(); // synchronous
+  setModalOpen(true); // synchronous
+};
+
   const truncateText = (text: string, maxLength: number): string =>
     text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
 
@@ -71,7 +78,7 @@ export default function CreatedEventsPage() {
       <Button
         variant="contained"
         sx={{ fontWeight: 'bold', display: 'flex', mb: 3, ml: 1 }}
-        onClick={() => setModalOpen(true)}
+        onClick={handleCreateClick}
       >
         Create Event
       </Button>

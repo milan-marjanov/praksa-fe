@@ -8,7 +8,7 @@ type DateTimeFormProps = {
 };
 
 const DateTimeForm: React.FC<DateTimeFormProps> = ({ label, required = false, onValidChange }) => {
-  function getCurrentDatetimeLocal() {
+  /*function getCurrentDatetimeLocal() {
     const now = new Date();
 
     const year = now.getFullYear();
@@ -18,8 +18,8 @@ const DateTimeForm: React.FC<DateTimeFormProps> = ({ label, required = false, on
     const minutes = String(now.getMinutes()).padStart(2, '0');
 
     return `${year}-${month}-${day}T${hours}:${minutes}`;
-  }
-  const [value, setValue] = useState(getCurrentDatetimeLocal());
+  }*/
+  const [value, setValue] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   const minISO = useMemo(() => {

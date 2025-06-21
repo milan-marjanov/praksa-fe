@@ -16,7 +16,7 @@ const RestaurantOptionsModal: React.FC = () => {
 
   useEffect(() => {
     console.log(eventData);
-    if (optionType === 2 && (!restaurantOptions || restaurantOptions.length === 0)) {
+    if (!restaurantOptions || restaurantOptions.length === 0) {
       setEventData({
         restaurantOptions: [{ id: Date.now(), name: '' }],
       });
@@ -48,6 +48,16 @@ const RestaurantOptionsModal: React.FC = () => {
     });
   };
 
+  const handleOptionType = (value: 1 | 2 | 3) => {
+setOptionType(value);
+  const initialRestaurantOption = { id: Date.now(), name: '' };
+
+  setEventData({
+    ...eventData,
+    restaurantOptions: [initialRestaurantOption],
+  });
+};
+
   return (
     <Box display="flex" flexDirection="column" gap={3} marginLeft={1}>
       <Box>
@@ -57,20 +67,29 @@ const RestaurantOptionsModal: React.FC = () => {
         <Box display="flex" flexDirection="column" mt={1}>
           <FormControlLabel
             control={
-              <Radio checked={optionType === 1} onChange={() => setOptionType(1)} value={1} />
-            }
+      <Radio
+        checked={optionType === 1}
+        onChange={() => handleOptionType(1)}
+        value={1}
+      />            }
             label="Choose One Restaurant"
           />
           <FormControlLabel
             control={
-              <Radio checked={optionType === 2} onChange={() => setOptionType(2)} value={2} />
-            }
+      <Radio
+        checked={optionType === 2}
+        onChange={() => handleOptionType(2)}
+        value={2}
+      />            }
             label="Let Participants Vote on Restaurants"
           />
           <FormControlLabel
             control={
-              <Radio checked={optionType === 3} onChange={() => setOptionType(3)} value={3} />
-            }
+      <Radio
+        checked={optionType === 3}
+        onChange={() => handleOptionType(3)}
+        value={3}
+      />            }
             label="Skip Restaurant Selection"
           />
         </Box>
@@ -99,8 +118,14 @@ const RestaurantOptionsModal: React.FC = () => {
 
       {optionType === 2 && (
         <>
+                    <Typography style={{    fontSize: 14,
+    color: '#555',
+    marginBottom: -10,
+    marginLeft:8,
+    fontWeight: '600',}}>Voting Deadline</Typography>
+        
           <DateTimeForm
-            label="Voting Deadline"
+            label=""
             required
             onValidChange={(e) => setVoteDeadline(e)}
           />

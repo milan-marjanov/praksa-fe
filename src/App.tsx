@@ -15,8 +15,10 @@ import HomePage from './pages/HomePage';
 import MyProfilePage from './pages/MyProfilePage';
 import ProfilePage from './pages/ProfilePage';
 import { AuthProvider } from './contexts/AuthContext';
+import { EventFormProvider } from './contexts/EventContext';
 
 export default function App() {
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -86,9 +88,11 @@ export default function App() {
               <Route
                 path="/createdEvents"
                 element={
-                  <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
-                    <CreatedEventsPage />
-                  </ProtectedRoute>
+ <EventFormProvider>
+  <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+    <CreatedEventsPage />
+  </ProtectedRoute>
+</EventFormProvider>
                 }
               />
               <Route path="/unauthorized" element={<UnauthorizedPage />} />
