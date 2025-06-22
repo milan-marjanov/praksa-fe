@@ -1,7 +1,12 @@
 import { useRef, useState } from 'react';
 import { Button, Modal, Box, Typography, Stack, Divider } from '@mui/material';
 import EventModal from './EventModal';
-import { CreateEventDto, CreateEventModalProps, EventModalRef, UpdateEventDTO } from '../../types/Event';
+import {
+  CreateEventDto,
+  CreateEventModalProps,
+  EventModalRef,
+  UpdateEventDTO,
+} from '../../types/Event';
 import RestaurantOptionsModal from './RestaurantOptionsModal';
 import TimeOptionsModal from './TimeOptionsModal';
 import { createEvent } from '../../services/eventService';
@@ -18,7 +23,7 @@ export default function CreateEventModal({
   const [slideIndex, setSlideIndex] = useState(0);
   const formRef = useRef<EventModalRef>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const { eventData} = useEventForm();
+  const { eventData } = useEventForm();
 
   const handleFormSubmit = async (data: CreateEventDto | UpdateEventDTO, isUpdate: boolean) => {
     if (event) {
@@ -38,8 +43,8 @@ export default function CreateEventModal({
       onSubmit={handleFormSubmit}
       ref={formRef}
     />,
-    <TimeOptionsModal key="slide2" ref={formRef}/>,
-    <RestaurantOptionsModal key="slide3" ref={formRef}/>,
+    <TimeOptionsModal key="slide2" ref={formRef} />,
+    <RestaurantOptionsModal key="slide3" ref={formRef} />,
   ];
 
   const handleClose = () => {
@@ -71,30 +76,27 @@ export default function CreateEventModal({
     }
   };
 
-const handleCreateEvent = async () => {
-      if (slideIndex ===2) {
+  const handleCreateEvent = async () => {
+    if (slideIndex === 2) {
       const result = formRef.current?.validate();
       if (result?.hasError) return;
     }
-  try {
-    const dataToSubmit: CreateEventDto = {
-      ...eventData as CreateEventDto,
-      creatorId: creator.id,
-    };
+    try {
+      const dataToSubmit: CreateEventDto = {
+        ...(eventData as CreateEventDto),
+        creatorId: creator.id,
+      };
 
-    console.log('Submitted eventData: ', dataToSubmit);
+      console.log('Submitted eventData: ', dataToSubmit);
 
-    const response = await createEvent(dataToSubmit);
-    console.log('Event created successfully:', response);
-    toast.success("Event created successfully");
-    handleClose();
-  } catch (error) {
-    console.error('Error creating event:', error);
-  }
-};
-
-
-
+      const response = await createEvent(dataToSubmit);
+      console.log('Event created successfully:', response);
+      toast.success('Event created successfully');
+      handleClose();
+    } catch (error) {
+      console.error('Error creating event:', error);
+    }
+  };
 
   return (
     <div style={{ padding: 40 }}>
@@ -156,12 +158,12 @@ const handleCreateEvent = async () => {
             </Stack>
 
             {slideIndex === slides.length - 1 ? (
-    <Button variant="contained" onClick={handleCreateEvent}>
-      Create Event
-    </Button>
-  ) : (
-    <Button onClick={next}>Next</Button>
-  )}
+              <Button variant="contained" onClick={handleCreateEvent}>
+                Create Event
+              </Button>
+            ) : (
+              <Button onClick={next}>Next</Button>
+            )}
           </Stack>
         </Box>
       </Modal>

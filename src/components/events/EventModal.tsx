@@ -16,15 +16,12 @@ import { SelectChangeEvent } from '@mui/material/Select';
 import { CreateEventDto, EventModalProps, EventModalRef, UpdateEventDTO } from '../../types/Event';
 import { useEventForm } from '../../contexts/EventContext';
 
-
-
 const EventModal = forwardRef<EventModalRef, EventModalProps>(
   ({ users, creator, event, onSubmit }, ref) => {
     const { eventData, setEventData } = useEventForm();
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const maxDescriptionChars = 255;
     const isUpdate = !!event;
-    
 
     useEffect(() => {
       console.log('eventData changed:', eventData);

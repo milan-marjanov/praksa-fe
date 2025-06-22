@@ -10,7 +10,6 @@ const tomorrowNoon = new Date();
 tomorrowNoon.setDate(tomorrowNoon.getDate() + 1);
 tomorrowNoon.setHours(12, 0, 0, 0); // sets time to 12:00:00.000 PM
 
-
 const defaultData: CreateEventDto = {
   id: 0,
   title: '',

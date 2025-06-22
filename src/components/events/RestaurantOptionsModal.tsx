@@ -24,7 +24,7 @@ const RestaurantOptionsModal = forwardRef<EventModalRef>((_, ref) => {
   });
 
   const votingDeadline = eventData.votingDeadline;
-    const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     console.log(eventData);
@@ -35,55 +35,80 @@ const RestaurantOptionsModal = forwardRef<EventModalRef>((_, ref) => {
     }
   }, [eventData, optionType, restaurantOptions, setEventData]);
 
-useEffect(() => {
-  console.log('One or more restaurant names changed');
+  useEffect(() => {
+    console.log('One or more restaurant names changed');
 
-  setErrors((prevErrors) => {
-    const newErrors = { ...prevErrors };
+    setErrors((prevErrors) => {
+      const newErrors = { ...prevErrors };
 
-    if (restaurantOptions) {
-      restaurantOptions.forEach((opt) => {
-        if (opt.name && opt.name.trim() !== '') {
-          delete newErrors[opt.id];
+      if (restaurantOptions) {
+        restaurantOptions.forEach((opt) => {
+          if (opt.name && opt.name.trim() !== '') {
+            delete newErrors[opt.id];
+          }
+        });
+      }
+
+      return newErrors;
+    });
+  }, [restaurantOptions?.map((opt) => opt.name).join('|')]);
+
+  useEffect(() => {
+    setErrors({});
+  }, [optionType]);
+
+  useEffect(() => {
+    setErrors((prevErrors) => {
+      const newErrors = { ...prevErrors };
+      // Remove only the 'invalidOptions' error
+      delete newErrors['invalidOptions'];
+      return newErrors;
+    });
+  }, [eventData.restaurantOptions?.length]);
+
+  useImperativeHandle(ref, () => ({
+    validate,
+  }));
+
+  const validate = () => {
+    const newErrors: Record<number | string, string> = {};
+    let hasError = false;
+
+    if (optionType === 1 || optionType === 2) {
+      for (let i = 0; i < (eventData.restaurantOptions?.length ?? 0); i++) {
+        const opt = eventData.restaurantOptions![i];
+        if (!opt.name || opt.name.trim() === '') {
+          newErrors[opt.id] = 'Restaurant name is required';
+          hasError = true;
         }
-      });
-    }
-
-    return newErrors;
-  });
-}, [restaurantOptions?.map(opt => opt.name).join('|')]);
-
-
-useEffect(() => {
-  setErrors({});
-}, [optionType]);
-
-
-useImperativeHandle(ref, () => ({
-  validate,
-}));
-
-const validate = () => {
-  const newErrors: Record<number, string> = {};
-  let hasError = false;
-
-  if (optionType === 1 || optionType === 2) {
-    for (let i = 0; i < (eventData.restaurantOptions?.length ?? 0); i++) {
-      const opt = eventData.restaurantOptions![i];
-      if (!opt.name || opt.name.trim() === '') {
-        newErrors[opt.id] = 'Restaurant name is required';
-        hasError = true;
       }
     }
-  }
+    if (optionType === 2) {
+      if (
+        eventData.restaurantOptions &&
+        (eventData.restaurantOptions.length < 2 || eventData.restaurantOptions.length > 6)
+      ) {
+        newErrors['invalidOptions'] = 'Number of restaurant options must be between 2 and 6.';
+        hasError = true;
+      }
+      if (!eventData.votingDeadline) {
+        hasError = true;
+      } else {
+        const now = new Date();
 
-  setErrors(newErrors);
+        const deadline = new Date(eventData.votingDeadline);
+        if (isNaN(deadline.getTime())) {
+          hasError = true;
+        } else if (deadline <= now) {
+          hasError = true;
+        }
+      }
+    }
 
-  return { hasError, newErrors };
-};
+    setErrors(newErrors);
 
-
-
+    return { hasError, newErrors };
+  };
 
   const handleAddRestaurantOption = () => {
     setEventData({
@@ -98,8 +123,7 @@ const validate = () => {
     });
   };
 
-
-    const handleRestaurantOptionChange = (
+  const handleRestaurantOptionChange = (
     id: number,
     field: keyof RestaurantOption,
     value: string,
@@ -109,7 +133,6 @@ const validate = () => {
         opt.id === id ? { ...opt, [field]: value } : opt,
       ),
     });
-
   };
 
   const handleOptionTypeChange = (value: 1 | 2 | 3) => {
@@ -121,32 +144,28 @@ const validate = () => {
 
     const initialRestaurantOption = { id: Date.now(), name: '' };
 
-
     setOptionType(value);
 
     if (value === 3) {
-    setEventData({
-      ...eventData,
-      restaurantOptionType: typeMap[value],
-      restaurantOptions: [],
-    });
+      setEventData({
+        ...eventData,
+        restaurantOptionType: typeMap[value],
+        restaurantOptions: [],
+      });
     } else {
-          setEventData({
-      ...eventData,
-      restaurantOptionType: typeMap[value],
-      restaurantOptions: [initialRestaurantOption],
-    });
+      setEventData({
+        ...eventData,
+        restaurantOptionType: typeMap[value],
+        restaurantOptions: [initialRestaurantOption],
+      });
     }
-
   };
 
-  
   const handleVotingDeadlineChange = (newDeadline: string) => {
-
     setEventData({
       ...eventData,
 
-    votingDeadline: newDeadline,
+      votingDeadline: newDeadline,
     });
   };
 
@@ -159,51 +178,62 @@ const validate = () => {
         <Box display="flex" flexDirection="column" mt={1}>
           <FormControlLabel
             control={
-              <Radio checked={optionType === 1} onChange={() => handleOptionTypeChange(1)} value={1} />
+              <Radio
+                checked={optionType === 1}
+                onChange={() => handleOptionTypeChange(1)}
+                value={1}
+              />
             }
             label="Choose One Restaurant"
           />
           <FormControlLabel
             control={
-              <Radio checked={optionType === 2} onChange={() => handleOptionTypeChange(2)} value={2} />
+              <Radio
+                checked={optionType === 2}
+                onChange={() => handleOptionTypeChange(2)}
+                value={2}
+              />
             }
             label="Let Participants Vote on Restaurants"
           />
           <FormControlLabel
             control={
-              <Radio checked={optionType === 3} onChange={() => handleOptionTypeChange(3)} value={3} />
+              <Radio
+                checked={optionType === 3}
+                onChange={() => handleOptionTypeChange(3)}
+                value={3}
+              />
             }
             label="Skip Restaurant Selection"
           />
         </Box>
       </Box>
 
-{optionType === 1 && restaurantOptions?.[0] && (
-  <Box
-    display="flex"
-    flexDirection="column"
-    gap={1}
-    p={2}
-    border={1}
-    borderRadius={2}
-    borderColor="grey.300"
-  >
-    <Typography variant="subtitle1" gutterBottom>
-      Selected Restaurant
-    </Typography>
-    <RestaurantFieldsForm
-      index={0}
-      option={restaurantOptions[0]}
-      onChangeOption={handleRestaurantOptionChange}
-    />
-    {errors[restaurantOptions[0].id] && (
-      <Box style={{ color: 'red', fontSize: '0.8em', marginLeft:8 }}>
-        {errors[restaurantOptions[0].id]}
-      </Box>
-    )}
-  </Box>
-)}
-
+      {optionType === 1 && restaurantOptions?.[0] && (
+        <Box
+          display="flex"
+          flexDirection="column"
+          gap={1}
+          p={2}
+          border={1}
+          borderRadius={2}
+          borderColor="grey.300"
+        >
+          <Typography variant="subtitle1" gutterBottom>
+            Selected Restaurant
+          </Typography>
+          <RestaurantFieldsForm
+            index={0}
+            option={restaurantOptions[0]}
+            onChangeOption={handleRestaurantOptionChange}
+          />
+          {errors[restaurantOptions[0].id] && (
+            <Box style={{ color: 'red', fontSize: '0.8em', marginLeft: 8 }}>
+              {errors[restaurantOptions[0].id]}
+            </Box>
+          )}
+        </Box>
+      )}
 
       {optionType === 2 && (
         <>
@@ -219,15 +249,12 @@ const validate = () => {
             Voting Deadline
           </Typography>
 
-          <DateTimeForm label="" required initialValue={votingDeadline}
-
-                onValidChange={(e) => handleVotingDeadlineChange(e)} />
-                {errors.votingDeadline && (
-  <Box style={{ color: 'red', fontSize: '0.8em', marginLeft:8, marginTop:-36 }}>
-    {errors.votingDeadline}
-  </Box>
-)}
-
+          <DateTimeForm
+            label=""
+            required
+            initialValue={votingDeadline}
+            onValidChange={(e) => handleVotingDeadlineChange(e)}
+          />
 
           {(restaurantOptions ?? []).map((option, i) => (
             <Box
@@ -255,12 +282,11 @@ const validate = () => {
                 onChangeOption={handleRestaurantOptionChange}
               />
               {errors[option.id] && (
-      <Box style={{ color: 'red', fontSize: '0.8em', marginLeft:8 }}>
-        {errors[option.id]}
-      </Box>
-    )}
+                <Box style={{ color: 'red', fontSize: '0.8em', marginLeft: 8 }}>
+                  {errors[option.id]}
+                </Box>
+              )}
             </Box>
-            
           ))}
 
           <Box textAlign="center">
@@ -273,8 +299,12 @@ const validate = () => {
               Add Restaurant Option
             </Button>
           </Box>
-          
         </>
+      )}
+      {errors['invalidOptions'] && (
+        <Box style={{ color: 'red', fontSize: '0.8em', marginLeft: 8, marginTop: 6 }}>
+          • {errors['invalidOptions']}
+        </Box>
       )}
     </Box>
   );

@@ -51,7 +51,6 @@ export interface CreateEventDto {
   restaurantOptions: RestaurantOption[];
 }
 
-
 export interface EventModalProps {
   users: ParticipantDto[];
   creator: ParticipantDto;

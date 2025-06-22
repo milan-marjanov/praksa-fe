@@ -32,16 +32,15 @@ const TimeOptionsModal = forwardRef<EventModalRef>((_, ref) => {
     setValidationErrors({});
   }, [optionType]);
 
-useEffect(() => {
-  setValidationErrors((prevErrors) => {
-    const newErrors = { ...prevErrors };
-    // Remove only the 'invalidOptions' error
-    delete newErrors['invalidOptions'];
-    return newErrors;
-  });
-}, [eventData.timeOptions?.length]);
+  useEffect(() => {
+    setValidationErrors((prevErrors) => {
+      const newErrors = { ...prevErrors };
+      // Remove only the 'invalidOptions' error
+      delete newErrors['invalidOptions'];
+      return newErrors;
+    });
+  }, [eventData.timeOptions?.length]);
 
-  
   useEffect(() => {
     setValidationErrors((prevErrors) => {
       const newErrors = { ...prevErrors };
@@ -65,7 +64,7 @@ useEffect(() => {
     timeOptions?.map((opt) => opt.endTime).join('|'),
   ]);
 
-   useImperativeHandle(ref, () => ({
+  useImperativeHandle(ref, () => ({
     validate: () => {
       let hasError = false;
       const now = new Date();
@@ -117,25 +116,26 @@ useEffect(() => {
         } else {
           const deadline = new Date(eventData.votingDeadline);
           if (isNaN(deadline.getTime())) {
-           // errors['votingDeadline'] = 'Voting deadline has an invalid format.';
+            // errors['votingDeadline'] = 'Voting deadline has an invalid format.';
             hasError = true;
           } else if (deadline <= now) {
-           // errors['votingDeadline'] = 'Voting deadline must be in the future.';
+            // errors['votingDeadline'] = 'Voting deadline must be in the future.';
             hasError = true;
           }
         }
-         if (eventData.timeOptions && (eventData.timeOptions.length < 2 || eventData.timeOptions.length > 6)) {
-      errors['invalidOptions'] = 'Number of time options must be between 2 and 6.';
-      hasError = true;
-    } 
+        if (
+          eventData.timeOptions &&
+          (eventData.timeOptions.length < 2 || eventData.timeOptions.length > 6)
+        ) {
+          errors['invalidOptions'] = 'Number of time options must be between 2 and 6.';
+          hasError = true;
+        }
       }
 
       setValidationErrors(errors);
       return { hasError, errors };
     },
   }));
-
-
 
   const votingDeadline = eventData.votingDeadline;
 
@@ -204,11 +204,10 @@ useEffect(() => {
   };
 
   const handleVotingDeadlineChange = (newDeadline: string) => {
-
     setEventData({
       ...eventData,
 
-    votingDeadline: newDeadline,
+      votingDeadline: newDeadline,
     });
   };
 
@@ -238,19 +237,31 @@ useEffect(() => {
         <Box display="flex" flexDirection="column">
           <FormControlLabel
             control={
-              <Radio checked={optionType === 1} onChange={() => handleOptionTypeChange(1)} value={1} />
+              <Radio
+                checked={optionType === 1}
+                onChange={() => handleOptionTypeChange(1)}
+                value={1}
+              />
             }
             label="Schedule One Specific Time"
           />
           <FormControlLabel
             control={
-              <Radio checked={optionType === 2} onChange={() => handleOptionTypeChange(2)} value={2} />
+              <Radio
+                checked={optionType === 2}
+                onChange={() => handleOptionTypeChange(2)}
+                value={2}
+              />
             }
             label="Let Participants Vote on the Best Time (Up to 6 options)"
           />
           <FormControlLabel
             control={
-              <Radio checked={optionType === 3} onChange={() => handleOptionTypeChange(3)} value={3} />
+              <Radio
+                checked={optionType === 3}
+                onChange={() => handleOptionTypeChange(3)}
+                value={3}
+              />
             }
             label="Create Multiple Time Slots with Capacity Limits"
           />
@@ -279,8 +290,7 @@ useEffect(() => {
               <DateTimeForm
                 label=""
                 required
-                  initialValue={votingDeadline}
-
+                initialValue={votingDeadline}
                 onValidChange={(e) => handleVotingDeadlineChange(e)}
               />
             </Box>
@@ -315,14 +325,15 @@ useEffect(() => {
         </>
       )}
 
- {Object.keys(validationErrors).length > 0 && (
-  <Box sx={{ color: 'red', mt: 2, ml: 2 }}>
-    {Object.entries(validationErrors).map(([key, error]) => (
-      <Typography key={key} variant="body2">• {error}</Typography>
-    ))}
-  </Box>
-)}
-
+      {Object.keys(validationErrors).length > 0 && (
+        <Box sx={{ color: 'red', mt: 2, ml: 2 }}>
+          {Object.entries(validationErrors).map(([key, error]) => (
+            <Typography key={key} variant="body2">
+              • {error}
+            </Typography>
+          ))}
+        </Box>
+      )}
     </Box>
   );
 });

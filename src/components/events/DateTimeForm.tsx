@@ -8,7 +8,12 @@ type DateTimeFormProps = {
   onValidChange?: (value: string) => void;
 };
 
-const DateTimeForm: React.FC<DateTimeFormProps> = ({ label, initialValue, required = false, onValidChange }) => {
+const DateTimeForm: React.FC<DateTimeFormProps> = ({
+  label,
+  initialValue,
+  required = false,
+  onValidChange,
+}) => {
   /*function getCurrentDatetimeLocal() {
     const now = new Date();
 
@@ -21,12 +26,11 @@ const DateTimeForm: React.FC<DateTimeFormProps> = ({ label, initialValue, requir
     return `${year}-${month}-${day}T${hours}:${minutes}`;
   }*/
   const [error, setError] = useState<string | null>(null);
-const [value, setValue] = useState<string>(initialValue || '');
+  const [value, setValue] = useState<string>(initialValue || '');
 
-useEffect(() => {
-  setValue(initialValue || '');
-}, [initialValue]);
-
+  useEffect(() => {
+    setValue(initialValue || '');
+  }, [initialValue]);
 
   const minISO = useMemo(() => {
     const min = new Date();
@@ -36,7 +40,7 @@ useEffect(() => {
 
   function validate(value: string): string | null {
     if (required && !value) {
-            if (label === '') {
+      if (label === '') {
         return `Voting deadline is required.`;
       }
       return `${label} is required.`;
@@ -64,7 +68,8 @@ useEffect(() => {
     setValue(newValue);
     const validationResult = validate(newValue);
     setError(validationResult);
-    if (onValidChange) {///PROVERITI
+    if (onValidChange) {
+      ///PROVERITI
       onValidChange(newValue);
     }
   }
