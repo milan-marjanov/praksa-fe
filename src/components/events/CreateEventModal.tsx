@@ -9,7 +9,7 @@ import {
 } from '../../types/Event';
 import RestaurantOptionsModal from './RestaurantOptionsModal';
 import TimeOptionsModal from './TimeOptionsModal';
-import { createEvent } from '../../services/eventService';
+import { createEvent, updateEvent } from '../../services/eventService';
 import { useEventForm } from '../../contexts/EventContext';
 import { toast } from 'react-toastify';
 
@@ -24,6 +24,7 @@ export default function CreateEventModal({
   const formRef = useRef<EventModalRef>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const { eventData } = useEventForm();
+  const isUpdate = !!event;
 
   const handleFormSubmit = async (data: CreateEventDto | UpdateEventDTO, isUpdate: boolean) => {
     if (event) {
@@ -98,6 +99,28 @@ export default function CreateEventModal({
     }
   };
 
+  const handleUpdateEvent = async () => {
+    const result = formRef.current?.validate();
+    if (result?.hasError) return;
+
+    try {
+      if (eventData) {
+        const dataToSubmit: UpdateEventDTO = {
+          ...(eventData as UpdateEventDTO),
+        };
+        console.log('Submitting updated eventData:', dataToSubmit);
+        const response = await updateEvent(eventData.id as number, dataToSubmit); // 👈 call your patch endpoint
+        //if (response) {
+        toast.success('Event updated successfully', response);
+        handleClose();
+        // }
+      }
+    } catch (error) {
+      console.error('Error updating event:', error);
+      toast.error('An error occurred while updating the event');
+    }
+  };
+
   return (
     <div style={{ padding: 40 }}>
       <Modal open={open} onClose={handleClose}>
@@ -158,8 +181,11 @@ export default function CreateEventModal({
             </Stack>
 
             {slideIndex === slides.length - 1 ? (
-              <Button variant="contained" onClick={handleCreateEvent}>
-                Create Event
+              <Button
+                variant="contained"
+                onClick={isUpdate ? handleUpdateEvent : handleCreateEvent}
+              >
+                {isUpdate ? 'Save Changes' : 'Create Event'}
               </Button>
             ) : (
               <Button onClick={next}>Next</Button>

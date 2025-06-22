@@ -1,5 +1,4 @@
 import { Container, Box, Card, CardContent, Typography, Button, CardActions } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import ConfirmDialog from '../../components/admin_panel/ConfirmDialog';
 import { EventDTO } from '../../types/Event';
@@ -18,17 +17,31 @@ import { useSetupEventForm } from '../../hooks/useSetupEventForm';
 import { useEventForm } from '../../contexts/EventContext';
 
 export default function CreatedEventsPage() {
-  const navigate = useNavigate();
   const { events, setEvents, loading } = useEvents();
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
   const [selectedEventTitle, setSelectedEventTitle] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const { creator, filteredUsers, loadingUsers } = useSetupEventForm();
-  const { resetEventData } = useEventForm();
+  const [selectedEvent, setSelectedEvent] = useState<EventDTO | undefined>(undefined);
+
+  const { setEventData, resetEventData } = useEventForm();
 
   const handleEditClick = (event: EventDTO) => {
-    navigate('/updateEvent', { state: { event } });
+    setSelectedEvent(event);
+    setEventData({
+      id: event.id,
+      title: event.title,
+      description: event.description,
+      creatorId: event.creator.id,
+      participantIds: event.participants.map((p) => p.id),
+      votingDeadline: event.votingDeadline,
+      timeOptionType: event.timeOptionType,
+      timeOptions: event.timeOptions,
+      restaurantOptionType: event.restaurantOptionType,
+      restaurantOptions: event.restaurantOptions,
+    });
+    setModalOpen(true);
   };
 
   const handleDeleteClick = (id: number, title: string) => {
@@ -58,6 +71,7 @@ export default function CreatedEventsPage() {
   };
 
   const handleCreateClick = () => {
+    setSelectedEvent(undefined);
     resetEventData();
     setModalOpen(true);
   };
@@ -86,6 +100,7 @@ export default function CreatedEventsPage() {
         users={filteredUsers}
         creator={creator}
         open={modalOpen}
+        event={selectedEvent || undefined} // Pass the selected event when editing, null when creating
         onClose={() => setModalOpen(false)}
       />
 

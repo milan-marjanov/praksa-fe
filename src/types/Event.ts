@@ -34,7 +34,10 @@ export interface EventDTO {
   description: string;
   creator: ParticipantDto;
   participants: ParticipantDto[];
+  votingDeadline: string;
+  timeOptionType: TimeOptionType;
   timeOptions: TimeOption[];
+  restaurantOptionType: RestaurantOptionType;
   restaurantOptions: RestaurantOption[];
 }
 
@@ -61,7 +64,7 @@ export interface EventModalProps {
 export interface CreateEventModalProps {
   users: ParticipantDto[];
   creator: ParticipantDto;
-  event?: UpdateEventDTO;
+  event?: EventDTO;
   open: boolean;
   onClose: () => void;
 }
@@ -69,8 +72,12 @@ export interface CreateEventModalProps {
 export interface UpdateEventDTO {
   title: string;
   description: string;
+  creatorId: number;
   participantIds: number[];
+  votingDeadline: string;
+  timeOptionType: TimeOptionType;
   timeOptions: TimeOption[];
+  restaurantOptionType: RestaurantOptionType;
   restaurantOptions: RestaurantOption[];
 }
 /*

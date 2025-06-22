@@ -94,7 +94,7 @@ const EventModal = forwardRef<EventModalRef, EventModalProps>(
       // Ensure creator is in the participants
       const participantSet = new Set(eventData.participantIds || []);
       participantSet.add(creator.id);
-      const allParticipantIds = Array.from(participantSet);
+      // const allParticipantIds = Array.from(participantSet);
 
       const title = eventData.title?.trim() || '';
       const description = eventData.description?.trim() || '';
@@ -103,9 +103,13 @@ const EventModal = forwardRef<EventModalRef, EventModalProps>(
         const updateData: UpdateEventDTO = {
           title,
           description,
-          participantIds: allParticipantIds,
-          timeOptions: event.timeOptions ?? [],
-          restaurantOptions: event.restaurantOptions ?? [],
+          participantIds: eventData.participantIds ?? [],
+          creatorId: creator.id,
+          votingDeadline: '',
+          timeOptionType: eventData.timeOptionType ?? 'FIXED',
+          timeOptions: eventData.timeOptions ?? [],
+          restaurantOptionType: eventData.restaurantOptionType ?? 'FIXED',
+          restaurantOptions: eventData.restaurantOptions ?? [],
         };
         await onSubmit(updateData, true);
       } else {
@@ -113,7 +117,7 @@ const EventModal = forwardRef<EventModalRef, EventModalProps>(
           id: 0,
           title,
           description,
-          participantIds: allParticipantIds,
+          participantIds: eventData.participantIds ?? [],
           creatorId: creator.id,
           votingDeadline: '',
           timeOptionType: eventData.timeOptionType ?? 'FIXED',
@@ -168,7 +172,7 @@ const EventModal = forwardRef<EventModalRef, EventModalProps>(
             <Select
               labelId="participants-label"
               multiple
-              value={eventData.participantIds || []}
+              value={eventData.participantIds?.filter((id) => id !== creator.id) || []}
               onChange={handleParticipantsChange}
               input={<OutlinedInput label="Participants *" />}
               renderValue={(selected) =>

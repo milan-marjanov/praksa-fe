@@ -8,8 +8,6 @@ import Navbar from './components/common/Navbar';
 import theme from './theme';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import UnauthorizedPage from './pages/UnauthorizedPage';
-import UpdateEventPage from './pages/events/UpdateEventPage';
-import CreateEventPage from './pages/events/CreateEventPage';
 import CreatedEventsPage from './pages/events/CreatedEventsPage';
 import HomePage from './pages/HomePage';
 import MyProfilePage from './pages/MyProfilePage';
@@ -63,23 +61,6 @@ export default function App() {
                 element={
                   <ProtectedRoute allowedRoles={['ADMIN']}>
                     <AdminHomePage />
-                  </ProtectedRoute>
-                }
-              />
-
-              <Route
-                path="/createEvent"
-                element={
-                  <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
-                    <CreateEventPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/updateEvent"
-                element={
-                  <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
-                    <UpdateEventPage />
                   </ProtectedRoute>
                 }
               />
