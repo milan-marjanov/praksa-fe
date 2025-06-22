@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { Button, Modal, Box, Typography, Stack, Divider } from '@mui/material';
-import EventModal, { EventModalRef } from './EventModal';
-import { CreateEventDto, CreateEventModalProps, UpdateEventDTO } from '../../types/Event';
+import EventModal from './EventModal';
+import { CreateEventDto, CreateEventModalProps, EventModalRef, UpdateEventDTO } from '../../types/Event';
 import RestaurantOptionsModal from './RestaurantOptionsModal';
 import TimeOptionsModal from './TimeOptionsModal';
 import { createEvent } from '../../services/eventService';
@@ -38,8 +38,8 @@ export default function CreateEventModal({
       onSubmit={handleFormSubmit}
       ref={formRef}
     />,
-    <TimeOptionsModal key="slide2" />,
-    <RestaurantOptionsModal key="slide3" />,
+    <TimeOptionsModal key="slide2" ref={formRef}/>,
+    <RestaurantOptionsModal key="slide3" ref={formRef}/>,
   ];
 
   const handleClose = () => {
@@ -48,7 +48,7 @@ export default function CreateEventModal({
   };
 
   const next = () => {
-    if (slideIndex === 0) {
+    if (slideIndex === 0 || slideIndex === 1) {
       const result = formRef.current?.validate();
       if (result?.hasError) return;
     }
@@ -72,6 +72,10 @@ export default function CreateEventModal({
   };
 
 const handleCreateEvent = async () => {
+      if (slideIndex ===2) {
+      const result = formRef.current?.validate();
+      if (result?.hasError) return;
+    }
   try {
     const dataToSubmit: CreateEventDto = {
       ...eventData as CreateEventDto,

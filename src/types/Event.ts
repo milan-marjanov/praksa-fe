@@ -24,6 +24,10 @@ export type TimeOptionType = 'FIXED' | 'VOTING' | 'CAPACITY_BASED';
 
 export type RestaurantOptionType = 'FIXED' | 'VOTING' | 'NONE';
 
+export type EventModalRef = {
+  validate: () => { hasError: boolean };
+};
+
 export interface EventDTO {
   id: number;
   title: string;

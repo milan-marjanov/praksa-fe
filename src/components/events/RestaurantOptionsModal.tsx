@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { Box, IconButton, Button, Typography, FormControlLabel, Radio } from '@mui/material';
 import { Add, Delete } from '@mui/icons-material';
 import RestaurantFieldsForm from './RestaurantFieldsForm';
-import { RestaurantOption } from '../../types/Event';
+import { EventModalRef, RestaurantOption } from '../../types/Event';
 import DateTimeForm from './DateTimeForm';
 import { useEventForm } from '../../contexts/EventContext';
 
-const RestaurantOptionsModal: React.FC = () => {
+const RestaurantOptionsModal = forwardRef<EventModalRef>((_, ref) => {
   const { eventData, setEventData } = useEventForm();
   const restaurantOptions = eventData.restaurantOptions;
 
@@ -24,6 +24,7 @@ const RestaurantOptionsModal: React.FC = () => {
   });
 
   const votingDeadline = eventData.votingDeadline;
+    const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     console.log(eventData);
@@ -33,6 +34,56 @@ const RestaurantOptionsModal: React.FC = () => {
       });
     }
   }, [eventData, optionType, restaurantOptions, setEventData]);
+
+useEffect(() => {
+  console.log('One or more restaurant names changed');
+
+  setErrors((prevErrors) => {
+    const newErrors = { ...prevErrors };
+
+    if (restaurantOptions) {
+      restaurantOptions.forEach((opt) => {
+        if (opt.name && opt.name.trim() !== '') {
+          delete newErrors[opt.id];
+        }
+      });
+    }
+
+    return newErrors;
+  });
+}, [restaurantOptions?.map(opt => opt.name).join('|')]);
+
+
+useEffect(() => {
+  setErrors({});
+}, [optionType]);
+
+
+useImperativeHandle(ref, () => ({
+  validate,
+}));
+
+const validate = () => {
+  const newErrors: Record<number, string> = {};
+  let hasError = false;
+
+  if (optionType === 1 || optionType === 2) {
+    for (let i = 0; i < (eventData.restaurantOptions?.length ?? 0); i++) {
+      const opt = eventData.restaurantOptions![i];
+      if (!opt.name || opt.name.trim() === '') {
+        newErrors[opt.id] = 'Restaurant name is required';
+        hasError = true;
+      }
+    }
+  }
+
+  setErrors(newErrors);
+
+  return { hasError, newErrors };
+};
+
+
+
 
   const handleAddRestaurantOption = () => {
     setEventData({
@@ -47,7 +98,8 @@ const RestaurantOptionsModal: React.FC = () => {
     });
   };
 
-  const handleRestaurantOptionChange = (
+
+    const handleRestaurantOptionChange = (
     id: number,
     field: keyof RestaurantOption,
     value: string,
@@ -57,6 +109,7 @@ const RestaurantOptionsModal: React.FC = () => {
         opt.id === id ? { ...opt, [field]: value } : opt,
       ),
     });
+
   };
 
   const handleOptionTypeChange = (value: 1 | 2 | 3) => {
@@ -125,26 +178,32 @@ const RestaurantOptionsModal: React.FC = () => {
         </Box>
       </Box>
 
-      {optionType === 1 && (
-        <Box
-          display="flex"
-          flexDirection="column"
-          gap={1}
-          p={2}
-          border={1}
-          borderRadius={2}
-          borderColor="grey.300"
-        >
-          <Typography variant="subtitle1" gutterBottom>
-            Selected Restaurant
-          </Typography>
-          <RestaurantFieldsForm
-            index={0}
-            option={(restaurantOptions ?? [{ id: Date.now(), name: '' }])[0]}
-            onChangeOption={handleRestaurantOptionChange}
-          />
-        </Box>
-      )}
+{optionType === 1 && restaurantOptions?.[0] && (
+  <Box
+    display="flex"
+    flexDirection="column"
+    gap={1}
+    p={2}
+    border={1}
+    borderRadius={2}
+    borderColor="grey.300"
+  >
+    <Typography variant="subtitle1" gutterBottom>
+      Selected Restaurant
+    </Typography>
+    <RestaurantFieldsForm
+      index={0}
+      option={restaurantOptions[0]}
+      onChangeOption={handleRestaurantOptionChange}
+    />
+    {errors[restaurantOptions[0].id] && (
+      <Box style={{ color: 'red', fontSize: '0.8em', marginLeft:8 }}>
+        {errors[restaurantOptions[0].id]}
+      </Box>
+    )}
+  </Box>
+)}
+
 
       {optionType === 2 && (
         <>
@@ -163,6 +222,12 @@ const RestaurantOptionsModal: React.FC = () => {
           <DateTimeForm label="" required initialValue={votingDeadline}
 
                 onValidChange={(e) => handleVotingDeadlineChange(e)} />
+                {errors.votingDeadline && (
+  <Box style={{ color: 'red', fontSize: '0.8em', marginLeft:8, marginTop:-36 }}>
+    {errors.votingDeadline}
+  </Box>
+)}
+
 
           {(restaurantOptions ?? []).map((option, i) => (
             <Box
@@ -189,7 +254,13 @@ const RestaurantOptionsModal: React.FC = () => {
                 option={option}
                 onChangeOption={handleRestaurantOptionChange}
               />
+              {errors[option.id] && (
+      <Box style={{ color: 'red', fontSize: '0.8em', marginLeft:8 }}>
+        {errors[option.id]}
+      </Box>
+    )}
             </Box>
+            
           ))}
 
           <Box textAlign="center">
@@ -202,10 +273,11 @@ const RestaurantOptionsModal: React.FC = () => {
               Add Restaurant Option
             </Button>
           </Box>
+          
         </>
       )}
     </Box>
   );
-};
+});
 
 export default RestaurantOptionsModal;

@@ -6,6 +6,10 @@ interface EventFormContextType {
   setEventData: (data: Partial<CreateEventDto>) => void;
   resetEventData: () => void;
 }
+const tomorrowNoon = new Date();
+tomorrowNoon.setDate(tomorrowNoon.getDate() + 1);
+tomorrowNoon.setHours(12, 0, 0, 0); // sets time to 12:00:00.000 PM
+
 
 const defaultData: CreateEventDto = {
   id: 0,
@@ -13,7 +17,7 @@ const defaultData: CreateEventDto = {
   description: '',
   creatorId: 0,
   participantIds: [],
-  votingDeadline: '',
+  votingDeadline: tomorrowNoon.toISOString().slice(0, 16),
   timeOptionType: 'FIXED',
   timeOptions: [],
   restaurantOptionType: 'FIXED',

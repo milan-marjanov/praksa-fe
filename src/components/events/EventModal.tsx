@@ -13,12 +13,10 @@ import {
   Box,
 } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material/Select';
-import { CreateEventDto, EventModalProps, UpdateEventDTO } from '../../types/Event';
+import { CreateEventDto, EventModalProps, EventModalRef, UpdateEventDTO } from '../../types/Event';
 import { useEventForm } from '../../contexts/EventContext';
 
-export type EventModalRef = {
-  validate: () => { hasError: boolean };
-};
+
 
 const EventModal = forwardRef<EventModalRef, EventModalProps>(
   ({ users, creator, event, onSubmit }, ref) => {

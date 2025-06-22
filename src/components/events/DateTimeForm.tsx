@@ -36,6 +36,9 @@ useEffect(() => {
 
   function validate(value: string): string | null {
     if (required && !value) {
+            if (label === '') {
+        return `Voting deadline is required.`;
+      }
       return `${label} is required.`;
     }
 
@@ -61,7 +64,7 @@ useEffect(() => {
     setValue(newValue);
     const validationResult = validate(newValue);
     setError(validationResult);
-    if (!validationResult && onValidChange) {
+    if (onValidChange) {///PROVERITI
       onValidChange(newValue);
     }
   }

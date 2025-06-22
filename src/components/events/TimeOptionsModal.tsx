@@ -1,17 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { Box, Button, FormControlLabel, Radio, Typography } from '@mui/material';
 import TimeOptionFieldsForm from './TimeOptionFieldsForm';
 import { Add } from '@mui/icons-material';
 import DateTimeForm from './DateTimeForm';
 import { useEventForm } from '../../contexts/EventContext';
+import { EventModalRef } from '../../types/Event';
 
 function generateId(min = 1, max = 10000): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-const TimeOptionsModal: React.FC = () => {
+const TimeOptionsModal = forwardRef<EventModalRef>((_, ref) => {
   const { eventData, setEventData } = useEventForm();
   const timeOptions = eventData.timeOptions;
+  const [validationErrors, setValidationErrors] = useState<Record<number | string, string>>({});
 
   const [optionType, setOptionType] = useState<1 | 2 | 3>(() => {
     switch (eventData.timeOptionType) {
@@ -25,6 +27,116 @@ const TimeOptionsModal: React.FC = () => {
         return 1;
     }
   });
+
+  useEffect(() => {
+    setValidationErrors({});
+  }, [optionType]);
+
+useEffect(() => {
+  setValidationErrors((prevErrors) => {
+    const newErrors = { ...prevErrors };
+    // Remove only the 'invalidOptions' error
+    delete newErrors['invalidOptions'];
+    return newErrors;
+  });
+}, [eventData.timeOptions?.length]);
+
+  
+  useEffect(() => {
+    setValidationErrors((prevErrors) => {
+      const newErrors = { ...prevErrors };
+
+      if (timeOptions) {
+        timeOptions.forEach((opt) => {
+          const startValid = opt.startTime && opt.startTime.trim() !== '';
+          const endValid = opt.endTime && opt.endTime.trim() !== '';
+
+          // If both start and end are valid, remove errors for this option id
+          if (startValid && endValid && newErrors[opt.id]) {
+            delete newErrors[opt.id];
+          }
+        });
+      }
+
+      return newErrors;
+    });
+  }, [
+    timeOptions?.map((opt) => opt.startTime).join('|'),
+    timeOptions?.map((opt) => opt.endTime).join('|'),
+  ]);
+
+   useImperativeHandle(ref, () => ({
+    validate: () => {
+      let hasError = false;
+      const now = new Date();
+      const errors: Record<number | string, string> = {};
+
+      if (!eventData?.timeOptions || eventData.timeOptions.length === 0) {
+        errors['noOptions'] = 'No time options provided.';
+        hasError = true;
+      } else {
+        eventData.timeOptions.forEach((opt, i) => {
+          const index = i + 1;
+
+          if (!opt.startTime || !opt.endTime) {
+            errors[opt.id] = `Option ${index}: Start and end time are required.`;
+            hasError = true;
+            return;
+          }
+
+          const start = new Date(opt.startTime);
+          const end = new Date(opt.endTime);
+
+          if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+            errors[opt.id] = `Option ${index}: Invalid date format.`;
+            hasError = true;
+            return;
+          }
+
+          if (start <= now) {
+            errors[opt.id] = `Option ${index}: Start time must be in the future.`;
+            hasError = true;
+          }
+
+          if (end <= now) {
+            errors[opt.id] = `Option ${index}: End time must be in the future.`;
+            hasError = true;
+          }
+
+          if (start >= end) {
+            errors[opt.id] = `Option ${index}: Start time must be before end time.`;
+            hasError = true;
+          }
+        });
+      }
+
+      if (optionType === 2 || optionType === 3) {
+        if (!eventData.votingDeadline) {
+          //errors['votingDeadline'] = 'Voting deadline is required.';
+          hasError = true;
+        } else {
+          const deadline = new Date(eventData.votingDeadline);
+          if (isNaN(deadline.getTime())) {
+           // errors['votingDeadline'] = 'Voting deadline has an invalid format.';
+            hasError = true;
+          } else if (deadline <= now) {
+           // errors['votingDeadline'] = 'Voting deadline must be in the future.';
+            hasError = true;
+          }
+        }
+         if (eventData.timeOptions && (eventData.timeOptions.length < 2 || eventData.timeOptions.length > 6)) {
+      errors['invalidOptions'] = 'Number of time options must be between 2 and 6.';
+      hasError = true;
+    } 
+      }
+
+      setValidationErrors(errors);
+      return { hasError, errors };
+    },
+  }));
+
+
+
   const votingDeadline = eventData.votingDeadline;
 
   useEffect(() => {
@@ -55,7 +167,7 @@ const TimeOptionsModal: React.FC = () => {
       id: generateId(),
       startTime: '',
       endTime: '',
-      maxCapacity: 0,
+      maxCapacity: 1,
       createdAt: new Date().toISOString(),
     };
 
@@ -77,7 +189,7 @@ const TimeOptionsModal: React.FC = () => {
           id: generateId(),
           startTime: '',
           endTime: '',
-          maxCapacity: 0,
+          maxCapacity: 1,
           createdAt: new Date().toISOString(),
         },
       ],
@@ -202,9 +314,18 @@ const TimeOptionsModal: React.FC = () => {
           </Box>
         </>
       )}
+
+ {Object.keys(validationErrors).length > 0 && (
+  <Box sx={{ color: 'red', mt: 2, ml: 2 }}>
+    {Object.entries(validationErrors).map(([key, error]) => (
+      <Typography key={key} variant="body2">• {error}</Typography>
+    ))}
+  </Box>
+)}
+
     </Box>
   );
-};
+});
 
 const styles: { [key: string]: React.CSSProperties } = {
   form: {
