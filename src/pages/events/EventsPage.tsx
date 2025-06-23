@@ -29,7 +29,7 @@ import CreateEventModal from '../../components/events/CreateEventModal';
 import { useSetupEventForm } from '../../hooks/useSetupEventForm';
 import { useEventForm } from '../../contexts/EventContext';
 
-export default function CreatedEventsPage() {  
+export default function EventsPage() {  
   const navigate = useNavigate();
   const {
     createdEvents,
@@ -197,7 +197,11 @@ export default function CreatedEventsPage() {
                   </Typography>
                 </CardContent>
                 <CardActions sx={cardActionsStyle}>
-                  <Button variant="outlined" size="medium" onClick={() => handleEditClick(event)}>
+                  <Button 
+                    variant="outlined" 
+                    size="medium" 
+                    disabled={!isCreator}
+                    onClick={() => handleEditClick(event)}>
                     Edit
                   </Button>
                   <Button
