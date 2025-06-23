@@ -2,7 +2,6 @@ import api from '../axios/axiosClient';
 import axios from 'axios';
 import { CreateEventDto, UserEventsResponseDTO, UpdateEventDTO, EventDetailsDto } from '../types/Event';
 
-
 export const fetchUserEvents = async (userId: number): Promise<UserEventsResponseDTO> => {
   const response = await api.get<UserEventsResponseDTO>(
     `/api/events/fetchUserEvents/${userId}`
