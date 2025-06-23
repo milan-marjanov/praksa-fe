@@ -9,12 +9,12 @@ import {
   useTheme,
   useMediaQuery,
 } from '@mui/material';
-import UserList from '../components/admin_panel/UserList';
-import AddUserModal from '../components/admin_panel/AddUserModal';
-import ConfirmDialog from '../components/admin_panel/ConfirmDialog';
-import type { UserDTO, CreateUserDTO, MyProfileDTO } from '../types/User';
-import { getAllUsers, createUser, deleteUser, getMyProfile } from '../services/userService';
-import { buttonStyle } from '../styles/CommonStyles';
+import UserList from '../../components/admin_panel/UserList';
+import AddUserModal from '../../components/admin_panel/AddUserModal';
+import ConfirmDialog from '../../components/admin_panel/ConfirmDialog';
+import type { UserDTO, CreateUserDTO, MyProfileDTO } from '../../types/User';
+import { getAllUsers, createUser, deleteUser, getMyProfile } from '../../services/userService';
+import { buttonStyle } from '../../styles/CommonStyles';
 import { toast } from 'react-toastify';
 import { AxiosError } from 'axios';
 

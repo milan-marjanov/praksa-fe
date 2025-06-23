@@ -2,16 +2,15 @@ import './App.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import LoginPage from './pages/LoginPage';
-import AdminHomePage from './pages/AdminHomePage';
+import LoginPage from './pages/user/LoginPage';
+import AdminHomePage from './pages/user/AdminHomePage';
 import Navbar from './components/common/Navbar';
 import theme from './theme';
 import ProtectedRoute from './components/common/ProtectedRoute';
-import UnauthorizedPage from './pages/UnauthorizedPage';
-import CreatedEventsPage from './pages/events/CreatedEventsPage';
-import HomePage from './pages/HomePage';
-import MyProfilePage from './pages/MyProfilePage';
-import ProfilePage from './pages/ProfilePage';
+import UnauthorizedPage from './pages/user/UnauthorizedPage';
+import CreatedEventsPage from './pages/events/EventsPage';
+import MyProfilePage from './pages/user/MyProfilePage';
+import ProfilePage from './pages/user/ProfilePage';
 import { AuthProvider } from './contexts/AuthContext';
 import EventDetailsPage  from './pages/events/EventDetailsPage'
 import { EventFormProvider } from './contexts/EventContext';
@@ -29,15 +28,6 @@ export default function App() {
             <Routes>
               <Route path="/login" element={<LoginPage />} />
               <Route path="/" element={<LoginPage />} />
-
-              <Route
-                path="/home"
-                element={
-                  <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
-                    <HomePage />
-                  </ProtectedRoute>
-                }
-              />
 
               <Route
                 path="/myprofile"

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Box, Avatar, Typography, Button, CircularProgress } from '@mui/material';
-import useProfile from '../hooks/useProfile';
-import { buttonStyle } from '../styles/CommonStyles';
+import useProfile from '../../hooks/useProfile';
+import { buttonStyle } from '../../styles/CommonStyles';
 
 const defaultAvatar = '/default-avatar.png';
 

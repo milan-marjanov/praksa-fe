@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Box, Avatar, Typography, Button, IconButton } from '@mui/material';
-import { UpdateProfileModal } from '../components/profile/UpdateProfileModal';
-import { ChangePasswordModal } from '../components/profile/ChangePasswordModal';
-import { ChangePfpModal } from '../components/profile/ChangePfpModal';
-import { buttonStyle } from '../styles/CommonStyles';
+import { UpdateProfileModal } from '../../components/profile/UpdateProfileModal';
+import { ChangePasswordModal } from '../../components/profile/ChangePasswordModal';
+import { ChangePfpModal } from '../../components/profile/ChangePfpModal';
+import { buttonStyle } from '../../styles/CommonStyles';
 import {
   getMyProfile,
   getProfileImage,
@@ -12,8 +12,8 @@ import {
   uploadProfilePicture,
   changePassword,
   removeProfilePicture,
-} from '../services/userService';
-import { PasswordChangeRequestDTO, UpdateProfileRequestDTO } from '../types/User';
+} from '../../services/userService';
+import { PasswordChangeRequestDTO, UpdateProfileRequestDTO } from '../../types/User';
 
 const MyProfilePage: React.FC = () => {
   const navigate = useNavigate();
