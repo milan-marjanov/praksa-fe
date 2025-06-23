@@ -1,55 +1,71 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Button, Modal, Box, Typography, Stack, Divider } from '@mui/material';
 import EventModal from './EventModal';
-import { CreateEventDto, UpdateEventDTO } from '../../types/Event';
-import { UserDTO } from '../../types/User';
+import {
+  CreateEventDto,
+  CreateEventModalProps,
+  EventModalRef,
+  UpdateEventDTO,
+} from '../../types/Event';
+import RestaurantOptionsModal from './RestaurantOptionsModal';
+import TimeOptionsModal from './TimeOptionsModal';
+import { createEvent, updateEvent } from '../../services/eventService';
+import { useEventForm } from '../../contexts/EventContext';
+import { toast } from 'react-toastify';
 
-type CreateEventModalProps = {
-  open: boolean;
-  onClose: () => void;
-};
-
-export default function CreateEventModal({ open, onClose }: CreateEventModalProps) {
+export default function CreateEventModal({
+  users,
+  creator,
+  event,
+  open,
+  onClose,
+}: CreateEventModalProps) {
   const [slideIndex, setSlideIndex] = useState(0);
-
-  const users: UserDTO[] = [
-    {
-      id: 1,
-      firstName: 'Alice',
-      lastName: 'Smith',
-      email: 'alice@example.com',
-      profilePictureUrl: '',
-    },
-    { id: 2, firstName: 'Bob', lastName: 'Jones', email: 'bob@example.com', profilePictureUrl: '' },
-    {
-      id: 3,
-      firstName: 'Charlie',
-      lastName: 'Brown',
-      email: 'charlie@example.com',
-      profilePictureUrl: '',
-    },
-  ];
-
-  const creator = users[0];
+  const formRef = useRef<EventModalRef>(null);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const { eventData } = useEventForm();
+  const isUpdate = !!event;
 
   const handleFormSubmit = async (data: CreateEventDto | UpdateEventDTO, isUpdate: boolean) => {
+    if (event) {
+      console.log('Event not null');
+    }
     console.log('Submitted data:', data, 'Is update:', isUpdate);
     setSlideIndex(1);
   };
 
-  const slideTitles = ['Event Info', 'Date & Time', 'Confirmation'];
+  const slideTitles = ['Event Info', 'Date & Time', 'Restaurant Options'];
 
   const slides = [
-    <EventModal key="form" users={users} creator={creator} onSubmit={handleFormSubmit} />,
-    <Typography key="slide2">Step 2: Date & Time (Coming Soon)</Typography>,
-    <Typography key="slide3">Step 3: Confirmation (Coming Soon)</Typography>,
+    <EventModal
+      key="form"
+      users={users}
+      creator={creator}
+      onSubmit={handleFormSubmit}
+      ref={formRef}
+    />,
+    <TimeOptionsModal key="slide2" ref={formRef} />,
+    <RestaurantOptionsModal key="slide3" ref={formRef} />,
   ];
 
   const handleClose = () => {
     setSlideIndex(0);
-    onClose(); // Use the passed in onClose
+    onClose();
   };
+
   const next = () => {
+    if (slideIndex === 0 || slideIndex === 1) {
+      const result = formRef.current?.validate();
+      if (result?.hasError) return;
+    }
+
+    if (slideIndex === 2) {
+      //const errors = validateRestaurantOptions();
+      //setErrorMap(errors);
+      //if (Object.keys(errors).length > 0) return;
+      setErrors(errors);
+    }
+
     if (slideIndex < slides.length - 1) {
       setSlideIndex(slideIndex + 1);
     }
@@ -58,6 +74,50 @@ export default function CreateEventModal({ open, onClose }: CreateEventModalProp
   const back = () => {
     if (slideIndex > 0) {
       setSlideIndex(slideIndex - 1);
+    }
+  };
+
+  const handleCreateEvent = async () => {
+    if (slideIndex === 2) {
+      const result = formRef.current?.validate();
+      if (result?.hasError) return;
+    }
+    try {
+      const dataToSubmit: CreateEventDto = {
+        ...(eventData as CreateEventDto),
+        creatorId: creator.id,
+      };
+
+      console.log('Submitted eventData: ', dataToSubmit);
+
+      const response = await createEvent(dataToSubmit);
+      console.log('Event created successfully:', response);
+      toast.success('Event created successfully');
+      handleClose();
+    } catch (error) {
+      console.error('Error creating event:', error);
+    }
+  };
+
+  const handleUpdateEvent = async () => {
+    const result = formRef.current?.validate();
+    if (result?.hasError) return;
+
+    try {
+      if (eventData) {
+        const dataToSubmit: UpdateEventDTO = {
+          ...(eventData as UpdateEventDTO),
+        };
+        console.log('Submitting updated eventData:', dataToSubmit);
+        const response = await updateEvent(eventData.id as number, dataToSubmit); // 👈 call your patch endpoint
+        //if (response) {
+        toast.success('Event updated successfully', response);
+        handleClose();
+        // }
+      }
+    } catch (error) {
+      console.error('Error updating event:', error);
+      toast.error('An error occurred while updating the event');
     }
   };
 
@@ -79,6 +139,10 @@ export default function CreateEventModal({ open, onClose }: CreateEventModalProp
             p: 4,
             display: 'flex',
             flexDirection: 'column',
+            overflowY: 'auto',
+            '&::-webkit-scrollbar': {
+              display: 'none',
+            },
           }}
         >
           <Box sx={{ mb: 2 }}>
@@ -116,9 +180,16 @@ export default function CreateEventModal({ open, onClose }: CreateEventModalProp
               ))}
             </Stack>
 
-            <Button onClick={next} disabled={slideIndex === slides.length - 1}>
-              Next
-            </Button>
+            {slideIndex === slides.length - 1 ? (
+              <Button
+                variant="contained"
+                onClick={isUpdate ? handleUpdateEvent : handleCreateEvent}
+              >
+                {isUpdate ? 'Save Changes' : 'Create Event'}
+              </Button>
+            ) : (
+              <Button onClick={next}>Next</Button>
+            )}
           </Stack>
         </Box>
       </Modal>

@@ -7,7 +7,7 @@ import { JwtDecoded } from '../types/User';
 export function useSetupEventForm() {
   const [creator, setCreator] = useState<UserDTO | undefined>(undefined);
   const [filteredUsers, setFilteredUsers] = useState<UserDTO[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingUsers, setLoadingUsers] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem('jwtToken');
@@ -30,12 +30,12 @@ export function useSetupEventForm() {
       } catch (err) {
         console.error('Error in useSetupEventForm:', err);
       } finally {
-        setLoading(false);
+        setLoadingUsers(false);
       }
     };
 
     fetchData();
   }, []);
 
-  return { creator, filteredUsers, loading };
+  return { creator, filteredUsers, loadingUsers };
 }

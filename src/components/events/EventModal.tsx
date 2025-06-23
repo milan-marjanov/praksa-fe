@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import {
   TextField,
   FormControl,
@@ -13,193 +13,201 @@ import {
   Box,
 } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material/Select';
-import { CreateEventDto, UpdateEventDTO, EventFormProps } from '../../types/Event';
+import { CreateEventDto, EventModalProps, EventModalRef, UpdateEventDTO } from '../../types/Event';
+import { useEventForm } from '../../contexts/EventContext';
 
-export default function EventModal({ users, creator, event, onSubmit }: EventFormProps) {
-  const [eventTitle, setEventTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [selectedParticipants, setSelectedParticipants] = useState<number[]>([]);
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const maxDescriptionChars = 255;
-  const isUpdate = !!event;
+const EventModal = forwardRef<EventModalRef, EventModalProps>(
+  ({ users, creator, event, onSubmit }, ref) => {
+    const { eventData, setEventData } = useEventForm();
+    const [errors, setErrors] = useState<{ [key: string]: string }>({});
+    const maxDescriptionChars = 255;
+    const isUpdate = !!event;
 
-  useEffect(() => {
-    if (event) {
-      setEventTitle(event.title);
-      setDescription(event.description);
-      setSelectedParticipants(
-        'participantIds' in event ? event.participantIds.filter((id) => id !== creator.id) : [],
-      );
-    }
-  }, [event, creator.id]);
+    useEffect(() => {
+      console.log('eventData changed:', eventData);
+    }, [eventData]);
 
-  const selectableUsers = users.filter((u) => u.id !== creator.id);
-  const allParticipantIds = selectableUsers.map((user) => user.id);
-  const isAllSelected =
-    selectedParticipants.length === selectableUsers.length && selectableUsers.length > 0;
+    useImperativeHandle(ref, () => ({
+      validate,
+    }));
 
-  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEventTitle(e.target.value);
-    if (e.target.value.trim() !== '') {
-      setErrors((prev) => ({ ...prev, title: '' }));
-    }
-  };
+    const selectableUsers = users.filter((u) => u.id !== creator.id);
+    const allParticipantIds = selectableUsers.map((user) => user.id);
+    const isAllSelected =
+      eventData.participantIds?.length === selectableUsers.length && selectableUsers.length > 0;
 
-  const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.value.length <= maxDescriptionChars) {
-      setDescription(e.target.value);
-    }
-  };
+    const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      setEventData({ title: e.target.value });
+      if (e.target.value.trim() !== '') {
+        setErrors((prev) => ({ ...prev, title: '' }));
+      }
+    };
 
-  const handleParticipantsChange = (event: SelectChangeEvent<typeof selectedParticipants>) => {
-    const value = event.target.value as number[];
-    let updated: number[];
+    const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (e.target.value.length <= maxDescriptionChars) {
+        setEventData({ description: e.target.value });
+      }
+    };
 
-    if (value.includes(-1)) {
-      updated = isAllSelected ? [] : allParticipantIds;
-    } else {
-      updated = value;
-    }
+    const handleParticipantsChange = (event: SelectChangeEvent<number[]>) => {
+      const value = event.target.value as number[];
+      let updated: number[];
 
-    setSelectedParticipants(updated);
+      if (value.includes(-1)) {
+        updated = isAllSelected ? [] : allParticipantIds;
+      } else {
+        updated = value;
+      }
 
-    if (updated.length > 0) {
-      setErrors((prev) => ({ ...prev, participants: '' }));
-    }
-  };
+      setEventData({ participantIds: updated });
 
-  const validate = () => {
-    const newErrors = { title: '', participants: '' };
-    let hasError = false;
+      if (updated.length > 0) {
+        setErrors((prev) => ({ ...prev, participants: '' }));
+      }
+    };
 
-    if (eventTitle.trim() === '') {
-      newErrors.title = 'Event title is required';
-      hasError = true;
-    }
+    const validate = () => {
+      const newErrors = { title: '', participants: '' };
+      let hasError = false;
 
-    if (selectedParticipants.length === 0) {
-      newErrors.participants = 'Please select at least one participant';
-      hasError = true;
-    }
+      if (!eventData.title?.trim()) {
+        newErrors.title = 'Event title is required';
+        hasError = true;
+      }
 
-    return { hasError, newErrors };
-  };
+      if (!eventData.participantIds || eventData.participantIds.length === 0) {
+        newErrors.participants = 'Please select at least one participant';
+        hasError = true;
+      }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+      setErrors(newErrors);
+      return { hasError, newErrors };
+    };
 
-    const { hasError, newErrors } = validate();
-    setErrors(newErrors);
-    if (hasError) return;
+    const handleSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
 
-    const allParticipantIds = selectedParticipants.includes(creator.id)
-      ? selectedParticipants
-      : [...selectedParticipants, creator.id];
+      const { hasError, newErrors } = validate();
+      setErrors(newErrors);
+      if (hasError) return;
 
-    if (isUpdate) {
-      const updateData: UpdateEventDTO = {
-        title: eventTitle,
-        description,
-        participantIds: allParticipantIds,
-        timeOptions: event?.timeOptions ?? [],
-        restaurantOptions: event?.restaurantOptions ?? [],
-      };
-      await onSubmit(updateData, true);
-    } else {
-      const createData: CreateEventDto = {
-        id: 0,
-        title: eventTitle,
-        description,
-        creatorId: creator.id,
-        participantIds: allParticipantIds,
-      };
-      await onSubmit(createData, false);
-    }
-  };
+      // Ensure creator is in the participants
+      const participantSet = new Set(eventData.participantIds || []);
+      participantSet.add(creator.id);
+      // const allParticipantIds = Array.from(participantSet);
 
-  return (
-    <Box
-      display="flex"
-      width="100%"
-      sx={{
-        backgroundColor: '#f5f5dc',
-        p: 1,
-      }}
-    >
-      <form onSubmit={handleSubmit} style={{ width: '100%' }}>
-        <TextField
-          fullWidth
-          label="Event Title *"
-          value={eventTitle}
-          onChange={handleTitleChange}
-          sx={{ mt: 0, mb: 1 }}
-          error={!!errors.title}
-          helperText={errors.title}
-        />
+      const title = eventData.title?.trim() || '';
+      const description = eventData.description?.trim() || '';
 
-        <Box position="relative">
+      if (isUpdate && event) {
+        const updateData: UpdateEventDTO = {
+          title,
+          description,
+          participantIds: eventData.participantIds ?? [],
+          creatorId: creator.id,
+          votingDeadline: '',
+          timeOptionType: eventData.timeOptionType ?? 'FIXED',
+          timeOptions: eventData.timeOptions ?? [],
+          restaurantOptionType: eventData.restaurantOptionType ?? 'FIXED',
+          restaurantOptions: eventData.restaurantOptions ?? [],
+        };
+        await onSubmit(updateData, true);
+      } else {
+        const createData: CreateEventDto = {
+          id: 0,
+          title,
+          description,
+          participantIds: eventData.participantIds ?? [],
+          creatorId: creator.id,
+          votingDeadline: '',
+          timeOptionType: eventData.timeOptionType ?? 'FIXED',
+          timeOptions: eventData.timeOptions ?? [],
+          restaurantOptionType: eventData.restaurantOptionType ?? 'FIXED',
+          restaurantOptions: eventData.restaurantOptions ?? [],
+        };
+        await onSubmit(createData, false);
+      }
+    };
+
+    return (
+      <Box display="flex" width="100%" sx={{ backgroundColor: '#f5f5dc', p: 1 }}>
+        <form onSubmit={handleSubmit} style={{ width: '100%' }}>
           <TextField
             fullWidth
-            label="Event Description (optional)"
-            value={description}
-            onChange={handleDescriptionChange}
-            margin="normal"
-            multiline
-            rows={3}
-            inputProps={{ maxLength: maxDescriptionChars }}
+            label="Event Title *"
+            value={eventData.title}
+            onChange={handleTitleChange}
+            sx={{ mt: 0, mb: 1 }}
+            error={!!errors.title}
+            helperText={errors.title}
           />
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            sx={{
-              position: 'absolute',
-              bottom: 8,
-              right: 16,
-              userSelect: 'none',
-            }}
-          >
-            {description.length}/{maxDescriptionChars}
-          </Typography>
-        </Box>
 
-        <FormControl fullWidth margin="normal" error={!!errors.participants}>
-          <InputLabel id="participants-label">Participants *</InputLabel>
-          <Select
-            labelId="participants-label"
-            multiple
-            value={selectedParticipants}
-            onChange={handleParticipantsChange}
-            input={<OutlinedInput label="Participants *" />}
-            renderValue={(selected) =>
-              selected
-                .map((id) => {
-                  const user = users.find((u) => u.id === id);
-                  return user ? `${user.firstName} ${user.lastName}` : '';
-                })
-                .join(', ')
-            }
-            MenuProps={{
-              PaperProps: {
-                sx: {
-                  backgroundColor: '#f5f5dc', // same color as the form
+          <Box position="relative">
+            <TextField
+              fullWidth
+              label="Event Description (optional)"
+              value={eventData.description}
+              onChange={handleDescriptionChange}
+              margin="normal"
+              multiline
+              rows={6}
+              inputProps={{ maxLength: maxDescriptionChars }}
+            />
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{
+                position: 'absolute',
+                bottom: 8,
+                right: 16,
+                userSelect: 'none',
+              }}
+            >
+              {eventData.description?.length ?? 0}/{maxDescriptionChars}
+            </Typography>
+          </Box>
+
+          <FormControl fullWidth margin="normal" error={!!errors.participants}>
+            <InputLabel id="participants-label">Participants *</InputLabel>
+            <Select
+              labelId="participants-label"
+              multiple
+              value={eventData.participantIds?.filter((id) => id !== creator.id) || []}
+              onChange={handleParticipantsChange}
+              input={<OutlinedInput label="Participants *" />}
+              renderValue={(selected) =>
+                selected
+                  .map((id) => {
+                    const user = users.find((u) => u.id === id);
+                    return user ? `${user.firstName} ${user.lastName}` : '';
+                  })
+                  .join(', ')
+              }
+              MenuProps={{
+                PaperProps: {
+                  sx: {
+                    backgroundColor: '#f5f5dc',
+                  },
                 },
-              },
-            }}
-          >
-            <MenuItem value={-1}>
-              <Checkbox checked={isAllSelected} />
-              <ListItemText primary="Select All" />
-            </MenuItem>
-            {selectableUsers.map((user) => (
-              <MenuItem key={user.id} value={user.id}>
-                <Checkbox checked={selectedParticipants.includes(user.id)} />
-                <ListItemText primary={`${user.firstName} ${user.lastName}`} />
+              }}
+            >
+              <MenuItem value={-1}>
+                <Checkbox checked={isAllSelected} />
+                <ListItemText primary="Select All" />
               </MenuItem>
-            ))}
-          </Select>
-          <FormHelperText>{errors.participants}</FormHelperText>
-        </FormControl>
-      </form>
-    </Box>
-  );
-}
+              {selectableUsers.map((user) => (
+                <MenuItem key={user.id} value={user.id}>
+                  <Checkbox checked={eventData.participantIds?.includes(user.id)} />
+                  <ListItemText primary={`${user.firstName} ${user.lastName}`} />
+                </MenuItem>
+              ))}
+            </Select>
+            <FormHelperText>{errors.participants}</FormHelperText>
+          </FormControl>
+        </form>
+      </Box>
+    );
+  },
+);
+
+export default EventModal;
