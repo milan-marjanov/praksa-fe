@@ -1,200 +1,321 @@
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Box, Typography, Button } from '@mui/material';
-import { getEventDetails } from '../../services/eventService';
-import { EventDetailsDto } from '../../types/Event';
-import { useEvents } from '../../hooks/useEvents';
-import ParticipantsList from '../../components/events/ParticipantsListProps';
-import { buttonStyle } from '../../styles/CommonStyles';
+import { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
+import { Box, Typography } from '@mui/material'
+import {
+  EventDetailsDto,
+  TimeOptionDto,
+  RestaurantOptionDto,
+} from '../../types/Event'
+import ParticipantsList from '../../components/events/ParticipantsListProps'
+import TimeOptionItem from '../../components/events/TimeOptionItem'
+import RestaurantOptionItem from '../../components/events/RestaurantOptionItem'
+import VoteList from '../../components/events/VoteList'
+import ConfirmOption from '../../components/events/ConfirmOption'
+import {
+  pageContainer,
+  headerBox,
+  headerTitle,
+  panelBox,
+  mapItemBox,
+} from '../../styles/CommonStyles'
+import { ParticipantProfileDto } from '../../types/User'
 
 export default function EventDetailsPage() {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const { userId } = useEvents();
-  const [event, setEvent] = useState<EventDetailsDto | null>(null);
+  const { id } = useParams<{ id: string }>()
 
-  const descHeight = {
-    xs: 'auto',
-    md: 'clamp(200px, 30vh, 400px)',
-    lg: 'clamp(220px, 40vh, 450px)',
-  };
-  const optHeight = {
-    xs: 'auto',
-    md: 'clamp(200px, 25vh, 500px)',
-    lg: 'clamp(220px, 22vh, 550px)',
-  };
-  const gapPx = '32px';
-  const participantsHeight = {
-    xs: 'auto',
-    md: `calc(${descHeight.md} + ${optHeight.md} + ${gapPx})`,
-    lg: `calc(${descHeight.lg} + ${optHeight.lg} + ${gapPx})`,
-  };
+  const [event, setEvent] = useState<EventDetailsDto | null>(null)
+  const [selectedTime, setSelectedTime] = useState<number | null>(null)
+  const [selectedRestaurant, setSelectedRestaurant] = useState<number | null>(null)
 
-  useEffect(() => {
-    if (!id) return;
-    getEventDetails(+id)
-      .then(data => setEvent(data))
-      .catch(err => console.error('Error loading event:', err));
-  }, [id]);
+  const [voteListOpen, setVoteListOpen] = useState(false)
+  const [modalUsers, setModalUsers] = useState<ParticipantProfileDto[]>([])
+  const [modalTitle, setModalTitle] = useState('')
 
-  if (!event) {
-    return <Typography>Učitavanje</Typography>;
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [confirmTitle, setConfirmTitle] = useState('')
+  const [confirmContent, setConfirmContent] = useState<React.ReactNode>(null)
+  const [onConfirmAction, setOnConfirmAction] = useState<() => void>(() => {})
+
+  const openConfirm = (
+    title: string,
+    content: React.ReactNode,
+    action: () => void
+  ) => {
+    setConfirmTitle(title)
+    setConfirmContent(content)
+    setOnConfirmAction(() => () => {
+      action()
+      setConfirmOpen(false)
+    })
+    setConfirmOpen(true)
   }
 
-  const numericUserId = Number(userId);
-  const isCreator = event.creator?.id === numericUserId;
+  const handleTimeSelect = (opt: TimeOptionDto) =>
+    openConfirm(
+      selectedTime === opt.id ? 'Cancel reservation?' : 'Confirm reservation',
+      `Are you sure you want to ${
+        selectedTime === opt.id ? 'cancel' : 'reserve'
+      } ${new Date(opt.startTime).toLocaleString()}?`,
+      () => setSelectedTime(selectedTime === opt.id ? null : opt.id)
+    )
+
+  const handleRestaurantSelect = (opt: RestaurantOptionDto) =>
+    openConfirm(
+      selectedRestaurant === opt.id ? 'Cancel vote?' : 'Confirm vote',
+      `Are you sure you want to ${
+        selectedRestaurant === opt.id ? 'cancel your vote for' : 'vote for'
+      } "${opt.name}"?`,
+      () => setSelectedRestaurant(selectedRestaurant === opt.id ? null : opt.id)
+    )
+
+  useEffect(() => {
+    const stub: EventDetailsDto = {
+      creator: {
+        id: 42,
+        firstName: 'Ana',
+        lastName: 'Marković',
+        profilePicture: null,
+      },
+      id: 1,
+      title: 'Lupus in fabula',
+      description: 'Lupus in fabula is a Latin phrase meaning the wolf in the story. Its a proverb used to describe the situation when someone or something appears unexpectedly, as if summoned by the very act of talking about it. Its similar to the English idiom speak of the devil. ',
+      participants: Array.from({ length: 10 }, (_, i) => ({
+        id: i + 1,
+        firstName: `User${i + 1}`,
+        lastName: 'Test',
+        email: `user${i + 1}@example.com`,
+        profilePictureUrl: null,
+      })),
+      timeOptions: [
+        {
+          id: 10,
+          startTime: '2025-07-01T09:00:00.000Z',
+          endTime: '2025-07-01T10:00:00.000Z',
+          createdAt: '2025-06-15T00:00:00.000Z',
+          maxCapacity: 5,
+          votesCount: 3,
+          reservedCount: 2,
+          votedUsers: [
+            { id: 1, firstName: 'Vukasin', lastName: 'Patkovic', email: 'vp@example.com', profilePictureUrl: null },
+            { id: 2, firstName: 'User', lastName: 'Test', email: 'vpa@example.com', profilePictureUrl: null },
+            { id: 3, firstName: 'U', lastName: 'T', email: 'ut@example.com', profilePictureUrl: null },
+          ],
+        },
+        {
+          id: 11,
+          startTime: '2025-07-01T09:00:00.000Z',
+          endTime: '2025-07-01T10:00:00.000Z',
+          createdAt: '2025-06-15T00:00:00.000Z',
+          maxCapacity: 5,
+          votesCount: 4,
+          reservedCount: 1,
+          votedUsers: [
+            { id: 1, firstName: 'Sofija', lastName: 'Markovic', email: 'sm@example.com', profilePictureUrl: null },
+            { id: 2, firstName: 'User', lastName: 'Test', email: 'sste@example.com', profilePictureUrl: null },
+            { id: 3, firstName: 'U', lastName: 'T', email: 'ut@example.com', profilePictureUrl: null },
+          ],
+        },
+      ],
+      restaurantOptions: [
+        {
+          id: 100,
+          name: 'Cuprija',
+          menuImageUrl: null,
+          restaurantUrl: '',
+          votesCount: 1,
+          votedUsers: [],
+        },
+        {
+          id: 101,
+          name: 'Malo Sokace',
+          menuImageUrl: null,
+          restaurantUrl: '',
+          votesCount: 0,
+          votedUsers: [],
+        },
+      ],
+      timeOptionType: 'FIXED',
+      restaurantOptionType: 'VOTING',
+      currentVote: null,
+    }
+
+    setEvent(stub)
+    setSelectedTime(null)
+    setSelectedRestaurant(null)
+  }, [id])
+
+  if (!event) return <Typography>Loading...</Typography>
+
+  const isTimeFixed =
+    event.timeOptionType === 'FIXED' && event.timeOptions.length === 1
+  const isRestFixed =
+    event.restaurantOptionType === 'FIXED' && event.restaurantOptions.length === 1
 
   return (
-    <Box
-      sx={{
-        width: { xs: '100%', sm: '95%', md: '90%', lg: '85%', xl: '75%' },
-        mx: 'auto',
-        px: { xs: 2, md: 4 },
-        py: { xs: 2, md: 4 },
-      }}
-    >
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-        <Box sx={{ flex: 1 }} />
-
-        <Typography variant="h4" sx={{ flex: 1, textAlign: 'center' }}>
+    <Box sx={pageContainer}>
+      <Box sx={headerBox}>
+        <Box sx={{ textAlign: 'center' }} />
+        <Typography variant="h4" sx={headerTitle}>
           {event.title}
         </Typography>
-
-        {isCreator
-          ? (
-            <Box sx={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
-              <Button
-                variant="outlined"
-                sx={buttonStyle}
-                size="medium"
-                onClick={() => navigate('/updateEvent', { state: { event } })}
-              >
-                Edit
-              </Button>
-            </Box>
-          )
-          : <Box sx={{ flex: 1 }} />
-        }
       </Box>
 
-      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: { xs: 2, md: 4 } }}>
-        <Box sx={{ flex: 2, display: 'flex', flexDirection: 'column', gap: { xs: 2, md: 4 } }}>
+      <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={3}>
+        <Box flex={2} display="flex" flexDirection="column" gap={3}>
           <Box
             sx={{
-              border: '1px solid',
-              borderColor: 'divider',
-              borderRadius: 1,
-              p: 2,
-              height: descHeight,
+              ...panelBox,
+              textAlign: 'left',
+              height: { md: '40vh' },
               overflowY: 'auto',
             }}
           >
             <Typography
-              variant="subtitle2"
-              sx={{
-                mb: 1,
-                fontSize: { xs: 18, md: 20 },
-                fontWeight: 'bold',
-                textAlign: 'center',
-              }}
+              variant="subtitle1"
+              align="center"
+              fontWeight="bold"
+              mb={1}
             >
               Description
             </Typography>
-            <Typography
-              variant="body1"
-              sx={{
-                textAlign: 'left',
-                fontSize: { xs: '0.5rem', md: '1.1rem' },
-                lineHeight: 1.6,
-              }}
-            >
+            <Typography sx={{ whiteSpace: 'pre-wrap', textAlign: 'left' }}>
               {event.description}
             </Typography>
           </Box>
 
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: { xs: 'column', md: 'row' },
-              gap: 2,
-              height: optHeight,
-              overflow: 'auto',
-            }}
-          >
+          <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={3}>
             <Box
-              sx={{
-                flex: 1,
-                border: '1px solid',
-                borderColor: 'divider',
-                borderRadius: 1,
-                p: 2,
-                overflowY: 'auto',
-              }}
+              sx={panelBox}
+              flex={event.restaurantOptionType === 'NONE' ? 2 : 1}
             >
-              <Typography
-                variant="subtitle2"
-                sx={{
-                  mb: 1,
-                  fontSize: { xs: 16, md: 18 },
-                  fontWeight: 'bold',
-                  textAlign: 'center',
-                }}
-              >
+              <Typography variant="h6" mb={2}>
                 Time
               </Typography>
-              {event.timeOptions.map(opt => (
-                <Box key={opt.id} sx={{ mb: 1, fontSize: { xs: '0.95rem', md: '1.15rem' } }}>
-                  {/* <TimeOptionItem option={opt} /> */}
+
+              {isTimeFixed ? (
+                <Box
+                  sx={{ ...mapItemBox, display: 'flex', justifyContent: 'center' }}
+                >
+                  <Typography>
+                    {new Date(event.timeOptions[0].startTime).toLocaleString()}
+                  </Typography>
                 </Box>
-              ))}
+              ) : event.restaurantOptionType === 'NONE' ? (
+                <Box
+                  sx={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(2, 1fr)',
+                    gap: 2,
+                  }}
+                >
+                  {event.timeOptions.map((opt) => (
+                    <Box key={opt.id} sx={mapItemBox}>
+                      <TimeOptionItem
+                        optionType={event.timeOptionType}
+                        option={opt}
+                        isSelected={selectedTime === opt.id}
+                        disabled={
+                          opt.reservedCount >= (opt.maxCapacity ?? Infinity)
+                        }
+                        onSelect={() => handleTimeSelect(opt)}
+                        onViewVotes={(title, users) => {
+                          setModalTitle(title)
+                          setModalUsers(users)
+                          setVoteListOpen(true)
+                        }}
+                      />
+                    </Box>
+                  ))}
+                </Box>
+              ) : (
+                event.timeOptions.map((opt) => (
+                  <Box key={opt.id} sx={mapItemBox}>
+                    <TimeOptionItem
+                      optionType={event.timeOptionType}
+                      option={opt}
+                      isSelected={selectedTime === opt.id}
+                      disabled={
+                        opt.reservedCount >= (opt.maxCapacity ?? Infinity)
+                      }
+                      onSelect={() => handleTimeSelect(opt)}
+                      onViewVotes={(title, users) => {
+                        setModalTitle(title)
+                        setModalUsers(users)
+                        setVoteListOpen(true)
+                      }}
+                    />
+                  </Box>
+                ))
+              )}
             </Box>
 
-            <Box
-              sx={{
-                flex: 1,
-                border: '1px solid',
-                borderColor: 'divider',
-                borderRadius: 1,
-                p: 2,
-                overflowY: 'auto',
-              }}
-            >
-              <Typography
-                variant="subtitle2"
-                sx={{
-                  mb: 1,
-                  fontSize: { xs: 16, md: 18 },
-                  fontWeight: 'bold',
-                  textAlign: 'center',
-                }}
-              >
-                Restaurant
-              </Typography>
-              {event.restaurantOptions.map(opt => (
-                <Box key={opt.id} sx={{ mb: 1, fontSize: { xs: '0.95rem', md: '1.15rem' } }}>
-                  {/* <RestaurantOptionItem option={opt} /> */}
-                </Box>
-              ))}
-            </Box>
+            {event.restaurantOptionType !== 'NONE' && (
+              <Box sx={panelBox} flex={1}>
+                <Typography variant="h6" mb={2}>
+                  Restaurant
+                </Typography>
+                {isRestFixed ? (
+                  <Box
+                    sx={{
+                      ...mapItemBox,
+                      display: 'flex',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <RestaurantOptionItem
+                      option={event.restaurantOptions[0]}
+                      optionType={event.restaurantOptionType}
+                      isSelected={
+                        selectedRestaurant === event.restaurantOptions[0].id
+                      }
+                      onSelect={() =>
+                        handleRestaurantSelect(event.restaurantOptions[0])
+                      }
+                    />
+                  </Box>
+                ) : (
+                  event.restaurantOptions.map((opt) => (
+                    <Box key={opt.id} sx={mapItemBox}>
+                      <RestaurantOptionItem
+                        option={opt}
+                        optionType={event.restaurantOptionType}
+                        isSelected={selectedRestaurant === opt.id}
+                        onSelect={() => handleRestaurantSelect(opt)}
+                      />
+                    </Box>
+                  ))
+                )}
+              </Box>
+            )}
           </Box>
         </Box>
 
-        <Box sx={{ flex: 1, ml: { xs: 0, md: 4 } }}>
-          <Box
-            sx={{
-              border: '1px solid',
-              borderColor: 'divider',
-              borderRadius: 1,
-              p: 2,
-              pt: 1,
-              height: participantsHeight,
-              overflowY: 'auto',
-            }}
-          >
-            <ParticipantsList participants={event.participants} />
-          </Box>
+        <Box
+          sx={{
+            ...panelBox,
+            flex: 0.8,
+            height: { md: 'calc(40vh + 35vh + 25px)' },
+            overflowY: 'auto',
+          }}
+        >
+          <ParticipantsList participants={event.participants} />
         </Box>
       </Box>
+
+      <VoteList
+        open={voteListOpen}
+        onClose={() => setVoteListOpen(false)}
+        title={modalTitle}
+        users={modalUsers}
+      />
+      <ConfirmOption
+        open={confirmOpen}
+        title={confirmTitle}
+        onCancel={() => setConfirmOpen(false)}
+        onConfirm={onConfirmAction}
+      >
+        {confirmContent}
+      </ConfirmOption>
     </Box>
-  );
+  )
 }

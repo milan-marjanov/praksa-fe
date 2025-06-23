@@ -31,6 +31,7 @@ export interface ParticipantProfileDto {
   firstName: string;
   lastName: string;
   email: string;
+  profilePictureUrl?: string | null;
 }
 
 export interface MyProfileDTO extends UserProfileDTO {

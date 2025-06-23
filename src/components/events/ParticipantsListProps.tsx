@@ -1,6 +1,6 @@
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Avatar } from '@mui/material';
 import { ParticipantProfileDto } from '../../types/User';
-import { participStyle } from '../../styles/CommonStyles';
+import { participantsStyle } from '../../styles/CommonStyles';
 
 interface ParticipantsListProps {
   participants: ParticipantProfileDto[];
@@ -13,18 +13,42 @@ export default function ParticipantsList({ participants }: ParticipantsListProps
 
   return (
     <Box>
-      <Typography sx={participStyle}>Participants:</Typography>
-      {participants.map((p, index) => (
+      <Typography sx={participantsStyle}>Participants:</Typography>
+
+      {participants.map((p) => (
         <Box
-          key={index}
-          sx={{ mb: 1, borderBottom: '1px solid #ddd', pb: 1, cursor: 'pointer' }}
+          key={p.id}
           onClick={() => (window.location.href = `/user/${p.id}`)}
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: '1fr auto auto 1fr',
+            alignItems: 'center',
+            py: 2,
+            borderBottom: '1px solid #ddd',
+            cursor: 'pointer',
+          }}
         >
-          <Typography>
+          <Avatar
+            src={p.profilePictureUrl || undefined}
+            alt={`${p.firstName} ${p.lastName}`}
+            sx={{
+              gridColumn: 2,
+              width: 35,
+              height: 35,
+            }}
+          >
+            {p.firstName[0]}
+            {p.lastName[0]}
+          </Avatar>
+
+          <Typography
+            variant="body1"
+            sx={{
+              gridColumn: 3,
+              ml: 1,
+            }}
+          >
             {p.firstName} {p.lastName}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {p.email}
           </Typography>
         </Box>
       ))}

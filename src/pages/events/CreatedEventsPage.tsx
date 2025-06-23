@@ -57,7 +57,6 @@ export default function EventsPage() {
     if (selectedEventId !== null) {
       try {
         await deleteEvent(selectedEventId);
-        // Remove from both created and participant lists
         setCreatedEvents(prev => prev.filter(e => e.id !== selectedEventId));
         setParticipantEvents(prev => prev.filter(e => e.id !== selectedEventId));
       } catch (error) {

@@ -19,8 +19,11 @@ import { formButtonStyle } from '../../styles/CommonStyles';
 export default function EventForm({ users, creator, event, onSubmit }: EventFormProps) {
   const [eventTitle, setEventTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [votingDeadline, setVotingDeadline] = useState(
+    new Date().toISOString().slice(0, 16)
+  );
   const [selectedParticipants, setSelectedParticipants] = useState<number[]>([]);
-  const [errors, setErrors] = useState({ title: '', participants: '' });
+  const [errors, setErrors] = useState({ title: '', participants: '', votingDeadline: '' });
   const maxDescriptionChars = 1000;
 
   const isUpdate = !!event;
@@ -30,7 +33,7 @@ export default function EventForm({ users, creator, event, onSubmit }: EventForm
       setEventTitle(event.title);
       setDescription(event.description);
       setSelectedParticipants(
-        'participantIds' in event ? event.participantIds.filter((id) => id !== creator.id) : [],
+        'participantIds' in event ? event.participantIds.filter((id) => id !== creator.id) : []
       );
     }
   }, [event, creator.id]);
@@ -42,9 +45,7 @@ export default function EventForm({ users, creator, event, onSubmit }: EventForm
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEventTitle(e.target.value);
-    if (e.target.value.trim() !== '') {
-      setErrors((prev) => ({ ...prev, title: '' }));
-    }
+    if (e.target.value.trim()) setErrors((p) => ({ ...p, title: '' }));
   };
 
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,48 +54,47 @@ export default function EventForm({ users, creator, event, onSubmit }: EventForm
     }
   };
 
-  const handleParticipantsChange = (event: SelectChangeEvent<typeof selectedParticipants>) => {
-    const value = event.target.value as number[];
-    let updated: number[];
+  const handleDeadlineChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setVotingDeadline(e.target.value);
+    if (e.target.value) setErrors((p) => ({ ...p, votingDeadline: '' }));
+  };
 
+  const handleParticipantsChange = (e: SelectChangeEvent<typeof selectedParticipants>) => {
+    const value = e.target.value as number[];
+    let updated: number[];
     if (value.includes(-1)) {
       updated = isAllSelected ? [] : allParticipantIds;
     } else {
       updated = value;
     }
-
     setSelectedParticipants(updated);
-
-    if (updated.length > 0) {
-      setErrors((prev) => ({ ...prev, participants: '' }));
-    }
+    if (updated.length) setErrors((p) => ({ ...p, participants: '' }));
   };
 
   const validate = () => {
-    const newErrors = { title: '', participants: '' };
+    const newErrors = { title: '', participants: '', votingDeadline: '' };
     let hasError = false;
-
-    if (eventTitle.trim() === '') {
+    if (!eventTitle.trim()) {
       newErrors.title = 'Event title is required';
       hasError = true;
     }
-
+    if (!votingDeadline) {
+      newErrors.votingDeadline = 'Voting deadline is required';
+      hasError = true;
+    }
     if (selectedParticipants.length === 0) {
       newErrors.participants = 'Please select at least one participant';
       hasError = true;
     }
-
-    return { hasError, newErrors };
+    setErrors(newErrors);
+    return hasError;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (validate()) return;
 
-    const { hasError, newErrors } = validate();
-    setErrors(newErrors);
-    if (hasError) return;
-
-    const allParticipantIds = selectedParticipants.includes(creator.id)
+    const allParticipantIdsWithCreator = selectedParticipants.includes(creator.id)
       ? selectedParticipants
       : [...selectedParticipants, creator.id];
 
@@ -102,7 +102,7 @@ export default function EventForm({ users, creator, event, onSubmit }: EventForm
       const updateData: UpdateEventDTO = {
         title: eventTitle,
         description,
-        participantIds: allParticipantIds,
+        participantIds: allParticipantIdsWithCreator,
         timeOptions: event?.timeOptions ?? [],
         restaurantOptions: event?.restaurantOptions ?? [],
       };
@@ -113,7 +113,8 @@ export default function EventForm({ users, creator, event, onSubmit }: EventForm
         title: eventTitle,
         description,
         creatorId: creator.id,
-        participantIds: allParticipantIds,
+        votingDeadline: new Date(votingDeadline).toISOString(),
+        participantIds: allParticipantIdsWithCreator,
       };
       await onSubmit(createData, false);
     }
@@ -142,19 +143,19 @@ export default function EventForm({ users, creator, event, onSubmit }: EventForm
           rows={3}
           inputProps={{ maxLength: maxDescriptionChars }}
         />
-        {/* <Typography
-          variant="caption"
-          color="text.secondary"
-          sx={{
-            position: 'absolute',
-            bottom: 8,
-            right: 16,
-            userSelect: 'none',
-          }}
-        >
-          {description.length}/{maxDescriptionChars}
-        </Typography> */}
       </Box>
+
+      <TextField
+        fullWidth
+        label="Voting Deadline *"
+        type="datetime-local"
+        value={votingDeadline}
+        onChange={handleDeadlineChange}
+        margin="normal"
+        error={!!errors.votingDeadline}
+        helperText={errors.votingDeadline}
+        InputLabelProps={{ shrink: true }}
+      />
 
       <FormControl fullWidth margin="normal" error={!!errors.participants}>
         <InputLabel id="participants-label">Participants *</InputLabel>
@@ -167,8 +168,8 @@ export default function EventForm({ users, creator, event, onSubmit }: EventForm
           renderValue={(selected) =>
             selected
               .map((id) => {
-                const user = users.find((u) => u.id === id);
-                return user ? `${user.firstName} ${user.lastName}` : '';
+                const u = users.find((u) => u.id === id)
+                return u ? `${u.firstName} ${u.lastName}` : ''
               })
               .join(', ')
           }

@@ -1,4 +1,5 @@
 import { ParticipantProfileDto } from "./User";
+import { VoteDto } from "./Vote";
 
 export interface ParticipantDto {
   id: number;
@@ -38,6 +39,7 @@ export interface CreateEventDto {
   title: string;
   description: string;
   creatorId: number;
+  votingDeadline: string;
   participantIds: number[];
 }
 
@@ -61,13 +63,19 @@ export interface UserEventsResponseDTO {
   participantEvents: EventDTO[];
 }
 
+export type TimeOptionType = 'FIXED' | 'VOTING' | 'CAPACITY_BASED';
+
+export type RestaurantOptionType = 'NONE' | 'FIXED' | 'VOTING';
+
 export interface TimeOptionDto {
   id: number;
   maxCapacity: number | null;
   startTime: string;
   endTime: string;
-  deadline: string;
-  createdAt: string | null;
+  createdAt: string;
+  votesCount: number;
+  reservedCount: number;
+  votedUsers: ParticipantProfileDto[];
 }
 
 export interface RestaurantOptionDto {
@@ -75,13 +83,19 @@ export interface RestaurantOptionDto {
   name: string;
   menuImageUrl: string | null;
   restaurantUrl: string;
+  votesCount: number;
+  votedUsers: ParticipantProfileDto[];
 }
 
 export interface EventDetailsDto {
+  creator: ParticipantDto;
   id: number;
   title: string;
   description: string;
   participants: ParticipantProfileDto[];
   timeOptions: TimeOptionDto[];
   restaurantOptions: RestaurantOptionDto[];
+  timeOptionType: TimeOptionType;
+  restaurantOptionType: RestaurantOptionType;
+  currentVote: VoteDto | null;
 }
