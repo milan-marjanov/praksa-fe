@@ -22,17 +22,17 @@ export default function Navbar() {
   const theme = useTheme();
   const isSm = useMediaQuery(theme.breakpoints.down('sm'));
   const location = useLocation();
+  const hidePaths = ['/', '/login'];
   const token = localStorage.getItem('jwtToken');
   const isLoggedIn = Boolean(token);
+  const showNav = isLoggedIn && !hidePaths.includes(location.pathname);
 
   let isAdmin = false;
   if (token) {
     try {
-      const parts = token.split('.');
-      const decodedJson = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
-      isAdmin = decodedJson.role === 'ADMIN';
+      const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+      isAdmin = payload.role === 'ADMIN';
     } catch {
-      console.log('No jwtToken found.');
     }
   }
 
@@ -44,7 +44,7 @@ export default function Navbar() {
   ];
 
   const [open, setOpen] = useState(false);
-  const toggleOpen = () => setOpen((prev) => !prev);
+  const toggleOpen = () => setOpen(prev => !prev);
 
   const handleNavClick = (to: string) => {
     setOpen(false);
@@ -65,6 +65,7 @@ export default function Navbar() {
     '&:hover': {
       borderBottom: '2px solid black',
       color: 'black',
+      borderRadius: 0,
     },
   });
 
@@ -92,37 +93,37 @@ export default function Navbar() {
             <Avatar sx={avatarStyle}>
               <EventIcon />
             </Avatar>
-
             <Typography variant="h6" sx={{ ml: 1, fontWeight: 'bold', color: 'black' }}>
               SimpleEvent
             </Typography>
           </Box>
 
-          {!isSm && isLoggedIn && (
+          {showNav && !isSm && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
               {navItems.map(({ text, to }) =>
                 to === '/logout' ? (
                   <Button
                     key={to}
                     onClick={() => handleNavClick(to)}
-                    sx={{
-                      textTransform: 'none',
-                      color: 'black',
-                      fontWeight: 'normal',
-                    }}
+                    sx={linkStyle(to)}
                   >
                     Logout
                   </Button>
                 ) : (
-                  <Button key={to} component={RouterLink} to={to} sx={linkStyle(to)}>
+                  <Button
+                    key={to}
+                    component={RouterLink}
+                    to={to}
+                    sx={linkStyle(to)}
+                  >
                     {text}
                   </Button>
-                ),
+                )
               )}
             </Box>
           )}
 
-          {isSm && isLoggedIn && (
+          {showNav && isSm && (
             <IconButton color="inherit" onClick={toggleOpen}>
               <MenuIcon />
             </IconButton>
@@ -130,7 +131,7 @@ export default function Navbar() {
         </Toolbar>
       </AppBar>
 
-      {isSm && isLoggedIn && open && (
+      {showNav && isSm && open && (
         <Box
           sx={{
             position: 'absolute',
@@ -156,6 +157,7 @@ export default function Navbar() {
                   px: 2,
                   borderBottom: '1px solid',
                   borderColor: 'divider',
+                  borderRadius: 0,
                 }}
               >
                 <ListItemText
