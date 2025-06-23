@@ -32,6 +32,7 @@ export default function Notifications() {
       try {
         const data = await getUserNotifications();
         setNotifications(data);
+        console.log(data);
       } catch (err) {
         setError('Error.');
       } finally {
@@ -44,6 +45,29 @@ export default function Notifications() {
 
   if (loading) return <p>Loading.....</p>;
   if (error) return <p>{error}</p>;
+
+  const handleMarkAsRead = async (id: number) => {
+    try {
+      await markNotificationAsRead(id);
+      setNotifications(prev =>
+        prev.map(notif =>
+          notif.id === id ? { ...notif, isRead: true } : notif
+        )
+      );
+    } catch (error) {
+      console.error('Failed to mark as read', error);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteNotification(id);
+      setNotifications(prev => prev.filter(notif => notif.id !== id));
+    } catch (error) {
+      console.error('Failed to delete notification', error);
+    }
+  };
+
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4 }}>
@@ -78,14 +102,14 @@ export default function Notifications() {
                       sx={{ minWidth: '70px', justifyContent: 'center' }}
                       onClick={() => {
                         if (!notif.isRead) {
-                          markNotificationAsRead(notif.id)
+                          handleMarkAsRead(notif.id)
                         }
                       }}
                     />
                     <IconButton
                       aria-label="delete"
                       size={isMobile ? 'small' : 'medium'}
-                      onClick={() => deleteNotification(notif.id)}
+                      onClick={() => handleDelete(notif.id)}
                       sx={{ ml: notif.isRead ? '3px' : '4px' }}
                     >
                       <DeleteIcon fontSize="inherit" />

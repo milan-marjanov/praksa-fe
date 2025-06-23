@@ -35,7 +35,7 @@ export async function getUserProfile(id: number) {
 }
 
 export async function getUserNotifications() {
-  const response = await api.get<NotificationDto[]>(`/api/notification/user`);
+  const response = await api.get<NotificationDto[]>(`/api/notifications/user`);
   return response.data;
 }
 
