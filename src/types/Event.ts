@@ -7,10 +7,9 @@ export interface ParticipantDto {
 
 export interface TimeOption {
   id: number;
-  maxCapacity?: number;
+  maxCapacity: number;
   startTime: string;
   endTime: string;
-  deadline: string;
   createdAt: string;
 }
 
@@ -21,13 +20,24 @@ export interface RestaurantOption {
   restaurantUrl?: string;
 }
 
+export type TimeOptionType = 'FIXED' | 'VOTING' | 'CAPACITY_BASED';
+
+export type RestaurantOptionType = 'FIXED' | 'VOTING' | 'NONE';
+
+export type EventModalRef = {
+  validate: () => { hasError: boolean };
+};
+
 export interface EventDTO {
   id: number;
   title: string;
   description: string;
   creator: ParticipantDto;
   participants: ParticipantDto[];
+  votingDeadline: string;
+  timeOptionType: TimeOptionType;
   timeOptions: TimeOption[];
+  restaurantOptionType: RestaurantOptionType;
   restaurantOptions: RestaurantOption[];
 }
 
@@ -37,20 +47,37 @@ export interface CreateEventDto {
   description: string;
   creatorId: number;
   participantIds: number[];
+  votingDeadline: string;
+  timeOptionType: TimeOptionType;
+  timeOptions: TimeOption[];
+  restaurantOptionType: RestaurantOptionType;
+  restaurantOptions: RestaurantOption[];
 }
 
-export interface EventFormProps {
+export interface EventModalProps {
   users: ParticipantDto[];
   creator: ParticipantDto;
   event?: UpdateEventDTO;
   onSubmit: (event: UpdateEventDTO | CreateEventDto, isUpdate: boolean) => Promise<void>;
 }
 
+export interface CreateEventModalProps {
+  users: ParticipantDto[];
+  creator: ParticipantDto;
+  event?: EventDTO;
+  open: boolean;
+  onClose: () => void;
+}
+
 export interface UpdateEventDTO {
   title: string;
   description: string;
+  creatorId: number;
   participantIds: number[];
+  votingDeadline: string;
+  timeOptionType: TimeOptionType;
   timeOptions: TimeOption[];
+  restaurantOptionType: RestaurantOptionType;
   restaurantOptions: RestaurantOption[];
 }
 /*
