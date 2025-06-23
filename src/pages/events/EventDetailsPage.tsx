@@ -101,20 +101,6 @@ export default function EventDetailsPage() {
             { id: 3, firstName: 'U', lastName: 'T', email: 'ut@example.com', profilePictureUrl: null },
           ],
         },
-        {
-          id: 11,
-          startTime: '2025-07-01T09:00:00.000Z',
-          endTime: '2025-07-01T10:00:00.000Z',
-          createdAt: '2025-06-15T00:00:00.000Z',
-          maxCapacity: 5,
-          votesCount: 4,
-          reservedCount: 1,
-          votedUsers: [
-            { id: 1, firstName: 'Sofija', lastName: 'Markovic', email: 'sm@example.com', profilePictureUrl: null },
-            { id: 2, firstName: 'User', lastName: 'Test', email: 'sste@example.com', profilePictureUrl: null },
-            { id: 3, firstName: 'U', lastName: 'T', email: 'ut@example.com', profilePictureUrl: null },
-          ],
-        },
       ],
       restaurantOptions: [
         {
@@ -125,17 +111,9 @@ export default function EventDetailsPage() {
           votesCount: 1,
           votedUsers: [],
         },
-        {
-          id: 101,
-          name: 'Malo Sokace',
-          menuImageUrl: null,
-          restaurantUrl: '',
-          votesCount: 0,
-          votedUsers: [],
-        },
       ],
       timeOptionType: 'FIXED',
-      restaurantOptionType: 'VOTING',
+      restaurantOptionType: 'FIXED',
       currentVote: null,
     }
 
@@ -259,7 +237,7 @@ export default function EventDetailsPage() {
                     sx={{
                       ...mapItemBox,
                       display: 'flex',
-                      justifyContent: 'center',
+                      alignItems: 'center',
                     }}
                   >
                     <RestaurantOptionItem

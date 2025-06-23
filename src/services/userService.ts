@@ -1,4 +1,4 @@
-import api from '../axios/AxiosClient';
+import api from '../axios/axiosClient';
 import {
   UserDTO,
   CreateUserDTO,

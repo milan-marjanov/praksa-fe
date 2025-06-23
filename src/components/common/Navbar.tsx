@@ -22,7 +22,6 @@ export default function Navbar() {
   const theme = useTheme();
   const isSm = useMediaQuery(theme.breakpoints.down('sm'));
   const location = useLocation();
-
   const hidePaths = ['/', '/login'];
   const token = localStorage.getItem('jwtToken');
   const isLoggedIn = Boolean(token);
@@ -79,7 +78,6 @@ export default function Navbar() {
             position: 'relative',
           }}
         >
-          {/* Logo i naziv */}
           <Box
             sx={{
               display: 'flex',
