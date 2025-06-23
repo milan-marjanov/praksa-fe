@@ -79,6 +79,7 @@ export default function Navbar() {
             position: 'relative',
           }}
         >
+          {/* Logo i naziv */}
           <Box
             sx={{
               display: 'flex',
