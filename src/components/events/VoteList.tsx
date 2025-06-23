@@ -1,4 +1,13 @@
-import { Dialog, DialogTitle, DialogContent, List, ListItem, ListItemAvatar, Avatar, ListItemText } from '@mui/material';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  List,
+  ListItem,
+  ListItemAvatar,
+  Avatar,
+  ListItemText,
+} from '@mui/material';
 import { ParticipantProfileDto } from '../../types/User';
 
 interface VoteListProps {
@@ -14,7 +23,7 @@ export default function VoteList({ open, onClose, title, users }: VoteListProps)
       <DialogTitle>{title}</DialogTitle>
       <DialogContent dividers>
         <List>
-          {users.map(u => (
+          {users.map((u) => (
             <ListItem key={u.id}>
               <ListItemAvatar>
                 <Avatar src={u.profilePictureUrl || undefined} />

@@ -24,12 +24,7 @@ interface Props {
   onSelect: (id: number) => void;
 }
 
-export default function RestaurantOptionItem({
-  option,
-  optionType,
-  isSelected,
-  onSelect,
-}: Props) {
+export default function RestaurantOptionItem({ option, optionType, isSelected, onSelect }: Props) {
   const [votesOpen, setVotesOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
 
@@ -38,17 +33,12 @@ export default function RestaurantOptionItem({
   const remainingCount = voters.length - displayVoters.length;
 
   const isVoting = optionType === 'VOTING';
-  const isFixed  = optionType === 'FIXED';
+  const isFixed = optionType === 'FIXED';
 
   return (
     <>
       <Box sx={{ display: 'flex', alignItems: 'center', py: 1 }}>
-        {isVoting && (
-          <Checkbox
-            checked={isSelected}
-            onChange={() => onSelect(option.id)}
-          />
-        )}
+        {isVoting && <Checkbox checked={isSelected} onChange={() => onSelect(option.id)} />}
 
         <Box
           onClick={() => setInfoOpen(true)}
@@ -87,7 +77,7 @@ export default function RestaurantOptionItem({
             }}
             onClick={() => setVotesOpen(true)}
           >
-            {displayVoters.map(u => (
+            {displayVoters.map((u) => (
               <Avatar
                 key={u.id}
                 src={u.profilePictureUrl || undefined}
@@ -108,10 +98,13 @@ export default function RestaurantOptionItem({
         <DialogTitle>Votes for {option.name}</DialogTitle>
         <DialogContent dividers>
           <List>
-            {voters.map(u => (
+            {voters.map((u) => (
               <ListItem key={u.id}>
                 <ListItemAvatar>
-                  <Avatar src={u.profilePictureUrl || undefined} alt={`${u.firstName} ${u.lastName}`} />
+                  <Avatar
+                    src={u.profilePictureUrl || undefined}
+                    alt={`${u.firstName} ${u.lastName}`}
+                  />
                 </ListItemAvatar>
                 <ListItemText primary={`${u.firstName} ${u.lastName}`} secondary={u.email} />
               </ListItem>

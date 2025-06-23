@@ -1,54 +1,46 @@
-import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
-import { Box, Typography } from '@mui/material'
-import {
-  EventDetailsDto,
-  TimeOptionDto,
-  RestaurantOptionDto,
-} from '../../types/Event'
-import ParticipantsList from '../../components/events/ParticipantsListProps'
-import TimeOptionItem from '../../components/events/TimeOptionItem'
-import RestaurantOptionItem from '../../components/events/RestaurantOptionItem'
-import VoteList from '../../components/events/VoteList'
-import ConfirmOption from '../../components/events/ConfirmOption'
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { Box, Typography } from '@mui/material';
+import { EventDetailsDto, TimeOptionDto, RestaurantOptionDto } from '../../types/Event';
+import ParticipantsList from '../../components/events/ParticipantsListProps';
+import TimeOptionItem from '../../components/events/TimeOptionItem';
+import RestaurantOptionItem from '../../components/events/RestaurantOptionItem';
+import VoteList from '../../components/events/VoteList';
+import ConfirmOption from '../../components/events/ConfirmOption';
 import {
   pageContainer,
   headerBox,
   headerTitle,
   panelBox,
   mapItemBox,
-} from '../../styles/CommonStyles'
-import { ParticipantProfileDto } from '../../types/User'
+} from '../../styles/CommonStyles';
+import { ParticipantProfileDto } from '../../types/User';
 
 export default function EventDetailsPage() {
-  const { id } = useParams<{ id: string }>()
+  const { id } = useParams<{ id: string }>();
 
-  const [event, setEvent] = useState<EventDetailsDto | null>(null)
-  const [selectedTime, setSelectedTime] = useState<number | null>(null)
-  const [selectedRestaurant, setSelectedRestaurant] = useState<number | null>(null)
+  const [event, setEvent] = useState<EventDetailsDto | null>(null);
+  const [selectedTime, setSelectedTime] = useState<number | null>(null);
+  const [selectedRestaurant, setSelectedRestaurant] = useState<number | null>(null);
 
-  const [voteListOpen, setVoteListOpen] = useState(false)
-  const [modalUsers, setModalUsers] = useState<ParticipantProfileDto[]>([])
-  const [modalTitle, setModalTitle] = useState('')
+  const [voteListOpen, setVoteListOpen] = useState(false);
+  const [modalUsers, setModalUsers] = useState<ParticipantProfileDto[]>([]);
+  const [modalTitle, setModalTitle] = useState('');
 
-  const [confirmOpen, setConfirmOpen] = useState(false)
-  const [confirmTitle, setConfirmTitle] = useState('')
-  const [confirmContent, setConfirmContent] = useState<React.ReactNode>(null)
-  const [onConfirmAction, setOnConfirmAction] = useState<() => void>(() => {})
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmTitle, setConfirmTitle] = useState('');
+  const [confirmContent, setConfirmContent] = useState<React.ReactNode>(null);
+  const [onConfirmAction, setOnConfirmAction] = useState<() => void>(() => {});
 
-  const openConfirm = (
-    title: string,
-    content: React.ReactNode,
-    action: () => void
-  ) => {
-    setConfirmTitle(title)
-    setConfirmContent(content)
+  const openConfirm = (title: string, content: React.ReactNode, action: () => void) => {
+    setConfirmTitle(title);
+    setConfirmContent(content);
     setOnConfirmAction(() => () => {
-      action()
-      setConfirmOpen(false)
-    })
-    setConfirmOpen(true)
-  }
+      action();
+      setConfirmOpen(false);
+    });
+    setConfirmOpen(true);
+  };
 
   const handleTimeSelect = (opt: TimeOptionDto) =>
     openConfirm(
@@ -56,8 +48,8 @@ export default function EventDetailsPage() {
       `Are you sure you want to ${
         selectedTime === opt.id ? 'cancel' : 'reserve'
       } ${new Date(opt.startTime).toLocaleString()}?`,
-      () => setSelectedTime(selectedTime === opt.id ? null : opt.id)
-    )
+      () => setSelectedTime(selectedTime === opt.id ? null : opt.id),
+    );
 
   const handleRestaurantSelect = (opt: RestaurantOptionDto) =>
     openConfirm(
@@ -65,8 +57,8 @@ export default function EventDetailsPage() {
       `Are you sure you want to ${
         selectedRestaurant === opt.id ? 'cancel your vote for' : 'vote for'
       } "${opt.name}"?`,
-      () => setSelectedRestaurant(selectedRestaurant === opt.id ? null : opt.id)
-    )
+      () => setSelectedRestaurant(selectedRestaurant === opt.id ? null : opt.id),
+    );
 
   useEffect(() => {
     const stub: EventDetailsDto = {
@@ -78,7 +70,8 @@ export default function EventDetailsPage() {
       },
       id: 1,
       title: 'Lupus in fabula',
-      description: 'Lupus in fabula is a Latin phrase meaning the wolf in the story. Its a proverb used to describe the situation when someone or something appears unexpectedly, as if summoned by the very act of talking about it. Its similar to the English idiom speak of the devil. ',
+      description:
+        'Lupus in fabula is a Latin phrase meaning the wolf in the story. Its a proverb used to describe the situation when someone or something appears unexpectedly, as if summoned by the very act of talking about it. Its similar to the English idiom speak of the devil. ',
       participants: Array.from({ length: 10 }, (_, i) => ({
         id: i + 1,
         firstName: `User${i + 1}`,
@@ -96,9 +89,27 @@ export default function EventDetailsPage() {
           votesCount: 3,
           reservedCount: 2,
           votedUsers: [
-            { id: 1, firstName: 'Vukasin', lastName: 'Patkovic', email: 'vp@example.com', profilePictureUrl: null },
-            { id: 2, firstName: 'User', lastName: 'Test', email: 'vpa@example.com', profilePictureUrl: null },
-            { id: 3, firstName: 'U', lastName: 'T', email: 'ut@example.com', profilePictureUrl: null },
+            {
+              id: 1,
+              firstName: 'Vukasin',
+              lastName: 'Patkovic',
+              email: 'vp@example.com',
+              profilePictureUrl: null,
+            },
+            {
+              id: 2,
+              firstName: 'User',
+              lastName: 'Test',
+              email: 'vpa@example.com',
+              profilePictureUrl: null,
+            },
+            {
+              id: 3,
+              firstName: 'U',
+              lastName: 'T',
+              email: 'ut@example.com',
+              profilePictureUrl: null,
+            },
           ],
         },
       ],
@@ -115,19 +126,18 @@ export default function EventDetailsPage() {
       timeOptionType: 'FIXED',
       restaurantOptionType: 'FIXED',
       currentVote: null,
-    }
+    };
 
-    setEvent(stub)
-    setSelectedTime(null)
-    setSelectedRestaurant(null)
-  }, [id])
+    setEvent(stub);
+    setSelectedTime(null);
+    setSelectedRestaurant(null);
+  }, [id]);
 
-  if (!event) return <Typography>Loading...</Typography>
+  if (!event) return <Typography>Loading...</Typography>;
 
-  const isTimeFixed =
-    event.timeOptionType === 'FIXED' && event.timeOptions.length === 1
+  const isTimeFixed = event.timeOptionType === 'FIXED' && event.timeOptions.length === 1;
   const isRestFixed =
-    event.restaurantOptionType === 'FIXED' && event.restaurantOptions.length === 1
+    event.restaurantOptionType === 'FIXED' && event.restaurantOptions.length === 1;
 
   return (
     <Box sx={pageContainer}>
@@ -148,12 +158,7 @@ export default function EventDetailsPage() {
               overflowY: 'auto',
             }}
           >
-            <Typography
-              variant="subtitle1"
-              align="center"
-              fontWeight="bold"
-              mb={1}
-            >
+            <Typography variant="subtitle1" align="center" fontWeight="bold" mb={1}>
               Description
             </Typography>
             <Typography sx={{ whiteSpace: 'pre-wrap', textAlign: 'left' }}>
@@ -162,18 +167,13 @@ export default function EventDetailsPage() {
           </Box>
 
           <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={3}>
-            <Box
-              sx={panelBox}
-              flex={event.restaurantOptionType === 'NONE' ? 2 : 1}
-            >
+            <Box sx={panelBox} flex={event.restaurantOptionType === 'NONE' ? 2 : 1}>
               <Typography variant="h6" mb={2}>
                 Time
               </Typography>
 
               {isTimeFixed ? (
-                <Box
-                  sx={{ ...mapItemBox, display: 'flex', justifyContent: 'center' }}
-                >
+                <Box sx={{ ...mapItemBox, display: 'flex', justifyContent: 'center' }}>
                   <Typography>
                     {new Date(event.timeOptions[0].startTime).toLocaleString()}
                   </Typography>
@@ -192,14 +192,12 @@ export default function EventDetailsPage() {
                         optionType={event.timeOptionType}
                         option={opt}
                         isSelected={selectedTime === opt.id}
-                        disabled={
-                          opt.reservedCount >= (opt.maxCapacity ?? Infinity)
-                        }
+                        disabled={opt.reservedCount >= (opt.maxCapacity ?? Infinity)}
                         onSelect={() => handleTimeSelect(opt)}
                         onViewVotes={(title, users) => {
-                          setModalTitle(title)
-                          setModalUsers(users)
-                          setVoteListOpen(true)
+                          setModalTitle(title);
+                          setModalUsers(users);
+                          setVoteListOpen(true);
                         }}
                       />
                     </Box>
@@ -212,14 +210,12 @@ export default function EventDetailsPage() {
                       optionType={event.timeOptionType}
                       option={opt}
                       isSelected={selectedTime === opt.id}
-                      disabled={
-                        opt.reservedCount >= (opt.maxCapacity ?? Infinity)
-                      }
+                      disabled={opt.reservedCount >= (opt.maxCapacity ?? Infinity)}
                       onSelect={() => handleTimeSelect(opt)}
                       onViewVotes={(title, users) => {
-                        setModalTitle(title)
-                        setModalUsers(users)
-                        setVoteListOpen(true)
+                        setModalTitle(title);
+                        setModalUsers(users);
+                        setVoteListOpen(true);
                       }}
                     />
                   </Box>
@@ -243,12 +239,8 @@ export default function EventDetailsPage() {
                     <RestaurantOptionItem
                       option={event.restaurantOptions[0]}
                       optionType={event.restaurantOptionType}
-                      isSelected={
-                        selectedRestaurant === event.restaurantOptions[0].id
-                      }
-                      onSelect={() =>
-                        handleRestaurantSelect(event.restaurantOptions[0])
-                      }
+                      isSelected={selectedRestaurant === event.restaurantOptions[0].id}
+                      onSelect={() => handleRestaurantSelect(event.restaurantOptions[0])}
                     />
                   </Box>
                 ) : (
@@ -295,5 +287,5 @@ export default function EventDetailsPage() {
         {confirmContent}
       </ConfirmOption>
     </Box>
-  )
+  );
 }

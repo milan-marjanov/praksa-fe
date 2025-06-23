@@ -1,19 +1,21 @@
 import api from '../axios/axiosClient';
 import axios from 'axios';
-import { CreateEventDto, UserEventsResponseDTO, UpdateEventDTO, EventDetailsDto } from '../types/Event';
+import {
+  CreateEventDto,
+  UserEventsResponseDTO,
+  UpdateEventDTO,
+  EventDetailsDto,
+} from '../types/Event';
 
 export const fetchUserEvents = async (userId: number): Promise<UserEventsResponseDTO> => {
-  const response = await api.get<UserEventsResponseDTO>(
-    `/api/events/fetchUserEvents/${userId}`
-  );
+  const response = await api.get<UserEventsResponseDTO>(`/api/events/fetchUserEvents/${userId}`);
   return response.data;
 };
-
 
 export async function createEvent(eventData: CreateEventDto) {
   try {
     const response = await api.post<CreateEventDto>('/api/events/createEvent', eventData);
-    console.log(response.data)
+    console.log(response.data);
     return response.data;
   } catch (err) {
     if (axios.isAxiosError(err) && err.response?.status === 404) {

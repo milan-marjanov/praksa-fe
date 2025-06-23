@@ -5,15 +5,32 @@ import { Add } from '@mui/icons-material';
 import DateTimeForm from './DateTimeForm';
 import { useEventForm } from '../../contexts/EventContext';
 import { EventModalRef } from '../../types/Event';
+import EventConfirmDialog from './EventConfirmDialog';
 
 function generateId(min = 1, max = 10000): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+function getCurrentDatetimeLocal() {
+  const now = new Date();
 
-const TimeOptionsModal = forwardRef<EventModalRef>((_, ref) => {
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes() + 5).padStart(2, '0');
+
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
+
+interface TimeOptionsModalProps {
+  isUpdate: boolean;
+}
+
+const TimeOptionsModal = forwardRef<EventModalRef, TimeOptionsModalProps>(({ isUpdate }, ref) => {
   const { eventData, setEventData } = useEventForm();
   const timeOptions = eventData.timeOptions;
   const [validationErrors, setValidationErrors] = useState<Record<number | string, string>>({});
+  const [openDialog, setOpenDialog] = useState(false);
 
   const [optionType, setOptionType] = useState<1 | 2 | 3>(() => {
     switch (eventData.timeOptionType) {
@@ -35,7 +52,6 @@ const TimeOptionsModal = forwardRef<EventModalRef>((_, ref) => {
   useEffect(() => {
     setValidationErrors((prevErrors) => {
       const newErrors = { ...prevErrors };
-      // Remove only the 'invalidOptions' error
       delete newErrors['invalidOptions'];
       return newErrors;
     });
@@ -50,7 +66,6 @@ const TimeOptionsModal = forwardRef<EventModalRef>((_, ref) => {
           const startValid = opt.startTime && opt.startTime.trim() !== '';
           const endValid = opt.endTime && opt.endTime.trim() !== '';
 
-          // If both start and end are valid, remove errors for this option id
           if (startValid && endValid && newErrors[opt.id]) {
             delete newErrors[opt.id];
           }
@@ -202,6 +217,17 @@ const TimeOptionsModal = forwardRef<EventModalRef>((_, ref) => {
       timeOptions: (timeOptions ?? []).filter((opt) => opt.id !== id),
     });
   };
+  const handleCancelClose = () => {
+    setOpenDialog(false);
+  };
+
+  const handleConfirmClose = () => {
+    handleVotingDeadlineChange(getCurrentDatetimeLocal());
+    setOpenDialog(false);
+
+    // Optional: clear any error manually if you're tracking it
+    //setFormError(false); // if you use error state
+  };
 
   const handleVotingDeadlineChange = (newDeadline: string) => {
     setEventData({
@@ -290,9 +316,20 @@ const TimeOptionsModal = forwardRef<EventModalRef>((_, ref) => {
               <DateTimeForm
                 label=""
                 required
+                value={votingDeadline}
                 initialValue={votingDeadline}
                 onValidChange={(e) => handleVotingDeadlineChange(e)}
               />
+              {isUpdate && (
+                <Button
+                  variant="contained"
+                  size="small"
+                  sx={{ mb: 3, mt: 1 }}
+                  onClick={() => setOpenDialog(true)} // open dialog here
+                >
+                  Close Voting
+                </Button>
+              )}
             </Box>
           </Box>
 
@@ -334,6 +371,14 @@ const TimeOptionsModal = forwardRef<EventModalRef>((_, ref) => {
           ))}
         </Box>
       )}
+      <EventConfirmDialog
+        open={openDialog}
+        title="Confirm Close Voting"
+        onCancel={handleCancelClose}
+        onConfirm={handleConfirmClose}
+      >
+        Are you sure you want to close the voting?
+      </EventConfirmDialog>
     </Box>
   );
 });

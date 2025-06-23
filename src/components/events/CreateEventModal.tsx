@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Button, Modal, Box, Typography, Stack, Divider } from '@mui/material';
+import { Button, Modal, Box, Typography, Stack, Divider, IconButton } from '@mui/material';
 import EventModal from './EventModal';
 import {
   CreateEventDto,
@@ -7,11 +7,52 @@ import {
   EventModalRef,
   UpdateEventDTO,
 } from '../../types/Event';
-import RestaurantOptionsModal from './RestaurantOptionsModal';
 import TimeOptionsModal from './TimeOptionsModal';
 import { createEvent, updateEvent } from '../../services/eventService';
 import { useEventForm } from '../../contexts/EventContext';
 import { toast } from 'react-toastify';
+import CloseIcon from '@mui/icons-material/Close';
+import EventConfirmDialog from './EventConfirmDialog';
+import RestaurantOptionsModal from './RestaurantOptionsModal';
+
+export const modalBoxStyle = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: '90vw',
+  maxWidth: 800,
+  maxHeight: '90vh',
+  bgcolor: '#f5f5dc',
+  borderRadius: 3,
+  boxShadow: 24,
+  pt: 4,
+  pb: 4,
+  pl: 4,
+  pr: 1,
+  display: 'flex',
+  flexDirection: 'column',
+};
+
+export const modalScrollbarStyle = {
+  overflowY: 'auto',
+  maxHeight: 'calc(90vh - 64px)',
+  pr: 4,
+  '&::-webkit-scrollbar': {
+    width: 6,
+  },
+  '&::-webkit-scrollbar-thumb': {
+    backgroundColor: '#ccc',
+    borderRadius: 4,
+  },
+};
+
+export const slideIndicatorStyle = (active: boolean) => ({
+  width: 10,
+  height: 10,
+  borderRadius: '50%',
+  bgcolor: active ? 'primary.main' : 'grey.400',
+});
 
 export default function CreateEventModal({
   users,
@@ -22,48 +63,41 @@ export default function CreateEventModal({
 }: CreateEventModalProps) {
   const [slideIndex, setSlideIndex] = useState(0);
   const formRef = useRef<EventModalRef>(null);
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const { eventData } = useEventForm();
   const isUpdate = !!event;
-
-  const handleFormSubmit = async (data: CreateEventDto | UpdateEventDTO, isUpdate: boolean) => {
-    if (event) {
-      console.log('Event not null');
-    }
-    console.log('Submitted data:', data, 'Is update:', isUpdate);
-    setSlideIndex(1);
-  };
-
   const slideTitles = ['Event Info', 'Date & Time', 'Restaurant Options'];
+  const [openDialog, setOpenDialog] = useState(false);
+  const [dialogTitle, setDialogTitle] = useState('');
+  const [dialogContent, setDialogContent] = useState('');
+  const [dialogAction, setDialogAction] = useState<() => void>(() => () => {});
 
   const slides = [
-    <EventModal
-      key="form"
-      users={users}
-      creator={creator}
-      onSubmit={handleFormSubmit}
-      ref={formRef}
-    />,
-    <TimeOptionsModal key="slide2" ref={formRef} />,
-    <RestaurantOptionsModal key="slide3" ref={formRef} />,
+    <EventModal key="form" users={users} creator={creator} ref={formRef} />,
+    <TimeOptionsModal key="slide2" ref={formRef} isUpdate={isUpdate} />,
+    <RestaurantOptionsModal key="slide3" ref={formRef} isUpdate={isUpdate} />,
   ];
 
-  const handleClose = () => {
-    setSlideIndex(0);
-    onClose();
+  const handleOpenDialog = () => {
+    if (isUpdate) {
+      setDialogTitle('Discard Changes');
+      setDialogContent(
+        'Are you sure you want to discard your changes to this event? All unsaved edits will be lost.',
+      );
+      setDialogAction(() => handleClose);
+    } else {
+      setDialogTitle('Cancel Event Creation');
+      setDialogContent(
+        'Are you sure you want to cancel creating this event? All entered data will be lost.',
+      );
+      setDialogAction(() => handleClose);
+    }
+    setOpenDialog(true);
   };
 
   const next = () => {
     if (slideIndex === 0 || slideIndex === 1) {
       const result = formRef.current?.validate();
       if (result?.hasError) return;
-    }
-
-    if (slideIndex === 2) {
-      //const errors = validateRestaurantOptions();
-      //setErrorMap(errors);
-      //if (Object.keys(errors).length > 0) return;
-      setErrors(errors);
     }
 
     if (slideIndex < slides.length - 1) {
@@ -77,122 +111,125 @@ export default function CreateEventModal({
     }
   };
 
-  const handleCreateEvent = async () => {
+  const handleClose = () => {
+    setOpenDialog(false);
+    setSlideIndex(0);
+    onClose?.();
+  };
+
+  const HandleSaveEvent = async () => {
     if (slideIndex === 2) {
       const result = formRef.current?.validate();
       if (result?.hasError) return;
     }
+
     try {
-      const dataToSubmit: CreateEventDto = {
-        ...(eventData as CreateEventDto),
-        creatorId: creator.id,
+      if (eventData.timeOptionType !== 'CAPACITY_BASED') {
+        eventData.timeOptions = eventData.timeOptions?.map((opt) => ({
+          ...opt,
+          maxCapacity: undefined,
+        }));
+      }
+
+      if (eventData.timeOptionType === 'FIXED' && eventData.restaurantOptionType === 'FIXED') {
+        eventData.votingDeadline = undefined;
+      }
+
+      const dataToSubmit = {
+        ...eventData,
+        ...(isUpdate ? {} : { creatorId: creator.id }),
       };
 
-      console.log('Submitted eventData: ', dataToSubmit);
+      if (isUpdate) {
+        await updateEvent(eventData.id as number, dataToSubmit as UpdateEventDTO);
+        toast.success('Event updated successfully');
+      } else {
+        await createEvent(dataToSubmit as CreateEventDto);
+        toast.success('Event created successfully');
+      }
 
-      const response = await createEvent(dataToSubmit);
-      console.log('Event created successfully:', response);
-      toast.success('Event created successfully');
       handleClose();
     } catch (error) {
-      console.error('Error creating event:', error);
+      console.error(`Error ${isUpdate ? 'updating' : 'creating'} event:`, error);
     }
   };
 
-  const handleUpdateEvent = async () => {
-    const result = formRef.current?.validate();
-    if (result?.hasError) return;
-
-    try {
-      if (eventData) {
-        const dataToSubmit: UpdateEventDTO = {
-          ...(eventData as UpdateEventDTO),
-        };
-        console.log('Submitting updated eventData:', dataToSubmit);
-        const response = await updateEvent(eventData.id as number, dataToSubmit); // 👈 call your patch endpoint
-        //if (response) {
-        toast.success('Event updated successfully', response);
-        handleClose();
-        // }
-      }
-    } catch (error) {
-      console.error('Error updating event:', error);
-      toast.error('An error occurred while updating the event');
-    }
+  const confirmSaveEvent = () => {
+    setDialogTitle(isUpdate ? 'Confirm Update' : 'Confirm Creation');
+    setDialogContent(
+      isUpdate
+        ? 'Do you want to save the changes you made to this event?'
+        : 'Are you sure you want to create this event with the entered details?',
+    );
+    setDialogAction(() => HandleSaveEvent);
+    setOpenDialog(true);
   };
 
   return (
     <div style={{ padding: 40 }}>
-      <Modal open={open} onClose={handleClose}>
-        <Box
-          sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: '90vw',
-            maxWidth: 800,
-            maxHeight: '90vh',
-            bgcolor: '#f5f5dc',
-            borderRadius: 3,
-            boxShadow: 24,
-            p: 4,
-            display: 'flex',
-            flexDirection: 'column',
-            overflowY: 'auto',
-            '&::-webkit-scrollbar': {
-              display: 'none',
-            },
-          }}
-        >
-          <Box sx={{ mb: 2 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-              <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>
-                Create New Event
+      <Modal sx={modalBoxStyle} open={open} onClose={handleClose}>
+        <Box sx={modalBoxStyle}>
+          <Box sx={modalScrollbarStyle}>
+            <Box sx={{ mb: 2 }}>
+              <IconButton
+                onClick={handleOpenDialog} // ✅ Correct
+                sx={{
+                  position: 'absolute',
+                  top: 8,
+                  right: 16,
+                  zIndex: 1,
+                }}
+              >
+                <CloseIcon />
+              </IconButton>
+              <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>
+                  Create New Event
+                </Typography>
+              </Box>
+
+              <Typography variant="subtitle1" color="text.secondary" marginLeft={1} marginTop={1}>
+                Step {slideIndex + 1}: {slideTitles[slideIndex]}
               </Typography>
+
+              <Divider sx={{ my: 2 }} />
             </Box>
 
-            <Typography variant="subtitle1" color="text.secondary" marginLeft={1} marginTop={1}>
-              Step {slideIndex + 1}: {slideTitles[slideIndex]}
-            </Typography>
+            <Box>{slides[slideIndex]}</Box>
 
-            <Divider sx={{ my: 2 }} />
-          </Box>
-
-          <Box>{slides[slideIndex]}</Box>
-
-          <Stack direction="row" justifyContent="space-between" alignItems="center" mt={4}>
-            <Button onClick={back} disabled={slideIndex === 0}>
-              Back
-            </Button>
-
-            <Stack direction="row" spacing={1}>
-              {slides.map((_, index) => (
-                <Box
-                  key={index}
-                  sx={{
-                    width: 10,
-                    height: 10,
-                    borderRadius: '50%',
-                    bgcolor: index === slideIndex ? 'primary.main' : 'grey.400',
-                  }}
-                />
-              ))}
-            </Stack>
-
-            {slideIndex === slides.length - 1 ? (
-              <Button
-                variant="contained"
-                onClick={isUpdate ? handleUpdateEvent : handleCreateEvent}
-              >
-                {isUpdate ? 'Save Changes' : 'Create Event'}
+            <Stack direction="row" justifyContent="space-between" mb={2} alignItems="center" mt={4}>
+              <Button onClick={back} disabled={slideIndex === 0}>
+                Back
               </Button>
-            ) : (
-              <Button onClick={next}>Next</Button>
-            )}
-          </Stack>
+
+              <Stack direction="row" spacing={1}>
+                {slides.map((_, index) => (
+                  <Box key={index} sx={slideIndicatorStyle(index === slideIndex)} />
+                ))}
+              </Stack>
+
+              {slideIndex === slides.length - 1 ? (
+                <Button variant="contained" onClick={confirmSaveEvent}>
+                  {isUpdate ? 'Save Changes' : 'Create Event'}
+                </Button>
+              ) : (
+                <Button onClick={next}>Next</Button>
+              )}
+            </Stack>
+          </Box>
         </Box>
       </Modal>
+      <EventConfirmDialog
+        open={openDialog}
+        title={dialogTitle}
+        onCancel={() => setOpenDialog(false)}
+        onConfirm={() => {
+          setOpenDialog(false);
+          dialogAction(); // ✅ Call the dynamically assigned action
+        }}
+      >
+        {dialogContent}
+      </EventConfirmDialog>
     </div>
   );
 }

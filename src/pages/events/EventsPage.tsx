@@ -29,7 +29,7 @@ import CreateEventModal from '../../components/events/CreateEventModal';
 import { useSetupEventForm } from '../../hooks/useSetupEventForm';
 import { useEventForm } from '../../contexts/EventContext';
 
-export default function EventsPage() {  
+export default function EventsPage() {
   const navigate = useNavigate();
   const {
     createdEvents,
@@ -46,7 +46,7 @@ export default function EventsPage() {
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
   const [selectedEventTitle, setSelectedEventTitle] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const {creator, filteredUsers, loadingUsers } = useSetupEventForm();
+  const { creator, filteredUsers, loadingUsers } = useSetupEventForm();
   const [selectedEvent, setSelectedEvent] = useState<EventDTO | undefined>(undefined);
 
   const { setEventData, resetEventData } = useEventForm();
@@ -78,8 +78,8 @@ export default function EventsPage() {
     if (selectedEventId !== null) {
       try {
         await deleteEvent(selectedEventId);
-        setCreatedEvents(prev => prev.filter(e => e.id !== selectedEventId));
-        setParticipantEvents(prev => prev.filter(e => e.id !== selectedEventId));
+        setCreatedEvents((prev) => prev.filter((e) => e.id !== selectedEventId));
+        setParticipantEvents((prev) => prev.filter((e) => e.id !== selectedEventId));
       } catch (error) {
         console.error('Error deleting event:', error);
       }
@@ -95,9 +95,8 @@ export default function EventsPage() {
     setSelectedEventTitle(null);
   };
 
-
   const handleCardClick = (eventId: number) => {
-    navigate(`/eventDetails/${eventId}`);
+    //navigate(`/eventDetails/${eventId}`);
   };
 
   const handleCreateClick = () => {
@@ -123,9 +122,7 @@ export default function EventsPage() {
       eventsToShow = createdEvents;
       break;
     case 'invited':
-      eventsToShow = participantEvents.filter(
-        e => !createdEvents.some(c => c.id === e.id)
-      );
+      eventsToShow = participantEvents.filter((e) => !createdEvents.some((c) => c.id === e.id));
       break;
     default:
       eventsToShow = allEvents;
@@ -155,7 +152,7 @@ export default function EventsPage() {
             labelId="event-filter-label"
             value={filter}
             label="Filter"
-            onChange={e => setFilter(e.target.value as 'all' | 'created' | 'invited')}
+            onChange={(e) => setFilter(e.target.value as 'all' | 'created' | 'invited')}
           >
             <MenuItem value="all">All</MenuItem>
             <MenuItem value="created">Created</MenuItem>
@@ -167,10 +164,10 @@ export default function EventsPage() {
       {eventsToShow.length === 0 ? (
         <Typography variant="body1" align="center">
           {filter === 'created'
-            ? "You haven’t created any events yet."
+            ? 'You haven’t created any events yet.'
             : filter === 'invited'
-            ? "You’re not invited to any events yet."
-            : "No events to display."}
+              ? 'You’re not invited to any events yet.'
+              : 'No events to display.'}
         </Typography>
       ) : (
         <Box sx={boxContainerStyle}>
@@ -188,20 +185,17 @@ export default function EventsPage() {
                   <Typography variant="h6" gutterBottom sx={eventTitleStyle}>
                     {event.title}
                   </Typography>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={eventDescriptionStyle}
-                  >
+                  <Typography variant="body2" color="text.secondary" sx={eventDescriptionStyle}>
                     {truncateText(event.description, 180)}
                   </Typography>
                 </CardContent>
                 <CardActions sx={cardActionsStyle}>
-                  <Button 
-                    variant="outlined" 
-                    size="medium" 
+                  <Button
+                    variant="outlined"
+                    size="medium"
                     disabled={!isCreator}
-                    onClick={() => handleEditClick(event)}>
+                    onClick={() => handleEditClick(event)}
+                  >
                     Edit
                   </Button>
                   <Button
@@ -209,7 +203,7 @@ export default function EventsPage() {
                     color="error"
                     size="medium"
                     disabled={!isCreator}
-                    onClick={e => {
+                    onClick={(e) => {
                       e.stopPropagation();
                       if (isCreator) handleDeleteClick(event.id, event.title);
                     }}
@@ -229,8 +223,7 @@ export default function EventsPage() {
         onCancel={handleCancelDelete}
         onConfirm={handleConfirmDelete}
       >
-        Are you sure you want to delete the event{' '}
-        <strong>{selectedEventTitle}</strong>?
+        Are you sure you want to delete the event <strong>{selectedEventTitle}</strong>?
       </ConfirmDialog>
     </Container>
   );

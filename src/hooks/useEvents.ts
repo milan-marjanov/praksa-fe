@@ -25,7 +25,7 @@ export function useEvents(): UseEventsResult {
   useEffect(() => {
     setAllEvents([
       ...createdEvents,
-      ...participantEvents.filter(e => !createdEvents.some(c => c.id === e.id)),
+      ...participantEvents.filter((e) => !createdEvents.some((c) => c.id === e.id)),
     ]);
   }, [createdEvents, participantEvents]);
 

@@ -12,7 +12,7 @@ import CreatedEventsPage from './pages/events/EventsPage';
 import MyProfilePage from './pages/user/MyProfilePage';
 import ProfilePage from './pages/user/ProfilePage';
 import { AuthProvider } from './contexts/AuthContext';
-import EventDetailsPage  from './pages/events/EventDetailsPage'
+import EventDetailsPage from './pages/events/EventDetailsPage';
 import { EventFormProvider } from './contexts/EventContext';
 
 export default function App() {
@@ -75,7 +75,7 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
-              
+
               <Route path="/unauthorized" element={<UnauthorizedPage />} />
             </Routes>
           </Router>

@@ -5,6 +5,7 @@ type DateTimeFormProps = {
   label: string;
   required?: boolean;
   initialValue?: string;
+  value?: string;
   onValidChange?: (value: string) => void;
 };
 
@@ -12,25 +13,21 @@ const DateTimeForm: React.FC<DateTimeFormProps> = ({
   label,
   initialValue,
   required = false,
+  value: externalValue,
   onValidChange,
 }) => {
-  /*function getCurrentDatetimeLocal() {
-    const now = new Date();
-
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
-  }*/
   const [error, setError] = useState<string | null>(null);
   const [value, setValue] = useState<string>(initialValue || '');
 
   useEffect(() => {
-    setValue(initialValue || '');
-  }, [initialValue]);
+    if (externalValue !== undefined) {
+      setValue(externalValue);
+      const validationResult = validate(externalValue);
+      setError(validationResult);
+    } else {
+      setValue(initialValue || '');
+    }
+  }, [externalValue, initialValue]);
 
   const minISO = useMemo(() => {
     const min = new Date();
@@ -40,10 +37,7 @@ const DateTimeForm: React.FC<DateTimeFormProps> = ({
 
   function validate(value: string): string | null {
     if (required && !value) {
-      if (label === '') {
-        return `Voting deadline is required.`;
-      }
-      return `${label} is required.`;
+      return label ? `${label} is required.` : `Voting deadline is required.`;
     }
 
     const date = new Date(value);
@@ -55,10 +49,7 @@ const DateTimeForm: React.FC<DateTimeFormProps> = ({
     now.setSeconds(0, 0);
 
     if (date < now) {
-      if (label === '') {
-        return `Voting deadline cannot be in the past.`;
-      }
-      return `${label} cannot be in the past.`;
+      return label ? `${label} cannot be in the past.` : `Voting deadline cannot be in the past.`;
     }
 
     return null;
@@ -69,7 +60,6 @@ const DateTimeForm: React.FC<DateTimeFormProps> = ({
     const validationResult = validate(newValue);
     setError(validationResult);
     if (onValidChange) {
-      ///PROVERITI
       onValidChange(newValue);
     }
   }

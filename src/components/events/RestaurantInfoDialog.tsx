@@ -1,4 +1,11 @@
-import { Dialog, DialogTitle, DialogContent, Typography, DialogActions, Button } from '@mui/material';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Typography,
+  DialogActions,
+  Button,
+} from '@mui/material';
 import { RestaurantOptionDto } from '../../types/Event';
 import { buttonStyle } from '../../styles/CommonStyles';
 
@@ -14,12 +21,18 @@ export default function RestaurantInfoDialog({ open, onClose, restaurant }: Prop
       <DialogTitle>{restaurant.name}</DialogTitle>
       <DialogContent dividers>
         <Typography variant="body2" gutterBottom>
-          Address: 123 Example St.<br/>
-          Website: <a href={restaurant.restaurantUrl} target="_blank" rel="noreferrer">{restaurant.restaurantUrl}</a>
+          Address: 123 Example St.
+          <br />
+          Website:{' '}
+          <a href={restaurant.restaurantUrl} target="_blank" rel="noreferrer">
+            {restaurant.restaurantUrl}
+          </a>
         </Typography>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} sx={buttonStyle}>Close</Button>
+        <Button onClick={onClose} sx={buttonStyle}>
+          Close
+        </Button>
       </DialogActions>
     </Dialog>
   );

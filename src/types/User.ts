@@ -27,7 +27,7 @@ export interface UserProfileDTO {
 }
 
 export interface ParticipantProfileDto {
-  id:number;
+  id: number;
   firstName: string;
   lastName: string;
   email: string;
