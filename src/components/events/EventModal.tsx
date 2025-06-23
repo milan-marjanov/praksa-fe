@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import {
   TextField,
   FormControl,
@@ -13,17 +13,14 @@ import {
   Box,
 } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material/Select';
-import { EventModalProps, EventModalRef } from '../../types/Event';
+import { EventModalProps, EventModalRef, ParticipantDto } from '../../types/Event';
 import { useEventForm } from '../../contexts/EventContext';
+import { eventDescriptionStyle, eventModalContainerStyle } from '../../styles/EventModalStyles';
+import { maxDescriptionChars } from '../../utils/EventDefaults';
 
 const EventModal = forwardRef<EventModalRef, EventModalProps>(({ users, creator }, ref) => {
   const { eventData, setEventData } = useEventForm();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const maxDescriptionChars = 255;
-
-  useEffect(() => {
-    console.log('eventData changed:', eventData);
-  }, [eventData]);
 
   useImperativeHandle(ref, () => ({
     validate,
@@ -63,6 +60,25 @@ const EventModal = forwardRef<EventModalRef, EventModalProps>(({ users, creator 
       setErrors((prev) => ({ ...prev, participants: '' }));
     }
   };
+  useImperativeHandle(ref, () => ({
+    validate: () => {
+      const newErrors = { title: '', participants: '' };
+      let hasError = false;
+
+      if (!eventData.title?.trim()) {
+        newErrors.title = 'Event title is required';
+        hasError = true;
+      }
+
+      if (!eventData.participantIds || eventData.participantIds.length === 0) {
+        newErrors.participants = 'Please select at least one participant';
+        hasError = true;
+      }
+
+      setErrors(newErrors);
+      return { hasError, newErrors };
+    },
+  }));
 
   const validate = () => {
     const newErrors = { title: '', participants: '' };
@@ -82,9 +98,18 @@ const EventModal = forwardRef<EventModalRef, EventModalProps>(({ users, creator 
     return { hasError, newErrors };
   };
 
+  const renderParticipantNames = (selected: number[], users: ParticipantDto[]): string => {
+    return selected
+      .map((id) => {
+        const user = users.find((u) => u.id === id);
+        return user ? `${user.firstName} ${user.lastName}` : '';
+      })
+      .join(', ');
+  };
+
   return (
-    <Box display="flex" width="100%" sx={{ backgroundColor: '#f5f5dc', p: 1 }}>
-      <form style={{ width: '100%' }}>
+    <Box sx={{ eventModalContainerStyle }}>
+      <Box component="form" style={{ width: '100%' }}>
         <TextField
           fullWidth
           label="Event Title *"
@@ -106,16 +131,7 @@ const EventModal = forwardRef<EventModalRef, EventModalProps>(({ users, creator 
             rows={6}
             inputProps={{ maxLength: maxDescriptionChars }}
           />
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            sx={{
-              position: 'absolute',
-              bottom: 8,
-              right: 16,
-              userSelect: 'none',
-            }}
-          >
+          <Typography variant="caption" color="text.secondary" sx={eventDescriptionStyle}>
             {eventData.description?.length ?? 0}/{maxDescriptionChars}
           </Typography>
         </Box>
@@ -128,14 +144,7 @@ const EventModal = forwardRef<EventModalRef, EventModalProps>(({ users, creator 
             value={eventData.participantIds?.filter((id) => id !== creator.id) || []}
             onChange={handleParticipantsChange}
             input={<OutlinedInput label="Participants *" />}
-            renderValue={(selected) =>
-              selected
-                .map((id) => {
-                  const user = users.find((u) => u.id === id);
-                  return user ? `${user.firstName} ${user.lastName}` : '';
-                })
-                .join(', ')
-            }
+            renderValue={(selected) => renderParticipantNames(selected as number[], users)}
             MenuProps={{
               PaperProps: {
                 sx: {
@@ -157,7 +166,7 @@ const EventModal = forwardRef<EventModalRef, EventModalProps>(({ users, creator 
           </Select>
           <FormHelperText>{errors.participants}</FormHelperText>
         </FormControl>
-      </form>
+      </Box>
     </Box>
   );
 });

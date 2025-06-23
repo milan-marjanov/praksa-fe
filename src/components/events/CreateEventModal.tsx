@@ -14,45 +14,12 @@ import { toast } from 'react-toastify';
 import CloseIcon from '@mui/icons-material/Close';
 import EventConfirmDialog from './EventConfirmDialog';
 import RestaurantOptionsModal from './RestaurantOptionsModal';
-
-export const modalBoxStyle = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: '90vw',
-  maxWidth: 800,
-  maxHeight: '90vh',
-  bgcolor: '#f5f5dc',
-  borderRadius: 3,
-  boxShadow: 24,
-  pt: 4,
-  pb: 4,
-  pl: 4,
-  pr: 1,
-  display: 'flex',
-  flexDirection: 'column',
-};
-
-export const modalScrollbarStyle = {
-  overflowY: 'auto',
-  maxHeight: 'calc(90vh - 64px)',
-  pr: 4,
-  '&::-webkit-scrollbar': {
-    width: 6,
-  },
-  '&::-webkit-scrollbar-thumb': {
-    backgroundColor: '#ccc',
-    borderRadius: 4,
-  },
-};
-
-export const slideIndicatorStyle = (active: boolean) => ({
-  width: 10,
-  height: 10,
-  borderRadius: '50%',
-  bgcolor: active ? 'primary.main' : 'grey.400',
-});
+import {
+  closeButtonStyle,
+  modalBoxStyle,
+  modalScrollbarStyle,
+  slideIndicatorStyle,
+} from '../../styles/EventModalStyles';
 
 export default function CreateEventModal({
   users,
@@ -117,6 +84,24 @@ export default function CreateEventModal({
     onClose?.();
   };
 
+  const buildSubmitData = (): Partial<CreateEventDto> => {
+    if (eventData.timeOptionType !== 'CAPACITY_BASED') {
+      eventData.timeOptions = eventData.timeOptions?.map((opt) => ({
+        ...opt,
+        maxCapacity: undefined,
+      }));
+    }
+
+    if (eventData.timeOptionType === 'FIXED' && eventData.restaurantOptionType !== 'VOTING') {
+      eventData.votingDeadline = undefined;
+    }
+
+    return {
+      ...eventData,
+      ...(isUpdate ? {} : { creatorId: creator.id }),
+    };
+  };
+
   const HandleSaveEvent = async () => {
     if (slideIndex === 2) {
       const result = formRef.current?.validate();
@@ -124,25 +109,12 @@ export default function CreateEventModal({
     }
 
     try {
-      if (eventData.timeOptionType !== 'CAPACITY_BASED') {
-        eventData.timeOptions = eventData.timeOptions?.map((opt) => ({
-          ...opt,
-          maxCapacity: undefined,
-        }));
-      }
-
-      if (eventData.timeOptionType === 'FIXED' && eventData.restaurantOptionType === 'FIXED') {
-        eventData.votingDeadline = undefined;
-      }
-
-      const dataToSubmit = {
-        ...eventData,
-        ...(isUpdate ? {} : { creatorId: creator.id }),
-      };
+      const dataToSubmit = buildSubmitData();
 
       if (isUpdate) {
         await updateEvent(eventData.id as number, dataToSubmit as UpdateEventDTO);
         toast.success('Event updated successfully');
+        console.log('Updated data:', eventData);
       } else {
         await createEvent(dataToSubmit as CreateEventDto);
         toast.success('Event created successfully');
@@ -166,20 +138,19 @@ export default function CreateEventModal({
   };
 
   return (
-    <div style={{ padding: 40 }}>
-      <Modal sx={modalBoxStyle} open={open} onClose={handleClose}>
+    <Box style={{ padding: 40 }}>
+      <Modal
+        open={open}
+        onClose={(_event, reason) => {
+          if (reason !== 'backdropClick' && reason !== 'escapeKeyDown') {
+            handleClose();
+          }
+        }}
+      >
         <Box sx={modalBoxStyle}>
           <Box sx={modalScrollbarStyle}>
             <Box sx={{ mb: 2 }}>
-              <IconButton
-                onClick={handleOpenDialog} // ✅ Correct
-                sx={{
-                  position: 'absolute',
-                  top: 8,
-                  right: 16,
-                  zIndex: 1,
-                }}
-              >
+              <IconButton onClick={handleOpenDialog} sx={closeButtonStyle}>
                 <CloseIcon />
               </IconButton>
               <Box sx={{ display: 'flex', justifyContent: 'center' }}>
@@ -225,11 +196,11 @@ export default function CreateEventModal({
         onCancel={() => setOpenDialog(false)}
         onConfirm={() => {
           setOpenDialog(false);
-          dialogAction(); // ✅ Call the dynamically assigned action
+          dialogAction();
         }}
       >
         {dialogContent}
       </EventConfirmDialog>
-    </div>
+    </Box>
   );
 }

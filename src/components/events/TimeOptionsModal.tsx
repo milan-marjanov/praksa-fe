@@ -6,21 +6,8 @@ import DateTimeForm from './DateTimeForm';
 import { useEventForm } from '../../contexts/EventContext';
 import { EventModalRef } from '../../types/Event';
 import EventConfirmDialog from './EventConfirmDialog';
-
-function generateId(min = 1, max = 10000): number {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-function getCurrentDatetimeLocal() {
-  const now = new Date();
-
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
-  const hours = String(now.getHours()).padStart(2, '0');
-  const minutes = String(now.getMinutes() + 5).padStart(2, '0');
-
-  return `${year}-${month}-${day}T${hours}:${minutes}`;
-}
+import { labelAbove, labelGroup, timeOptionsForm } from '../../styles/EventModalStyles';
+import { generateId, getCurrentDatetimeLocal, isValidFutureDate } from '../../utils/DateTimeUtils';
 
 interface TimeOptionsModalProps {
   isUpdate: boolean;
@@ -58,19 +45,19 @@ const TimeOptionsModal = forwardRef<EventModalRef, TimeOptionsModalProps>(({ isU
   }, [eventData.timeOptions?.length]);
 
   useEffect(() => {
+    if (!timeOptions) return;
+
     setValidationErrors((prevErrors) => {
       const newErrors = { ...prevErrors };
 
-      if (timeOptions) {
-        timeOptions.forEach((opt) => {
-          const startValid = opt.startTime && opt.startTime.trim() !== '';
-          const endValid = opt.endTime && opt.endTime.trim() !== '';
+      timeOptions.forEach(({ id, startTime, endTime }) => {
+        const startValid = startTime?.trim() !== '';
+        const endValid = endTime?.trim() !== '';
 
-          if (startValid && endValid && newErrors[opt.id]) {
-            delete newErrors[opt.id];
-          }
-        });
-      }
+        if (startValid && endValid && newErrors[id]) {
+          delete newErrors[id];
+        }
+      });
 
       return newErrors;
     });
@@ -79,77 +66,91 @@ const TimeOptionsModal = forwardRef<EventModalRef, TimeOptionsModalProps>(({ isU
     timeOptions?.map((opt) => opt.endTime).join('|'),
   ]);
 
-  useImperativeHandle(ref, () => ({
-    validate: () => {
-      let hasError = false;
-      const now = new Date();
-      const errors: Record<number | string, string> = {};
+  const validateTimeOptions = (timeOptions: typeof eventData.timeOptions, now: Date) => {
+    const errors: Record<string | number, string> = {};
+    let hasError = false;
 
-      if (!eventData?.timeOptions || eventData.timeOptions.length === 0) {
-        errors['noOptions'] = 'No time options provided.';
+    timeOptions?.forEach((option, index) => {
+      const optionNumber = index + 1;
+
+      if (!option.startTime || !option.endTime) {
+        errors[option.id] = `Option ${optionNumber}: Both start and end times are required.`;
         hasError = true;
-      } else {
-        eventData.timeOptions.forEach((opt, i) => {
-          const index = i + 1;
-
-          if (!opt.startTime || !opt.endTime) {
-            errors[opt.id] = `Option ${index}: Start and end time are required.`;
-            hasError = true;
-            return;
-          }
-
-          const start = new Date(opt.startTime);
-          const end = new Date(opt.endTime);
-
-          if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-            errors[opt.id] = `Option ${index}: Invalid date format.`;
-            hasError = true;
-            return;
-          }
-
-          if (start <= now) {
-            errors[opt.id] = `Option ${index}: Start time must be in the future.`;
-            hasError = true;
-          }
-
-          if (end <= now) {
-            errors[opt.id] = `Option ${index}: End time must be in the future.`;
-            hasError = true;
-          }
-
-          if (start >= end) {
-            errors[opt.id] = `Option ${index}: Start time must be before end time.`;
-            hasError = true;
-          }
-        });
+        return;
       }
 
-      if (optionType === 2 || optionType === 3) {
-        if (!eventData.votingDeadline) {
-          //errors['votingDeadline'] = 'Voting deadline is required.';
-          hasError = true;
-        } else {
-          const deadline = new Date(eventData.votingDeadline);
-          if (isNaN(deadline.getTime())) {
-            // errors['votingDeadline'] = 'Voting deadline has an invalid format.';
-            hasError = true;
-          } else if (deadline <= now) {
-            // errors['votingDeadline'] = 'Voting deadline must be in the future.';
-            hasError = true;
-          }
-        }
-        if (
-          eventData.timeOptions &&
-          (eventData.timeOptions.length < 2 || eventData.timeOptions.length > 6)
-        ) {
-          errors['invalidOptions'] = 'Number of time options must be between 2 and 6.';
-          hasError = true;
-        }
+      if (!isValidFutureDate(option.startTime, now)) {
+        errors[option.id] =
+          `Option ${optionNumber}: Start time must be a valid date in the future.`;
+        hasError = true;
       }
 
-      setValidationErrors(errors);
-      return { hasError, errors };
-    },
+      if (!isValidFutureDate(option.endTime, now)) {
+        errors[option.id] = `Option ${optionNumber}: End time must be a valid date in the future.`;
+        hasError = true;
+      }
+
+      const start = new Date(option.startTime);
+      const end = new Date(option.endTime);
+      if (start >= end) {
+        errors[option.id] = `Option ${optionNumber}: Start time must be before end time.`;
+        hasError = true;
+      }
+    });
+
+    return { hasError, errors };
+  };
+
+  const validateVotingDeadline = (votingDeadline: string | undefined, now: Date) => {
+    if (!votingDeadline) {
+      return { hasError: true, error: 'Voting deadline is required.' };
+    }
+
+    if (!isValidFutureDate(votingDeadline, now)) {
+      return { hasError: true, error: 'Voting deadline must be a valid date in the future.' };
+    }
+
+    return { hasError: false };
+  };
+
+  const validate = () => {
+    const now = new Date();
+    const errors: Record<string | number, string> = {};
+    let hasError = false;
+
+    const timeOptions = eventData?.timeOptions ?? [];
+    if (timeOptions.length === 0) {
+      errors['noOptions'] = 'No time options provided.';
+      hasError = true;
+    } else {
+      const { hasError: timeOptionsHaveErrors, errors: timeOptionErrors } = validateTimeOptions(
+        timeOptions,
+        now,
+      );
+      if (timeOptionsHaveErrors) {
+        hasError = true;
+        Object.assign(errors, timeOptionErrors);
+      }
+    }
+
+    if (optionType === 2 || optionType === 3) {
+      const votingDeadlineResult = validateVotingDeadline(eventData.votingDeadline, now);
+      if (votingDeadlineResult.hasError) {
+        hasError = true;
+      }
+
+      if (timeOptions.length < 2 || timeOptions.length > 6) {
+        hasError = true;
+      }
+    }
+
+    setValidationErrors(errors);
+
+    return { hasError, errors };
+  };
+
+  useImperativeHandle(ref, () => ({
+    validate,
   }));
 
   const votingDeadline = eventData.votingDeadline;
@@ -224,15 +225,11 @@ const TimeOptionsModal = forwardRef<EventModalRef, TimeOptionsModalProps>(({ isU
   const handleConfirmClose = () => {
     handleVotingDeadlineChange(getCurrentDatetimeLocal());
     setOpenDialog(false);
-
-    // Optional: clear any error manually if you're tracking it
-    //setFormError(false); // if you use error state
   };
 
   const handleVotingDeadlineChange = (newDeadline: string) => {
     setEventData({
       ...eventData,
-
       votingDeadline: newDeadline,
     });
   };
@@ -255,7 +252,7 @@ const TimeOptionsModal = forwardRef<EventModalRef, TimeOptionsModalProps>(({ isU
   };
 
   return (
-    <Box component="form" style={styles.form}>
+    <Box component="form" style={timeOptionsForm}>
       <Box display="flex" flexDirection="column" gap={3} marginLeft={1}>
         <Typography variant="subtitle1" fontWeight="bold">
           Choose How You Want to Schedule Your Event
@@ -310,8 +307,8 @@ const TimeOptionsModal = forwardRef<EventModalRef, TimeOptionsModalProps>(({ isU
       {(optionType === 2 || optionType === 3) && (
         <>
           <Box style={{ marginTop: 16 }}>
-            <Box style={styles.labelGroup}>
-              <Typography style={styles.labelAbove}>Voting Deadline</Typography>
+            <Box style={labelGroup}>
+              <Typography style={labelAbove}>Voting Deadline</Typography>
 
               <DateTimeForm
                 label=""
@@ -325,7 +322,7 @@ const TimeOptionsModal = forwardRef<EventModalRef, TimeOptionsModalProps>(({ isU
                   variant="contained"
                   size="small"
                   sx={{ mb: 3, mt: 1 }}
-                  onClick={() => setOpenDialog(true)} // open dialog here
+                  onClick={() => setOpenDialog(true)}
                 >
                   Close Voting
                 </Button>
@@ -382,119 +379,5 @@ const TimeOptionsModal = forwardRef<EventModalRef, TimeOptionsModalProps>(({ isU
     </Box>
   );
 });
-
-const styles: { [key: string]: React.CSSProperties } = {
-  form: {
-    maxWidth: '100%',
-    margin: '0 auto',
-    paddingLeft: 10,
-    paddingRight: 10,
-
-    paddingTop: 0,
-    borderRadius: 12,
-    backgroundColor: '#f5f5dc',
-  },
-  heading: {
-    fontSize: 20,
-    marginBottom: 16,
-    textAlign: 'center',
-    color: '#333',
-  },
-  optionGroup: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'flex-start',
-    gap: 8,
-    marginBottom: 16,
-    marginLeft: 'auto',
-    marginRight: 'auto',
-    width: 'fit-content',
-  },
-  radioLabel: {
-    fontSize: 14,
-    color: '#444',
-  },
-  divider: {
-    margin: '24px 0',
-    borderColor: '#ddd',
-  },
-  labelGroup: {
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center', // center content inside
-    marginBottom: 12,
-    maxWidth: '100%',
-    marginLeft: 'auto', // horizontal centering
-    marginRight: 'auto',
-    marginTop: 16,
-  },
-
-  labelAbove: {
-    fontSize: 14,
-    color: '#555',
-    marginBottom: 6,
-    fontWeight: '600',
-  },
-  uniformInput: {
-    padding: '6px 10px',
-    borderRadius: 6,
-    border: '1px solid #ccc',
-    fontSize: 14,
-  },
-  singleOptionContainer: {
-    display: 'flex',
-    gap: 20,
-    justifyContent: 'center',
-    flexWrap: 'wrap',
-    marginBottom: 12,
-  },
-  optionCard: {
-    position: 'relative',
-    padding: 16,
-    border: '1px solid #d0d0d0',
-    borderRadius: 10,
-    marginBottom: 12,
-    backgroundColor: '#fff',
-  },
-  optionRow: {
-    display: 'flex',
-    marginBottom: 12,
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-  },
-  addButton: {
-    padding: '8px 14px',
-    fontSize: 14,
-    backgroundColor: '#f0f0f0',
-    border: '1px solid #ccc',
-    borderRadius: 8,
-    cursor: 'pointer',
-    marginTop: 10,
-  },
-  removeBtn: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    border: 'none',
-    background: '#f44336',
-    color: '#fff',
-    borderRadius: '50%',
-    width: 24,
-    height: 24,
-    fontWeight: 'bold',
-    cursor: 'pointer',
-  },
-  submitBtn: {
-    backgroundColor: '#1976d2',
-    color: '#fff',
-    border: 'none',
-    padding: '10px 16px',
-    borderRadius: 8,
-    fontSize: 15,
-    cursor: 'pointer',
-    transition: 'background 0.3s',
-  },
-};
 
 export default TimeOptionsModal;
