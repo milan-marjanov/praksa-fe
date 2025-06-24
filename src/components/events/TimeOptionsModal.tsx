@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { Box, Button, FormControlLabel, Radio, Typography } from '@mui/material';
 import TimeOptionFieldsForm from './TimeOptionFieldsForm';
 import { Add } from '@mui/icons-material';
@@ -8,6 +8,7 @@ import { EventModalRef } from '../../types/Event';
 import EventConfirmDialog from './EventConfirmDialog';
 import { labelAbove, labelGroup, timeOptionsForm } from '../../styles/EventModalStyles';
 import { generateId, getCurrentDatetimeLocal, isValidFutureDate } from '../../utils/DateTimeUtils';
+import { initialTimeOption } from '../../utils/EventDefaults';
 
 interface TimeOptionsModalProps {
   isUpdate: boolean;
@@ -140,6 +141,8 @@ const TimeOptionsModal = forwardRef<EventModalRef, TimeOptionsModalProps>(({ isU
       }
 
       if (timeOptions.length < 2 || timeOptions.length > 6) {
+        errors['invalidOptions'] = 'Number of time options must be between 2 and 6.';
+
         hasError = true;
       }
     }
@@ -157,18 +160,17 @@ const TimeOptionsModal = forwardRef<EventModalRef, TimeOptionsModalProps>(({ isU
 
   useEffect(() => {
     if (eventData.timeOptions?.length === 0) {
+      const newOption = {
+        ...initialTimeOption,
+        id: generateId(),
+        createdAt: new Date().toISOString(),
+      };
+
       setEventData({
-        timeOptions: [
-          {
-            id: generateId(),
-            startTime: '',
-            endTime: '',
-            maxCapacity: 1,
-            createdAt: new Date().toISOString(),
-          },
-        ],
+        timeOptions: [newOption],
       });
     }
+
     console.log(eventData);
   }, [optionType, eventData.timeOptions, setEventData, eventData]);
 
@@ -178,14 +180,6 @@ const TimeOptionsModal = forwardRef<EventModalRef, TimeOptionsModalProps>(({ isU
       2: 'VOTING',
       3: 'CAPACITY_BASED',
     } as const;
-
-    const initialTimeOption = {
-      id: generateId(),
-      startTime: '',
-      endTime: '',
-      maxCapacity: 1,
-      createdAt: new Date().toISOString(),
-    };
 
     setOptionType(value);
 
@@ -198,26 +192,32 @@ const TimeOptionsModal = forwardRef<EventModalRef, TimeOptionsModalProps>(({ isU
 
   const addOption = () => {
     if ((eventData.timeOptions?.length ?? 0) >= 6) return;
+
+    const newOption = {
+      ...initialTimeOption,
+      id: generateId(),
+      createdAt: new Date().toISOString(),
+    };
+
     setEventData({
-      timeOptions: [
-        ...(timeOptions || []),
-        {
-          id: generateId(),
-          startTime: '',
-          endTime: '',
-          maxCapacity: 1,
-          createdAt: new Date().toISOString(),
-        },
-      ],
+      timeOptions: [...(eventData.timeOptions || []), newOption],
     });
   };
 
-  const removeOption = (id: number) => {
-    console.log(votingDeadline);
-    setEventData({
-      timeOptions: (timeOptions ?? []).filter((opt) => opt.id !== id),
-    });
-  };
+const removeOption = (id: number) => {
+  const updatedOptions = (timeOptions ?? []).filter((opt) => opt.id !== id);
+
+  setEventData({
+    timeOptions: updatedOptions,
+  });
+
+  const now = new Date();
+  const { errors } = validateTimeOptions(updatedOptions, now);
+  setValidationErrors(errors);
+};
+
+
+  
   const handleCancelClose = () => {
     setOpenDialog(false);
   };
@@ -322,7 +322,7 @@ const TimeOptionsModal = forwardRef<EventModalRef, TimeOptionsModalProps>(({ isU
                   variant="contained"
                   size="small"
                   sx={{ mb: 3, mt: 1 }}
-                  onClick={() => setOpenDialog(true)}
+                  onClick={() => setOpenDialog(true)} // open dialog here
                 >
                   Close Voting
                 </Button>
