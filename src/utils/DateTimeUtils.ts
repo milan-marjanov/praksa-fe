@@ -27,3 +27,10 @@ export function validateDateTime(value: string): string | null {
   if (date < now) return 'Date/time cannot be in the past.';
   return null;
 }
+
+export const formatDateTime = (dateTimeStr?: string) => {
+  if (!dateTimeStr) return 'N/A';
+  // Expecting format: "YYYY-MM-DDTHH:mm:ss"
+  // We want "YYYY-MM-DD HH:mm"
+  return dateTimeStr.replace('T', ' ').substring(0, 16);
+};

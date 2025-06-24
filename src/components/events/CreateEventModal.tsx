@@ -20,6 +20,7 @@ import {
   modalScrollbarStyle,
   slideIndicatorStyle,
 } from '../../styles/EventModalStyles';
+import EventDataReview from './EventDataReview';
 
 export default function CreateEventModal({
   users,
@@ -32,16 +33,22 @@ export default function CreateEventModal({
   const formRef = useRef<EventModalRef>(null);
   const { eventData } = useEventForm();
   const isUpdate = !!event;
-  const slideTitles = ['Event Info', 'Date & Time', 'Restaurant Options'];
+  const slideTitles = ['Event Info', 'Date & Time', 'Restaurant Options', 'Review & Confirm'];
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogTitle, setDialogTitle] = useState('');
   const [dialogContent, setDialogContent] = useState('');
   const [dialogAction, setDialogAction] = useState<() => void>(() => () => {});
-
+  const [validationError, setValidationError] = useState(false);
+  const handleValidationChange = (hasError: boolean) => {
+    setValidationError(hasError);
+  };
   const slides = [
     <EventModal key="form" users={users} creator={creator} ref={formRef} />,
     <TimeOptionsModal key="slide2" ref={formRef} isUpdate={isUpdate} />,
     <RestaurantOptionsModal key="slide3" ref={formRef} isUpdate={isUpdate} />,
+    <EventDataReview
+      key="slide3" onValidationChange={handleValidationChange}
+    />,
   ];
 
   const handleOpenDialog = () => {
@@ -62,7 +69,7 @@ export default function CreateEventModal({
   };
 
   const next = () => {
-    if (slideIndex === 0 || slideIndex === 1) {
+    if (slideIndex === 0 || slideIndex === 1 || slideIndex === 2) {
       const result = formRef.current?.validate();
       if (result?.hasError) return;
     }
@@ -103,11 +110,6 @@ export default function CreateEventModal({
   };
 
   const HandleSaveEvent = async () => {
-    if (slideIndex === 2) {
-      const result = formRef.current?.validate();
-      if (result?.hasError) return;
-    }
-
     try {
       const dataToSubmit = buildSubmitData();
 
@@ -180,7 +182,7 @@ export default function CreateEventModal({
               </Stack>
 
               {slideIndex === slides.length - 1 ? (
-                <Button variant="contained" onClick={confirmSaveEvent}>
+                <Button variant="contained" onClick={confirmSaveEvent} disabled={validationError}>
                   {isUpdate ? 'Save Changes' : 'Create Event'}
                 </Button>
               ) : (

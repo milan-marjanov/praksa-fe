@@ -204,20 +204,18 @@ const TimeOptionsModal = forwardRef<EventModalRef, TimeOptionsModalProps>(({ isU
     });
   };
 
-const removeOption = (id: number) => {
-  const updatedOptions = (timeOptions ?? []).filter((opt) => opt.id !== id);
+  const removeOption = (id: number) => {
+    const updatedOptions = (timeOptions ?? []).filter((opt) => opt.id !== id);
 
-  setEventData({
-    timeOptions: updatedOptions,
-  });
+    setEventData({
+      timeOptions: updatedOptions,
+    });
 
-  const now = new Date();
-  const { errors } = validateTimeOptions(updatedOptions, now);
-  setValidationErrors(errors);
-};
+    const now = new Date();
+    const { errors } = validateTimeOptions(updatedOptions, now);
+    setValidationErrors(errors);
+  };
 
-
-  
   const handleCancelClose = () => {
     setOpenDialog(false);
   };

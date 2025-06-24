@@ -42,7 +42,7 @@ export const slideIndicatorStyle = (active: boolean) => ({
 export const closeButtonStyle = {
   position: 'absolute',
   top: 8,
-  right: 16,
+  right: 10,
   zIndex: 1,
 };
 

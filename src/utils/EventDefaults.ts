@@ -24,7 +24,7 @@ export const initialTimeOption = {
   id: generateId(),
   startTime: '',
   endTime: '',
-  maxCapacity: 1,
+  maxCapacity: undefined,
   createdAt: new Date().toISOString(),
 };
 
