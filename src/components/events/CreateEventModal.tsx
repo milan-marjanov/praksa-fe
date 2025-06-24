@@ -5,10 +5,10 @@ import {
   Box,
   Typography,
   Stack,
-  Divider
+  Divider,
+  IconButton
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-
 import EventModal from './EventModal';
 import {
   CreateEventDto,
@@ -53,59 +53,33 @@ export default function CreateEventModal({
   const [dialogContent, setDialogContent] = useState('');
   const [dialogAction, setDialogAction] = useState<() => void>(() => () => {});
   const [validationError, setValidationError] = useState(false);
-  const handleValidationChange = (hasError: boolean) => {
-    setValidationError(hasError);
-  };
+  const handleValidationChange = (hasError: boolean) => setValidationError(hasError);
 
   const slides = [
-    <EventModal
-      key="form"
-      users={users}
-      creator={creator}
-      onSubmit={async () => setSlideIndex(1)}
-      ref={formRef}
-    />,
-
-    <TimeOptionsModal key="slide2" ref={formRef} />,
+    <EventModal key="form" users={users} creator={creator} ref={formRef} />,
+    <TimeOptionsModal key="slide2" ref={formRef} />,  
     <RestaurantOptionsModal key="slide3" ref={formRef} />,
-    <EventDataReview key="slide3" onValidationChange={handleValidationChange} />,
+    <EventDataReview key="slide4" onValidationChange={handleValidationChange} />,
   ];
 
   const handleOpenDialog = () => {
-    if (isUpdate) {
-      setDialogTitle('Discard Changes');
-      setDialogContent(
-        'Are you sure you want to discard your changes to this event? All unsaved edits will be lost.',
-      );
-      setDialogAction(() => handleClose);
-    } else {
-      setDialogTitle('Cancel Event Creation');
-      setDialogContent(
-        'Are you sure you want to cancel creating this event? All entered data will be lost.',
-      );
-      setDialogAction(() => handleClose);
-    }
+    setDialogTitle(isUpdate ? 'Discard Changes' : 'Cancel Event Creation');
+    setDialogContent(
+      isUpdate
+        ? 'Are you sure you want to discard your changes to this event? All unsaved edits will be lost.'
+        : 'Are you sure you want to cancel creating this event? All entered data will be lost.',
+    );
+    setDialogAction(() => handleClose);
     setOpenDialog(true);
   };
 
   const next = () => {
-    if (slideIndex === 0 || slideIndex === 1 || slideIndex === 2) {
-      const result = formRef.current?.validate();
-      if (result?.hasError) return;
-    }
-
-    if (slideIndex < slides.length - 1) {
-      const result = formRef.current?.validate();
-      if (result?.hasError) return;
-
-      setSlideIndex(slideIndex + 1);
-    }
+    const result = formRef.current?.validate();
+    if (result?.hasError) return;
+    if (slideIndex < slides.length - 1) setSlideIndex(slideIndex + 1);
   };
 
-  const back = () => {
-    if (slideIndex > 0) setSlideIndex(slideIndex - 1);
-  };
-
+  const back = () => { if (slideIndex > 0) setSlideIndex(slideIndex - 1); };
 
   const handleClose = () => {
     setOpenDialog(false);
@@ -115,38 +89,34 @@ export default function CreateEventModal({
 
   const buildSubmitData = (): Partial<CreateEventDto> => {
     if (eventData.timeOptionType !== 'CAPACITY_BASED') {
-      eventData.timeOptions = eventData.timeOptions?.map((opt) => ({
-        ...opt,
-        maxCapacity: undefined,
-      }));
+      eventData.timeOptions = eventData.timeOptions?.map((opt) => ({ ...opt, maxCapacity: undefined }));
     }
 
     if (eventData.timeOptionType === 'FIXED' && eventData.restaurantOptionType !== 'VOTING') {
       eventData.votingDeadline = undefined;
-
     }
-    return {
-      ...eventData,
-      ...(isUpdate ? {} : { creatorId: creator.id }),
-    };
+    return { ...eventData, ...(isUpdate ? {} : { creatorId: creator.id }) };
   };
 
-  const HandleSaveEvent = async () => {
+  const handleSaveEvent = async () => {
+    setLoading(true);
     try {
       const dataToSubmit = buildSubmitData();
 
       if (isUpdate) {
-        await updateEvent(eventData.id as number, dataToSubmit as UpdateEventDTO);
+        const updated: EventDTO = await updateEvent(eventData.id as number, dataToSubmit as UpdateEventDTO);
         toast.success('Event updated successfully');
-        console.log('Updated data:', eventData);
+        onEventUpdated?.(updated);
       } else {
-        await createEvent(dataToSubmit as CreateEventDto);
+        const created: EventDTO = await createEvent(dataToSubmit as CreateEventDto);
         toast.success('Event created successfully');
+        onEventCreated?.(created);
       }
-
       handleClose();
     } catch (error) {
       console.error(`Error ${isUpdate ? 'updating' : 'creating'} event:`, error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -155,9 +125,9 @@ export default function CreateEventModal({
     setDialogContent(
       isUpdate
         ? 'Do you want to save the changes you made to this event?'
-        : 'Are you sure you want to create this event with the entered details?',
+        : 'Are you sure you want to create this event with the entered details?'
     );
-    setDialogAction(() => HandleSaveEvent);
+    setDialogAction(() => handleSaveEvent);
     setOpenDialog(true);
   };
 
@@ -165,11 +135,7 @@ export default function CreateEventModal({
     <Box style={{ padding: 40 }}>
       <Modal
         open={open}
-        onClose={(_event, reason) => {
-          if (reason !== 'backdropClick' && reason !== 'escapeKeyDown') {
-            handleClose();
-          }
-        }}
+        onClose={(_e, reason) => reason === 'backdropClick' || reason === 'escapeKeyDown' ? null : handleClose()}
       >
         <Box sx={modalBoxStyle}>
           <Box sx={modalScrollbarStyle}>
@@ -179,41 +145,33 @@ export default function CreateEventModal({
               </IconButton>
               <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                 <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>
-                  Create New Event
+                  {isUpdate ? 'Update Event' : 'Create New Event'}
                 </Typography>
               </Box>
-
-              <Typography variant="subtitle1" color="text.secondary" marginLeft={1} marginTop={1}>
+              <Typography variant="subtitle1" color="text.secondary" ml={1} mt={1}>
                 Step {slideIndex + 1}: {slideTitles[slideIndex]}
               </Typography>
-
               <Divider sx={{ my: 2 }} />
             </Box>
 
             <Box>{slides[slideIndex]}</Box>
 
             <Stack direction="row" justifyContent="space-between" mb={2} alignItems="center" mt={4}>
-              <Button onClick={back} disabled={slideIndex === 0}>
-                Back
-              </Button>
+              <Button onClick={back} disabled={slideIndex === 0}>Back</Button>
 
               <Stack direction="row" spacing={1}>
-                {slides.map((_, index) => (
-                  <Box key={index} sx={slideIndicatorStyle(index === slideIndex)} />
-                ))}
+                {slides.map((_, idx) => (<Box key={idx} sx={slideIndicatorStyle(idx === slideIndex)} />))}
               </Stack>
 
               {slideIndex === slides.length - 1 ? (
-
-                
-                            <LoadingButton
-              variant="contained"
-               onClick={confirmSaveEvent} disabled={validationError}
-              loading={loading}
-              disabled={loading}                           
-            >
-              {isUpdate ? 'Save Changes' : 'Create Event'}
-            </LoadingButton>
+                <LoadingButton
+                  variant="contained"
+                  onClick={confirmSaveEvent}
+                  disabled={validationError || loading}
+                  loading={loading}
+                >
+                  {isUpdate ? 'Save Changes' : 'Create Event'}
+                </LoadingButton>
               ) : (
                 <Button onClick={next}>Next</Button>
               )}
@@ -221,18 +179,15 @@ export default function CreateEventModal({
           </Box>
         </Box>
       </Modal>
+
       <EventConfirmDialog
         open={openDialog}
         title={dialogTitle}
         onCancel={() => setOpenDialog(false)}
-        onConfirm={() => {
-          setOpenDialog(false);
-          dialogAction();
-        }}
+        onConfirm={() => { setOpenDialog(false); dialogAction(); }}
       >
         {dialogContent}
       </EventConfirmDialog>
     </Box>
-
   );
 }

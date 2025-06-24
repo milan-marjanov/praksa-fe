@@ -18,7 +18,7 @@ export const defaultData: CreateEventDto = {
   restaurantOptions: [],
 };
 
-export const maxDescriptionChars = 255;
+export const maxDescriptionChars = 1000;
 
 export const initialTimeOption = {
   id: generateId(),

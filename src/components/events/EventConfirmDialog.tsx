@@ -26,11 +26,11 @@ export default function ConfirmDialog({
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>{children}</DialogContent>
       <DialogActions>
-        <Button sx={buttonStyle} onClick={onConfirm}>
-          {confirmText}
-        </Button>
         <Button sx={buttonStyle} color="error" onClick={onCancel}>
           {cancelText}
+        </Button>
+        <Button sx={buttonStyle} onClick={onConfirm}>
+          {confirmText}
         </Button>
       </DialogActions>
     </Dialog>

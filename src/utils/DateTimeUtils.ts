@@ -1,16 +1,16 @@
 export function generateId(min = 1, max = 10000): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
-export function getCurrentDatetimeLocal() {
+export function getCurrentDatetimeLocal(): string {
   const now = new Date();
-
+  const pad = (n: number) => n.toString().padStart(2, '0');
   const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
-  const hours = String(now.getHours()).padStart(2, '0');
-  const minutes = String(now.getMinutes() + 5).padStart(2, '0');
-
-  return `${year}-${month}-${day}T${hours}:${minutes}`;
+  const month = pad(now.getMonth() + 1);
+  const day = pad(now.getDate());
+  const hour = pad(now.getHours());
+  const min = pad(now.getMinutes());
+  const sec = pad(now.getSeconds());
+  return `${year}-${month}-${day}T${hour}:${min}:${sec}`;
 }
 
 export const isValidFutureDate = (dateString: string, now: Date): boolean => {

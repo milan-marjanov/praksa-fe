@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { Box, Typography, IconButton } from '@mui/material'
+import { Box, Typography, IconButton, Button } from '@mui/material'
 import InfoIcon from '@mui/icons-material/Info'
-import { getEventDetails } from '../../services/eventService'
+import { getEventDetails, updateEvent } from '../../services/eventService'
 import { submitVote } from '../../services/voteService'
 import {
   EventDetailsDto,
@@ -21,9 +21,15 @@ import {
   headerTitle,
   panelBox,
   mapItemBox,
+  buttonStyle,
 } from '../../styles/CommonStyles'
+import { mapDetailsToUpdateDto } from '../../utils/EventMappers'
+import { getCurrentDatetimeLocal } from '../../utils/DateTimeUtils'
 import { ParticipantProfileDto } from '../../types/User'
 import { CreateVoteDto } from '../../types/Vote'
+import EventConfirmDialog from '../../components/events/EventConfirmDialog'
+import { toast } from 'react-toastify'
+import { useEvents } from '../../hooks/useEvents'
 
 export default function EventDetailsPage() {
   const { id } = useParams<{ id: string }>()
@@ -34,6 +40,8 @@ export default function EventDetailsPage() {
 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  const { userId } = useEvents()
 
   const [voteListOpen, setVoteListOpen] = useState(false)
   const [modalUsers, setModalUsers] = useState<ParticipantProfileDto[]>([])
@@ -46,6 +54,8 @@ export default function EventDetailsPage() {
 
   const [restaurantInfoOpen, setRestaurantInfoOpen] = useState(false)
   const [restaurantForInfo, setRestaurantForInfo] = useState<RestaurantOptionDto | null>(null)
+
+  const [openDialog, setOpenDialog] = useState(false)
 
   const openConfirm = (
     title: string,
@@ -110,6 +120,27 @@ export default function EventDetailsPage() {
     setRestaurantInfoOpen(true)
   }
 
+  const handleCancelClose = () => {
+    setOpenDialog(false)
+  }
+
+  const handleConfirmCloseVoting = async () => {
+    if (!event) return
+    try {
+      const now = getCurrentDatetimeLocal()
+      const dto = mapDetailsToUpdateDto(event, now)
+      await updateEvent(event.id, dto)
+      setEvent(prev =>
+        prev ? { ...prev, votingDeadline: now } : prev
+      )
+      toast.success('Successfully closed voting!')
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setOpenDialog(false)
+    }
+  }
+
   useEffect(() => {
     if (!id) return
     setLoading(true)
@@ -134,21 +165,53 @@ export default function EventDetailsPage() {
   }, [id])
 
   if (loading) return <Typography>Loading...</Typography>
-  if (error)   return <Typography color="error">{error}</Typography>
-  if (!event)  return <Typography>No event data</Typography>
+  if (error) return <Typography color="error">{error}</Typography>
+  if (!event) return <Typography>No event data</Typography>
 
-  const isTimeFixed =
-    event.timeOptionType === 'FIXED' && event.timeOptions.length === 1
-  const isRestFixed =
-    event.restaurantOptionType === 'FIXED' && event.restaurantOptions.length === 1
+  const isTimeFixed = event.timeOptionType === 'FIXED' && event.timeOptions.length === 1
+  const isRestFixed = event.restaurantOptionType === 'FIXED' && event.restaurantOptions.length === 1
+  const isVotingClosed = new Date(event.votingDeadline) <= new Date(getCurrentDatetimeLocal())
+
+  let topTimeOption: TimeOptionDto | null = null
+  if (event.timeOptionType !== 'CAPACITY_BASED') {
+    const maxVotes = Math.max(...event.timeOptions.map(o => o.reservedCount))
+    const ties = event.timeOptions.filter(o => o.reservedCount === maxVotes)
+    topTimeOption = ties[Math.floor(Math.random() * ties.length)]
+  }
+
+  let topRestaurantOption: RestaurantOptionDto | null = null
+  if (event.restaurantOptions.length > 0) {
+    const maxVotes = Math.max(...event.restaurantOptions.map(o => o.votesCount))
+    const ties = event.restaurantOptions.filter(o => o.votesCount === maxVotes)
+    topRestaurantOption = ties[Math.floor(Math.random() * ties.length)]
+  }
 
   return (
     <Box sx={pageContainer}>
       <Box sx={headerBox}>
-        <Box sx={{ textAlign: 'center' }} />
         <Typography variant="h4" sx={headerTitle}>
           {event.title}
         </Typography>
+        {event.creatorId === userId && (
+          <Box
+            sx={{
+              ...headerBox,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <Button
+              variant="contained"
+              size="small"
+              sx={{ ...buttonStyle, mt: 2 }}
+              onClick={() => setOpenDialog(true)}
+              disabled={isVotingClosed}
+            >
+              Close Voting
+            </Button>
+          </Box>
+        )}
       </Box>
 
       <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={3}>
@@ -166,11 +229,7 @@ export default function EventDetailsPage() {
               Description
             </Typography>
             <Typography
-              sx={{
-                whiteSpace: 'pre-wrap',
-                wordBreak: 'break-word',
-                textAlign: 'left',
-              }}
+              sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', textAlign: 'left' }}
             >
               {event.description}
             </Typography>
@@ -179,50 +238,79 @@ export default function EventDetailsPage() {
           <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={3}>
             <Box sx={panelBox} flex={event.restaurantOptionType === 'NONE' ? 2 : 1}>
               <Typography variant="h6" mb={2}>Time</Typography>
+
               {isTimeFixed ? (
                 <Box sx={{ ...mapItemBox, display: 'flex', justifyContent: 'center' }}>
                   <Typography>
                     {new Date(event.timeOptions[0].startTime).toLocaleString()}
                   </Typography>
                 </Box>
+              ) : isVotingClosed ? (
+                event.timeOptionType === 'CAPACITY_BASED' ? (
+                  event.restaurantOptionType === 'NONE' ? (
+                    <Box
+                      sx={{
+                        display: 'grid',
+                        gridTemplateColumns: { xs: '1fr', md: 'repeat(2,1fr)' },
+                        gap: 2,
+                      }}
+                    >
+                      {event.timeOptions.map(opt => (
+                        <Box key={opt.id} sx={mapItemBox}>
+                          <TimeOptionItem
+                            option={opt}
+                            optionType={event.timeOptionType}
+                            isSelected={false}
+                            disabled={true}
+                            onSelect={() => {}}
+                            onViewVotes={() => {}}
+                          />
+                        </Box>
+                      ))}
+                    </Box>
+                  ) : (
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      {event.timeOptions.map(opt => (
+                        <Box key={opt.id} sx={mapItemBox}>
+                          <TimeOptionItem
+                            option={opt}
+                            optionType={event.timeOptionType}
+                            isSelected={false}
+                            disabled={true}
+                            onSelect={() => {}}
+                            onViewVotes={() => {}}
+                          />
+                        </Box>
+                      ))}
+                    </Box>
+                  )
+                ) : (
+                  topTimeOption && (
+                    <Box sx={{ ...mapItemBox, display: 'flex', justifyContent: 'center' }}>
+                      <Typography fontWeight="bold">
+                        {new Date(topTimeOption.startTime).toLocaleString()}
+                      </Typography>
+                    </Box>
+                  )
+                )
               ) : event.restaurantOptionType === 'NONE' ? (
-                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 2 }}>
-                  {event.timeOptions.map(opt => {
-                    const disabled =
-                      event.timeOptionType === 'CAPACITY_BASED'
-                        ? opt.reservedCount >= (opt.maxCapacity ?? Infinity)
-                        : false
-                    return (
-                      <Box key={opt.id} sx={mapItemBox}>
-                        <TimeOptionItem
-                          option={opt}
-                          optionType={event.timeOptionType}
-                          isSelected={selectedTime === opt.id}
-                          disabled={disabled}
-                          onSelect={() => handleTimeSelect(opt)}
-                          onViewVotes={(t, u) => {
-                            setModalTitle(t)
-                            setModalUsers(u)
-                            setVoteListOpen(true)
-                          }}
-                        />
-                      </Box>
-                    )
-                  })}
-                </Box>
-              ) : (
-                event.timeOptions.map(opt => {
-                  const disabled =
-                    event.timeOptionType === 'CAPACITY_BASED'
-                      ? opt.reservedCount >= (opt.maxCapacity ?? Infinity)
-                      : false
-                  return (
+                <Box
+                  sx={{
+                    display: 'grid',
+                    gridTemplateColumns: { xs: '1fr', md: 'repeat(2,1fr)' },
+                    gap: 2,
+                  }}
+                >
+                  {event.timeOptions.map(opt => (
                     <Box key={opt.id} sx={mapItemBox}>
                       <TimeOptionItem
                         option={opt}
                         optionType={event.timeOptionType}
                         isSelected={selectedTime === opt.id}
-                        disabled={disabled}
+                        disabled={
+                          event.timeOptionType === 'CAPACITY_BASED' &&
+                          opt.reservedCount >= (opt.maxCapacity ?? Infinity)
+                        }
                         onSelect={() => handleTimeSelect(opt)}
                         onViewVotes={(t, u) => {
                           setModalTitle(t)
@@ -231,23 +319,77 @@ export default function EventDetailsPage() {
                         }}
                       />
                     </Box>
-                  )
-                })
+                  ))}
+                </Box>
+              ) : (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  {event.timeOptions.map(opt => (
+                    <Box key={opt.id} sx={mapItemBox}>
+                      <TimeOptionItem
+                        option={opt}
+                        optionType={event.timeOptionType}
+                        isSelected={selectedTime === opt.id}
+                        disabled={
+                          event.timeOptionType === 'CAPACITY_BASED' &&
+                          opt.reservedCount >= (opt.maxCapacity ?? Infinity)
+                        }
+                        onSelect={() => handleTimeSelect(opt)}
+                        onViewVotes={(t, u) => {
+                          setModalTitle(t)
+                          setModalUsers(u)
+                          setVoteListOpen(true)
+                        }}
+                      />
+                    </Box>
+                  ))}
+                </Box>
               )}
             </Box>
 
             {event.restaurantOptionType !== 'NONE' && (
               <Box sx={panelBox} flex={1}>
                 <Typography variant="h6" mb={2}>Restaurant</Typography>
+
                 {isRestFixed ? (
-                  <Box sx={{ ...mapItemBox, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      <Typography variant="subtitle1">{event.restaurantOptions[0].name}</Typography>
-                      <IconButton size="small" sx={{ ml: 1 }} onClick={() => handleViewRestaurantInfo(event.restaurantOptions[0])}>
+                  <Box
+                    sx={{
+                      ...mapItemBox,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Typography>{event.restaurantOptions[0].name}</Typography>
+                    <IconButton
+                      size="small"
+                      sx={{ ml: 1 }}
+                      onClick={() => handleViewRestaurantInfo(event.restaurantOptions[0])}
+                    >
+                      <InfoIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
+                ) : isVotingClosed ? (
+                  topRestaurantOption && (
+                    <Box
+                      sx={{
+                        ...mapItemBox,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <Typography fontWeight="bold">
+                        {topRestaurantOption.name}
+                      </Typography>
+                      <IconButton
+                        size="small"
+                        sx={{ ml: 1 }}
+                        onClick={() => handleViewRestaurantInfo(topRestaurantOption!)}
+                      >
                         <InfoIcon fontSize="small" />
                       </IconButton>
                     </Box>
-                  </Box>
+                  )
                 ) : (
                   event.restaurantOptions.map(opt => (
                     <Box key={opt.id} sx={mapItemBox}>
@@ -265,7 +407,14 @@ export default function EventDetailsPage() {
           </Box>
         </Box>
 
-        <Box sx={{ ...panelBox, flex: 0.8, height: { md: 'calc(40vh + 35vh + 25px)' }, overflowY: 'auto' }}>  
+        <Box
+          sx={{
+            ...panelBox,
+            flex: 0.8,
+            height: { md: 'calc(40vh + 35vh + 25px)' },
+            overflowY: 'auto',
+          }}
+        >
           <ParticipantsList participants={event.participants} />
         </Box>
       </Box>
@@ -284,6 +433,15 @@ export default function EventDetailsPage() {
       >
         {confirmContent}
       </ConfirmOption>
+
+      <EventConfirmDialog
+        open={openDialog}
+        title="Confirm Close Voting"
+        onCancel={handleCancelClose}
+        onConfirm={handleConfirmCloseVoting}
+      >
+        Are you sure you want to close the voting?
+      </EventConfirmDialog>
 
       {restaurantForInfo && (
         <RestaurantInfoDialog

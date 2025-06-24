@@ -104,7 +104,7 @@ export interface TimeOptionDto {
 export interface RestaurantOptionDto {
   id: number;
   name: string;
-  menuImageUrl: string | null;
+  menuImageUrl: string;
   restaurantUrl: string;
   votesCount: number;
   votedUsers: ParticipantProfileDto[];
@@ -112,9 +112,11 @@ export interface RestaurantOptionDto {
 
 export interface EventDetailsDto {
   creator: ParticipantDto;
+  creatorId: number;
   id: number;
   title: string;
   description: string;
+  votingDeadline: string;
   participants: ParticipantProfileDto[];
   timeOptions: TimeOptionDto[];
   restaurantOptions: RestaurantOptionDto[];

@@ -1,9 +1,9 @@
-import { Box, Typography, Avatar } from '@mui/material';
-import { ParticipantProfileDto } from '../../types/User';
-import { participantsStyle } from '../../styles/CommonStyles';
+import { Box, Typography, Avatar } from '@mui/material'
+import { ParticipantProfileDto } from '../../types/User'
+import { participantsStyle } from '../../styles/CommonStyles'
 
 interface ParticipantsListProps {
-  participants: ParticipantProfileDto[];
+  participants: ParticipantProfileDto[]
 }
 
 export default function ParticipantsList({ participants }: ParticipantsListProps) {
@@ -16,24 +16,25 @@ export default function ParticipantsList({ participants }: ParticipantsListProps
           There are no participants.
         </Typography>
       ) : (
-        participants.map((p) => (
+        participants.map((participant) => (
           <Box
-            key={p.id}
-            onClick={() => (window.location.href = `/user/${p.id}`)}
+            key={participant.id}
+            onClick={() => (window.location.href = `/user/${participant.id}`)}
             sx={{
               display: 'grid',
-              gridTemplateColumns: { xs: 'auto 1fr', sm: '80px 1fr' },
+              gridTemplateColumns: '40px 1fr',
               alignItems: 'center',
+              columnGap: { xs: 3, sm: 2 },
               py: 1,
-              pl: { xs: 3, sm: 4 },
+              pl: { xs: 2, sm: 3 }, 
               pr: 2,
               borderBottom: '1px solid #ddd',
               cursor: 'pointer',
             }}
           >
             <Avatar
-              alt={`${p.firstName} ${p.lastName}`}
-              src={p.profilePictureUrl ?? ''}
+              alt={`${participant.firstName} ${participant.lastName}`}
+              src={participant.profilePictureUrl ?? ''}
               sx={{
                 width: 40,
                 height: 40,
@@ -48,11 +49,11 @@ export default function ParticipantsList({ participants }: ParticipantsListProps
                 wordBreak: 'break-word',
               }}
             >
-              {p.firstName} {p.lastName}
+              {participant.firstName} {participant.lastName}
             </Typography>
           </Box>
         ))
       )}
     </Box>
-  );
+  )
 }

@@ -22,6 +22,7 @@ import { useSetupEventForm } from '../../hooks/useSetupEventForm';
 import { useEventForm } from '../../contexts/EventContext';
 import {
   boxContainerStyle,
+  buttonStyle,
   cardActionsStyle,
   cardContentStyle,
   eventCardStyle,
@@ -47,7 +48,6 @@ export default function EventsPage() {
   const [selectedEventTitle, setSelectedEventTitle] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const { creator, filteredUsers, loadingUsers } = useSetupEventForm();
-  const [selectedEvent, setSelectedEvent] = useState<EventDTO | undefined>(undefined);
   const { setEventData, resetEventData } = useEventForm();
   const [selectedEvent, setSelectedEvent] = useState<EventDTO>();
 
@@ -69,22 +69,19 @@ export default function EventsPage() {
   };
 
   const handleConfirmDelete = async () => {
-
-    if (selectedEventId != null) {
-      await deleteEvent(selectedEventId);
-      setCreatedEvents((prev) => prev.filter((e) => e.id !== selectedEventId));
-      setParticipantEvents((prev) => prev.filter((e) => e.id !== selectedEventId));
+    try {
+      if (selectedEventId != null) {
+        await deleteEvent(selectedEventId);
+        setCreatedEvents(prev => prev.filter(e => e.id !== selectedEventId));
+        setParticipantEvents(prev => prev.filter(e => e.id !== selectedEventId));
+      }
+    } catch (err) {
+      console.error('Error deleting event:', err);
+    } finally {
+      setOpenDialog(false);
+      setSelectedEventId(null);
+      setSelectedEventTitle(null);
     }
-    setOpenDialog(false);
-    setSelectedEventId(null);
-    setSelectedEventTitle(null);
-  };
-
-
-  const handleCancelDelete = () => {
-    setOpenDialog(false);
-    setSelectedEventId(null);
-    setSelectedEventTitle(null);
   };
 
   const handleCardClick = (eventId: number) => navigate(`/eventDetails/${eventId}`);
@@ -94,6 +91,7 @@ export default function EventsPage() {
     setSelectedEvent(undefined);
     setModalOpen(true);
   };
+
   const truncateText = (text: string, max: number) =>
     text.length > max ? text.slice(0, max) + '…' : text;
 
@@ -105,31 +103,35 @@ export default function EventsPage() {
     );
   }
 
-
-  let eventsToShow = filter === 'created'
-    ? createdEvents
-    : filter === 'invited'
-    ? participantEvents.filter((e) => !createdEvents.some((c) => c.id === e.id))
-    : allEvents;
-
+  let eventsToShow =
+    filter === 'created'
+      ? createdEvents
+      : filter === 'invited'
+      ? participantEvents.filter((e) => !createdEvents.some((c) => c.id === e.id))
+      : allEvents;
 
   return (
     <Container sx={{ mt: 4 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-        <Button variant="contained" onClick={handleCreateClick}>
+        <Button
+          variant="contained"
+          sx={{...buttonStyle, fontWeight: 'bold', display: 'flex', mb: 3, ml: 1 }}
+          onClick={handleCreateClick}
+        >
           Create Event
         </Button>
+
         <CreateEventModal
           users={filteredUsers}
           creator={creator}
           event={selectedEvent}
           open={modalOpen}
           onClose={() => setModalOpen(false)}
-          onEventCreated={(newEvt) => {
+          onEventCreated={(newEvt: EventDTO) => {
             setCreatedEvents((prev) => [...prev, newEvt]);
             setParticipantEvents((prev) => [...prev, newEvt]);
           }}
-          onEventUpdated={(upd) => {
+          onEventUpdated={(upd: EventDTO) => {
             setCreatedEvents((prev) =>
               prev.map((e) => (e.id === upd.id ? upd : e))
             );
@@ -157,10 +159,10 @@ export default function EventsPage() {
       {eventsToShow.length === 0 ? (
         <Typography align="center">
           {filter === 'created'
-            ? 'You haven’t created any events yet.'
+            ? "You haven’t created any events yet."
             : filter === 'invited'
-              ? 'You’re not invited to any events yet.'
-              : 'No events to display.'}
+            ? "You’re not invited to any events yet."
+            : "No events to display."}
         </Typography>
       ) : (
         <Box sx={boxContainerStyle}>
@@ -171,7 +173,7 @@ export default function EventsPage() {
               onClick={() => handleCardClick(evt.id)}
             >
               <CardContent sx={cardContentStyle}>
-                <Typography variant="h6" sx={eventTitleStyle}>
+                <Typography variant="h6" sx={{...eventTitleStyle, wordBreak:'break-word'}}>
                   {evt.title}
                 </Typography>
                 <Typography variant="body2" sx={eventDescriptionStyle}>
@@ -181,7 +183,7 @@ export default function EventsPage() {
               <CardActions sx={cardActionsStyle}>
                 <Button
                   variant="outlined"
-                  disabled={evt.creator.id !== userId}
+                  disabled={evt.creator.id !== userId || !!(evt.votingDeadline && new Date(evt.votingDeadline) < new Date())}
                   onClick={(e) => {
                     e.stopPropagation();
                     handleEditClick(evt);
@@ -219,3 +221,4 @@ export default function EventsPage() {
     </Container>
   );
 }
+

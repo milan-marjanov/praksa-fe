@@ -30,18 +30,20 @@ const EventDataReview = forwardRef<EventModalRef, EventDataReviewProps>(
     const { eventData, setEventData } = useEventForm();
     const [openDialog, setOpenDialog] = useState(false);
     const votingDeadline = eventData.votingDeadline;
+    onValidationChange?.(false);
 
     useEffect(() => {
       const now = new Date();
 
       let hasError = false;
-      if (!votingDeadline) {
-        hasError = true;
-      } else if (!isValidFutureDate(votingDeadline, now)) {
-        hasError = true;
+      if(eventData.timeOptionType === 'FIXED'|| eventData.restaurantOptionType !== 'VOTING'){
+        if (!votingDeadline) {
+          hasError = true;
+        } else if (!isValidFutureDate(votingDeadline, now)) {
+          hasError = true;
+        }
       }
 
-      onValidationChange?.(hasError);
     }, [votingDeadline, onValidationChange]);
 
     const handleCancelClose = () => {
