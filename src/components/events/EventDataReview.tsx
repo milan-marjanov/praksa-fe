@@ -19,7 +19,7 @@ import { useEventForm } from '../../contexts/EventContext';
 import EventConfirmDialog from './EventConfirmDialog';
 import { formatDateTime, isValidFutureDate } from '../../utils/DateTimeUtils';
 import DateTimeForm from './DateTimeForm';
-import { labelAbove } from '../../styles/EventModalStyles';
+import { labelAbove, tableCellStyle } from '../../styles/EventModalStyles';
 
 interface EventDataReviewProps {
   onValidationChange?: (hasError: boolean) => void;
@@ -91,26 +91,26 @@ const EventDataReview = forwardRef<EventModalRef, EventDataReviewProps>(
                 <TableHead>
                   <TableRow>
                     <TableCell align="center">
-                      <strong>#</strong>
+                      #
                     </TableCell>
                     <TableCell align="center">
-                      <strong>Start Time</strong>
+                      Start Time
                     </TableCell>
                     <TableCell align="center">
-                      <strong>End Time</strong>
+                      End Time
                     </TableCell>
                     <TableCell align="center">
-                      <strong>Max Capacity</strong>
+                      Max Capacity
                     </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {eventData.timeOptions.map((option, index) => (
                     <TableRow key={option.id}>
-                      <TableCell align="center">{index + 1}</TableCell>
-                      <TableCell align="center">{formatDateTime(option.startTime)}</TableCell>
-                      <TableCell align="center">{formatDateTime(option.endTime)}</TableCell>
-                      <TableCell align="center">{option.maxCapacity}</TableCell>
+                      <TableCell sx={tableCellStyle}>{index + 1}</TableCell>
+                      <TableCell sx={tableCellStyle}>{formatDateTime(option.startTime)}</TableCell>
+                      <TableCell sx={tableCellStyle}>{formatDateTime(option.endTime)}</TableCell>
+                      <TableCell sx={tableCellStyle}>{option.maxCapacity || 'N/A'}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -130,26 +130,26 @@ const EventDataReview = forwardRef<EventModalRef, EventDataReviewProps>(
                 <TableHead>
                   <TableRow>
                     <TableCell align="center">
-                      <strong>#</strong>
+                      #
                     </TableCell>
                     <TableCell align="center">
-                      <strong>Name</strong>
+                      Name
                     </TableCell>
                     <TableCell align="center">
-                      <strong>Menu Image</strong>
+                      Menu Image
                     </TableCell>
                     <TableCell align="center">
-                      <strong>Restaurant URL</strong>
+                      Restaurant URL
                     </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {eventData.restaurantOptions.map((restaurant, index) => (
                     <TableRow key={restaurant.id}>
-                      <TableCell align="center">{index + 1}</TableCell>
-                      <TableCell align="center">{restaurant.name}</TableCell>
-                      <TableCell align="center">{restaurant.menuImageUrl || 'N/A'}</TableCell>
-                      <TableCell align="center">{restaurant.restaurantUrl || 'N/A'}</TableCell>
+                      <TableCell sx={tableCellStyle}>{index + 1}</TableCell>
+                      <TableCell sx={tableCellStyle}>{restaurant.name}</TableCell>
+                      <TableCell sx={tableCellStyle}>{restaurant.menuImageUrl || 'N/A'}</TableCell>
+                      <TableCell sx={tableCellStyle}>{restaurant.restaurantUrl || 'N/A'}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

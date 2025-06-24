@@ -2,23 +2,18 @@ import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { Box, Button, FormControlLabel, Radio, Typography } from '@mui/material';
 import TimeOptionFieldsForm from './TimeOptionFieldsForm';
 import { Add } from '@mui/icons-material';
-import DateTimeForm from './DateTimeForm';
 import { useEventForm } from '../../contexts/EventContext';
 import { EventModalRef } from '../../types/Event';
-import EventConfirmDialog from './EventConfirmDialog';
-import { labelAbove, labelGroup, timeOptionsForm } from '../../styles/EventModalStyles';
-import { generateId, getCurrentDatetimeLocal, isValidFutureDate } from '../../utils/DateTimeUtils';
+import { timeOptionsForm } from '../../styles/EventModalStyles';
+import { generateId, isValidFutureDate } from '../../utils/DateTimeUtils';
 import { initialTimeOption } from '../../utils/EventDefaults';
 
-interface TimeOptionsModalProps {
-  isUpdate: boolean;
-}
 
-const TimeOptionsModal = forwardRef<EventModalRef, TimeOptionsModalProps>(({ isUpdate }, ref) => {
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+const TimeOptionsModal = forwardRef<EventModalRef, {}>((_props, ref) => {
   const { eventData, setEventData } = useEventForm();
   const timeOptions = eventData.timeOptions;
   const [validationErrors, setValidationErrors] = useState<Record<number | string, string>>({});
-  const [openDialog, setOpenDialog] = useState(false);
 
   const [optionType, setOptionType] = useState<1 | 2 | 3>(() => {
     switch (eventData.timeOptionType) {
@@ -102,18 +97,6 @@ const TimeOptionsModal = forwardRef<EventModalRef, TimeOptionsModalProps>(({ isU
     return { hasError, errors };
   };
 
-  const validateVotingDeadline = (votingDeadline: string | undefined, now: Date) => {
-    if (!votingDeadline) {
-      return { hasError: true, error: 'Voting deadline is required.' };
-    }
-
-    if (!isValidFutureDate(votingDeadline, now)) {
-      return { hasError: true, error: 'Voting deadline must be a valid date in the future.' };
-    }
-
-    return { hasError: false };
-  };
-
   const validate = () => {
     const now = new Date();
     const errors: Record<string | number, string> = {};
@@ -135,11 +118,6 @@ const TimeOptionsModal = forwardRef<EventModalRef, TimeOptionsModalProps>(({ isU
     }
 
     if (optionType === 2 || optionType === 3) {
-      const votingDeadlineResult = validateVotingDeadline(eventData.votingDeadline, now);
-      if (votingDeadlineResult.hasError) {
-        hasError = true;
-      }
-
       if (timeOptions.length < 2 || timeOptions.length > 6) {
         errors['invalidOptions'] = 'Number of time options must be between 2 and 6.';
 
@@ -155,8 +133,6 @@ const TimeOptionsModal = forwardRef<EventModalRef, TimeOptionsModalProps>(({ isU
   useImperativeHandle(ref, () => ({
     validate,
   }));
-
-  const votingDeadline = eventData.votingDeadline;
 
   useEffect(() => {
     if (eventData.timeOptions?.length === 0) {
@@ -214,22 +190,6 @@ const TimeOptionsModal = forwardRef<EventModalRef, TimeOptionsModalProps>(({ isU
     const now = new Date();
     const { errors } = validateTimeOptions(updatedOptions, now);
     setValidationErrors(errors);
-  };
-
-  const handleCancelClose = () => {
-    setOpenDialog(false);
-  };
-
-  const handleConfirmClose = () => {
-    handleVotingDeadlineChange(getCurrentDatetimeLocal());
-    setOpenDialog(false);
-  };
-
-  const handleVotingDeadlineChange = (newDeadline: string) => {
-    setEventData({
-      ...eventData,
-      votingDeadline: newDeadline,
-    });
   };
 
   const updateOption = (
@@ -304,31 +264,7 @@ const TimeOptionsModal = forwardRef<EventModalRef, TimeOptionsModalProps>(({ isU
 
       {(optionType === 2 || optionType === 3) && (
         <>
-          <Box style={{ marginTop: 16 }}>
-            <Box style={labelGroup}>
-              <Typography style={labelAbove}>Voting Deadline</Typography>
-
-              <DateTimeForm
-                label=""
-                required
-                value={votingDeadline}
-                initialValue={votingDeadline}
-                onValidChange={(e) => handleVotingDeadlineChange(e)}
-              />
-              {isUpdate && (
-                <Button
-                  variant="contained"
-                  size="small"
-                  sx={{ mb: 3, mt: 1 }}
-                  onClick={() => setOpenDialog(true)} // open dialog here
-                >
-                  Close Voting
-                </Button>
-              )}
-            </Box>
-          </Box>
-
-          <Typography sx={{ mt: 1, textAlign: 'center', fontWeight: 'bold', mb: 2 }}>
+          <Typography sx={{ mt: 3, textAlign: 'center', fontWeight: 'bold', mb: 3 }}>
             Time Options (You can add up to 6)
           </Typography>
           {(eventData.timeOptions || []).map((opt, i) => (
@@ -366,14 +302,6 @@ const TimeOptionsModal = forwardRef<EventModalRef, TimeOptionsModalProps>(({ isU
           ))}
         </Box>
       )}
-      <EventConfirmDialog
-        open={openDialog}
-        title="Confirm Close Voting"
-        onCancel={handleCancelClose}
-        onConfirm={handleConfirmClose}
-      >
-        Are you sure you want to close the voting?
-      </EventConfirmDialog>
     </Box>
   );
 });

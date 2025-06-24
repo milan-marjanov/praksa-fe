@@ -88,3 +88,8 @@ export const labelAbove: CSSProperties = {
   marginBottom: 6,
   fontWeight: '600',
 };
+
+export const tableCellStyle = {
+  textAlign: 'center',
+  color: 'text.secondary',
+};

@@ -44,11 +44,9 @@ export default function CreateEventModal({
   };
   const slides = [
     <EventModal key="form" users={users} creator={creator} ref={formRef} />,
-    <TimeOptionsModal key="slide2" ref={formRef} isUpdate={isUpdate} />,
-    <RestaurantOptionsModal key="slide3" ref={formRef} isUpdate={isUpdate} />,
-    <EventDataReview
-      key="slide3" onValidationChange={handleValidationChange}
-    />,
+    <TimeOptionsModal key="slide2" ref={formRef} />,
+    <RestaurantOptionsModal key="slide3" ref={formRef} />,
+    <EventDataReview key="slide3" onValidationChange={handleValidationChange} />,
   ];
 
   const handleOpenDialog = () => {
