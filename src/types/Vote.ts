@@ -5,3 +5,9 @@ export interface VoteDto {
   timeOptionId: number | null;
   restaurantOptionId: number | null;
 }
+
+export interface CreateVoteDto {
+  eventId: number
+  timeOptionId: number | null
+  restaurantOptionId: number | null
+}

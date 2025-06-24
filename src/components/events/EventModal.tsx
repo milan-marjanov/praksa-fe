@@ -20,7 +20,7 @@ const EventModal = forwardRef<EventModalRef, EventModalProps>(
   ({ users, creator, event, onSubmit }, ref) => {
     const { eventData, setEventData } = useEventForm();
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
-    const maxDescriptionChars = 255;
+    const maxDescriptionChars = 1000;
     const isUpdate = !!event;
 
     useEffect(() => {
@@ -91,10 +91,8 @@ const EventModal = forwardRef<EventModalRef, EventModalProps>(
       setErrors(newErrors);
       if (hasError) return;
 
-      // Ensure creator is in the participants
       const participantSet = new Set(eventData.participantIds || []);
       participantSet.add(creator.id);
-      // const allParticipantIds = Array.from(participantSet);
 
       const title = eventData.title?.trim() || '';
       const description = eventData.description?.trim() || '';

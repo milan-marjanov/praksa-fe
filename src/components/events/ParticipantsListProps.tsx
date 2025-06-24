@@ -7,51 +7,52 @@ interface ParticipantsListProps {
 }
 
 export default function ParticipantsList({ participants }: ParticipantsListProps) {
-  if (!participants || participants.length === 0) {
-    return <Typography>There are no participants</Typography>;
-  }
-
   return (
-    <Box>
+    <Box sx={{ height: '100%', overflowY: 'auto' }}>
       <Typography sx={participantsStyle}>Participants:</Typography>
 
-      {participants.map((p) => (
-        <Box
-          key={p.id}
-          onClick={() => (window.location.href = `/user/${p.id}`)}
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: '1fr auto auto 1fr',
-            alignItems: 'center',
-            py: 2,
-            borderBottom: '1px solid #ddd',
-            cursor: 'pointer',
-          }}
-        >
-          <Avatar
-            src={p.profilePictureUrl || undefined}
-            alt={`${p.firstName} ${p.lastName}`}
+      {participants.length === 0 ? (
+        <Typography variant="body2" color="textSecondary">
+          There are no participants.
+        </Typography>
+      ) : (
+        participants.map((p) => (
+          <Box
+            key={p.id}
+            onClick={() => (window.location.href = `/user/${p.id}`)}
             sx={{
-              gridColumn: 2,
-              width: 35,
-              height: 35,
+              display: 'grid',
+              gridTemplateColumns: { xs: 'auto 1fr', sm: '80px 1fr' },
+              alignItems: 'center',
+              py: 1,
+              pl: { xs: 3, sm: 4 },
+              pr: 2,
+              borderBottom: '1px solid #ddd',
+              cursor: 'pointer',
             }}
           >
-            {p.firstName[0]}
-            {p.lastName[0]}
-          </Avatar>
+            <Avatar
+              alt={`${p.firstName} ${p.lastName}`}
+              src={p.profilePictureUrl ?? ''}
+              sx={{
+                width: 40,
+                height: 40,
+                objectFit: 'cover',
+              }}
+            />
 
-          <Typography
-            variant="body1"
-            sx={{
-              gridColumn: 3,
-              ml: 1,
-            }}
-          >
-            {p.firstName} {p.lastName}
-          </Typography>
-        </Box>
-      ))}
+            <Typography
+              variant="body1"
+              sx={{
+                textAlign: 'left',
+                wordBreak: 'break-word',
+              }}
+            >
+              {p.firstName} {p.lastName}
+            </Typography>
+          </Box>
+        ))
+      )}
     </Box>
   );
 }
