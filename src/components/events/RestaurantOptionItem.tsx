@@ -38,7 +38,6 @@ export default function RestaurantOptionItem({
   const remainingCount = voters.length - displayVoters.length;
 
   const isVoting = optionType === 'VOTING';
-  const isFixed  = optionType === 'FIXED';
 
   return (
     <>
@@ -71,13 +70,11 @@ export default function RestaurantOptionItem({
           </IconButton>
         </Box>
 
-        {isVoting && (
-          <Typography variant="body2" sx={{ ml: 2, whiteSpace: 'nowrap' }}>
-            Votes: {option.votesCount}
-          </Typography>
-        )}
+        <Typography variant="body2" sx={{ ml: 2, whiteSpace: 'nowrap' }}>
+          Votes: {option.votesCount}
+        </Typography>
 
-        {isVoting && voters.length > 0 && (
+        {voters.length > 0 && (
           <Box
             sx={{
               display: 'flex',
