@@ -32,8 +32,7 @@ export default function Navbar() {
     try {
       const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
       isAdmin = payload.role === 'ADMIN';
-    } catch {
-    }
+    } catch {}
   }
 
   const navItems = [
@@ -44,7 +43,7 @@ export default function Navbar() {
   ];
 
   const [open, setOpen] = useState(false);
-  const toggleOpen = () => setOpen(prev => !prev);
+  const toggleOpen = () => setOpen((prev) => !prev);
 
   const handleNavClick = (to: string) => {
     setOpen(false);
@@ -102,23 +101,14 @@ export default function Navbar() {
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
               {navItems.map(({ text, to }) =>
                 to === '/logout' ? (
-                  <Button
-                    key={to}
-                    onClick={() => handleNavClick(to)}
-                    sx={linkStyle(to)}
-                  >
+                  <Button key={to} onClick={() => handleNavClick(to)} sx={linkStyle(to)}>
                     Logout
                   </Button>
                 ) : (
-                  <Button
-                    key={to}
-                    component={RouterLink}
-                    to={to}
-                    sx={linkStyle(to)}
-                  >
+                  <Button key={to} component={RouterLink} to={to} sx={linkStyle(to)}>
                     {text}
                   </Button>
-                )
+                ),
               )}
             </Box>
           )}

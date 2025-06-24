@@ -1,36 +1,36 @@
-import React from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
+import React from 'react';
 import { buttonStyle } from '../../styles/CommonStyles';
 
-interface ConfirmOptionProps {
+interface ConfirmDialogProps {
   open: boolean;
   title: string;
-  children: React.ReactNode;
-  onCancel: () => void;
-  onConfirm: () => void;
+  onCancel(): void;
+  onConfirm(): void;
+  children?: React.ReactNode;
   confirmText?: string;
   cancelText?: string;
 }
 
-export default function ConfirmOption({
+export default function ConfirmDialog({
   open,
   title,
   children,
   onCancel,
   onConfirm,
-  confirmText = 'Yes',
+  confirmText = 'Confirm',
   cancelText = 'Cancel',
-}: ConfirmOptionProps) {
+}: ConfirmDialogProps) {
   return (
     <Dialog open={open} onClose={onCancel}>
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>{children}</DialogContent>
       <DialogActions>
-        <Button sx={buttonStyle} onClick={onCancel}>
-          {cancelText}
-        </Button>
-        <Button sx={buttonStyle} onClick={onConfirm} variant="contained">
+        <Button sx={buttonStyle} onClick={onConfirm}>
           {confirmText}
+        </Button>
+        <Button sx={buttonStyle} color="error" onClick={onCancel}>
+          {cancelText}
         </Button>
       </DialogActions>
     </Dialog>

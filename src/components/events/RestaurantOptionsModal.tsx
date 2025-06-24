@@ -1,12 +1,12 @@
-import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { Box, IconButton, Button, Typography, FormControlLabel, Radio } from '@mui/material';
 import { Add, Delete } from '@mui/icons-material';
 import RestaurantFieldsForm from './RestaurantFieldsForm';
 import { EventModalRef, RestaurantOption } from '../../types/Event';
-import DateTimeForm from './DateTimeForm';
 import { useEventForm } from '../../contexts/EventContext';
 
-const RestaurantOptionsModal = forwardRef<EventModalRef>((_, ref) => {
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+const RestaurantOptionsModal = forwardRef<EventModalRef, {}>((_props, ref) => {
   const { eventData, setEventData } = useEventForm();
   const restaurantOptions = eventData.restaurantOptions;
 
@@ -23,7 +23,6 @@ const RestaurantOptionsModal = forwardRef<EventModalRef>((_, ref) => {
     }
   });
 
-  const votingDeadline = eventData.votingDeadline;
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
@@ -60,7 +59,6 @@ const RestaurantOptionsModal = forwardRef<EventModalRef>((_, ref) => {
   useEffect(() => {
     setErrors((prevErrors) => {
       const newErrors = { ...prevErrors };
-      // Remove only the 'invalidOptions' error
       delete newErrors['invalidOptions'];
       return newErrors;
     });
@@ -91,18 +89,6 @@ const RestaurantOptionsModal = forwardRef<EventModalRef>((_, ref) => {
         newErrors['invalidOptions'] = 'Number of restaurant options must be between 2 and 6.';
         hasError = true;
       }
-      if (!eventData.votingDeadline) {
-        hasError = true;
-      } else {
-        const now = new Date();
-
-        const deadline = new Date(eventData.votingDeadline);
-        if (isNaN(deadline.getTime())) {
-          hasError = true;
-        } else if (deadline <= now) {
-          hasError = true;
-        }
-      }
     }
 
     setErrors(newErrors);
@@ -114,7 +100,6 @@ const RestaurantOptionsModal = forwardRef<EventModalRef>((_, ref) => {
     setEventData({
       restaurantOptions: [...(restaurantOptions || []), { id: Date.now(), name: '' }],
     });
-    console.log(votingDeadline);
   };
 
   const handleRemoveRestaurantOption = (id: number) => {
@@ -159,14 +144,6 @@ const RestaurantOptionsModal = forwardRef<EventModalRef>((_, ref) => {
         restaurantOptions: [initialRestaurantOption],
       });
     }
-  };
-
-  const handleVotingDeadlineChange = (newDeadline: string) => {
-    setEventData({
-      ...eventData,
-
-      votingDeadline: newDeadline,
-    });
   };
 
   return (
@@ -237,25 +214,6 @@ const RestaurantOptionsModal = forwardRef<EventModalRef>((_, ref) => {
 
       {optionType === 2 && (
         <>
-          <Typography
-            style={{
-              fontSize: 14,
-              color: '#555',
-              marginBottom: -10,
-              marginLeft: 8,
-              fontWeight: '600',
-            }}
-          >
-            Voting Deadline
-          </Typography>
-
-          <DateTimeForm
-            label=""
-            required
-            initialValue={votingDeadline}
-            onValidChange={(e) => handleVotingDeadlineChange(e)}
-          />
-
           {(restaurantOptions ?? []).map((option, i) => (
             <Box
               key={option.id}
@@ -266,6 +224,7 @@ const RestaurantOptionsModal = forwardRef<EventModalRef>((_, ref) => {
               border={1}
               borderRadius={2}
               borderColor="grey.300"
+              marginTop="-15px"
             >
               <Box display="flex" alignItems="center" justifyContent="space-between">
                 <Typography variant="subtitle1">Option {i + 1}</Typography>

@@ -47,6 +47,7 @@ export default function EventsPage() {
   const [selectedEventTitle, setSelectedEventTitle] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const { creator, filteredUsers, loadingUsers } = useSetupEventForm();
+  const [selectedEvent, setSelectedEvent] = useState<EventDTO | undefined>(undefined);
   const { setEventData, resetEventData } = useEventForm();
   const [selectedEvent, setSelectedEvent] = useState<EventDTO>();
 
@@ -68,6 +69,7 @@ export default function EventsPage() {
   };
 
   const handleConfirmDelete = async () => {
+
     if (selectedEventId != null) {
       await deleteEvent(selectedEventId);
       setCreatedEvents((prev) => prev.filter((e) => e.id !== selectedEventId));
@@ -78,7 +80,15 @@ export default function EventsPage() {
     setSelectedEventTitle(null);
   };
 
+
+  const handleCancelDelete = () => {
+    setOpenDialog(false);
+    setSelectedEventId(null);
+    setSelectedEventTitle(null);
+  };
+
   const handleCardClick = (eventId: number) => navigate(`/eventDetails/${eventId}`);
+
   const handleCreateClick = () => {
     resetEventData();
     setSelectedEvent(undefined);
@@ -95,11 +105,13 @@ export default function EventsPage() {
     );
   }
 
+
   let eventsToShow = filter === 'created'
     ? createdEvents
     : filter === 'invited'
     ? participantEvents.filter((e) => !createdEvents.some((c) => c.id === e.id))
     : allEvents;
+
 
   return (
     <Container sx={{ mt: 4 }}>
@@ -145,10 +157,10 @@ export default function EventsPage() {
       {eventsToShow.length === 0 ? (
         <Typography align="center">
           {filter === 'created'
-            ? "You haven’t created any events yet."
+            ? 'You haven’t created any events yet.'
             : filter === 'invited'
-            ? "You’re not invited to any events yet."
-            : "No events to display."}
+              ? 'You’re not invited to any events yet.'
+              : 'No events to display.'}
         </Typography>
       ) : (
         <Box sx={boxContainerStyle}>

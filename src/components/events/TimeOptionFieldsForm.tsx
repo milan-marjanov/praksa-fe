@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { Box, Typography, TextField, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { TimeOption } from '../../types/Event';
+import { validateDateTime, validateStartEndTimes } from '../../utils/DateTimeUtils';
 
 type TimeOptionFormProps = {
   opt: TimeOption;
@@ -29,44 +30,18 @@ export default function TimeOptionFieldsForm({
     return tomorrow.toISOString().slice(0, 16);
   }, []);
 
-  function validateDateTime(value: string): string | null {
-    if (!value) return 'This field is required.';
-    const date = new Date(value);
-    if (isNaN(date.getTime())) return 'Invalid date/time format.';
-    const now = new Date();
-    now.setSeconds(0, 0);
-    if (date < now) return 'Date/time cannot be in the past.';
-    return null;
-  }
-
-  function validateStartEndTimes(start: string, end: string): string | null {
-    if (!start || !end) return null;
-    const startDate = new Date(start);
-    const endDate = new Date(end);
-    if (endDate <= startDate) return 'End Time must be after Start Time.';
-    return null;
-  }
-
-  function handleStartTimeChange(value: string) {
-    updateOption(opt.id, 'startTime', value);
+  function handleDateTimeChange(field: 'startTime' | 'endTime', value: string) {
+    updateOption(opt.id, field, value);
 
     const error = validateDateTime(value);
-    setErrors((prev) => ({ ...prev, startTime: error || undefined }));
+    setErrors((prev) => ({ ...prev, [field]: error || undefined }));
 
     if (!error) {
-      const crossError = validateStartEndTimes(value, opt.endTime);
-      setErrors((prev) => ({ ...prev, endTime: crossError || undefined }));
-    }
-  }
+      const startTime = field === 'startTime' ? value : opt.startTime;
+      const endTime = field === 'endTime' ? value : opt.endTime;
 
-  function handleEndTimeChange(value: string) {
-    updateOption(opt.id, 'endTime', value);
+      const crossError = validateStartEndTimes(startTime, endTime);
 
-    const error = validateDateTime(value);
-    setErrors((prev) => ({ ...prev, endTime: error || undefined }));
-
-    if (!error) {
-      const crossError = validateStartEndTimes(opt.startTime, value);
       setErrors((prev) => ({ ...prev, endTime: crossError || undefined }));
     }
   }
@@ -101,7 +76,7 @@ export default function TimeOptionFieldsForm({
             fullWidth
             type="datetime-local"
             value={opt.startTime}
-            onChange={(e) => handleStartTimeChange(e.target.value)}
+            onChange={(e) => handleDateTimeChange('startTime', e.target.value)}
             required
             error={!!errors.startTime}
             helperText={errors.startTime || ' '}
@@ -117,7 +92,7 @@ export default function TimeOptionFieldsForm({
             fullWidth
             type="datetime-local"
             value={opt.endTime}
-            onChange={(e) => handleEndTimeChange(e.target.value)}
+            onChange={(e) => handleDateTimeChange('endTime', e.target.value)}
             required
             error={!!errors.endTime}
             helperText={errors.endTime || ' '}

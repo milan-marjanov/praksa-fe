@@ -1,5 +1,5 @@
-import { ParticipantProfileDto } from "./User";
-import { VoteDto } from "./Vote";
+import { ParticipantProfileDto } from './User';
+import { VoteDto } from './Vote';
 
 export interface ParticipantDto {
   id: number;
@@ -10,7 +10,7 @@ export interface ParticipantDto {
 
 export interface TimeOption {
   id: number;
-  maxCapacity: number;
+  maxCapacity?: number;
   startTime: string;
   endTime: string;
   createdAt: string;
@@ -49,7 +49,7 @@ export interface CreateEventDto {
   title: string;
   description: string;
   creatorId: number;
-  votingDeadline: string;
+  votingDeadline?: string;
   participantIds: number[];
   timeOptionType: TimeOptionType;
   timeOptions: TimeOption[];
@@ -61,7 +61,6 @@ export interface EventModalProps {
   users: ParticipantDto[];
   creator: ParticipantDto;
   event?: UpdateEventDTO;
-  onSubmit: (event: UpdateEventDTO | CreateEventDto, isUpdate: boolean) => Promise<void>;
 }
 
 export interface CreateEventModalProps {
