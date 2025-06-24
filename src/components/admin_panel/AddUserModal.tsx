@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Modal, Box, Typography, TextField, Button } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
 import type { CreateUserDTO } from '../../types/User';
 import { buttonStyle } from '../../styles/CommonStyles';
 
@@ -25,9 +26,11 @@ export default function AddUserModal({ open, onClose, onAdd }: AddUserModalProps
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const handleAdd = async () => {
     setError(null);
+    setLoading(true);
     try {
       await onAdd({ firstName, lastName, email });
       setFirstName('');
@@ -38,6 +41,8 @@ export default function AddUserModal({ open, onClose, onAdd }: AddUserModalProps
       if (err instanceof Error) {
         setError(err.message);
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -77,12 +82,18 @@ export default function AddUserModal({ open, onClose, onAdd }: AddUserModalProps
         )}
 
         <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <Button sx={buttonStyle} onClick={onClose}>
+          <Button sx={buttonStyle} onClick={onClose} disabled={loading}>
             Cancel
           </Button>
-          <Button variant="contained" sx={buttonStyle} onClick={handleAdd}>
+          <LoadingButton
+            variant="contained"
+            sx={buttonStyle}
+            onClick={handleAdd}
+            loading={loading}
+            disabled={loading} 
+          >
             Add User
-          </Button>
+          </LoadingButton>
         </Box>
       </Box>
     </Modal>

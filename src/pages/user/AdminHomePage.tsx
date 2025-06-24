@@ -80,7 +80,8 @@ export default function AdminHomePage() {
   };
 
   const initials =
-    (adminFirstName.charAt(0) || '').toUpperCase() + (adminLastName.charAt(0) || '').toUpperCase();
+    (adminFirstName.charAt(0) || '').toUpperCase() +
+    (adminLastName.charAt(0) || '').toUpperCase();
 
   return (
     <Container
@@ -123,6 +124,17 @@ export default function AdminHomePage() {
         </Box>
       )}
 
+      <Box display="flex" justifyContent="center" mt={2}>
+        <Button
+          variant="contained"
+          sx={buttonStyle}
+          size={isSm ? 'medium' : 'large'}
+          onClick={() => setAddOpen(true)}
+        >
+          Add User
+        </Button>
+      </Box>
+
       <AddUserModal open={addOpen} onClose={() => setAddOpen(false)} onAdd={handleAdd} />
 
       <ConfirmDialog
@@ -133,24 +145,6 @@ export default function AdminHomePage() {
       >
         Are you sure you want to delete this user?
       </ConfirmDialog>
-
-      <Box
-        sx={{
-          position: 'fixed',
-          bottom: { xs: 16, md: 32 },
-          left: '50%',
-          transform: 'translateX(-50%)',
-        }}
-      >
-        <Button
-          variant="contained"
-          sx={buttonStyle}
-          size={isSm ? 'medium' : 'large'}
-          onClick={() => setAddOpen(true)}
-        >
-          Add User
-        </Button>
-      </Box>
     </Container>
   );
 }

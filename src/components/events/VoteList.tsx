@@ -1,13 +1,5 @@
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  List,
-  ListItem,
-  ListItemAvatar,
-  Avatar,
-  ListItemText,
-} from '@mui/material';
+
+import { Dialog, DialogTitle, DialogContent, List, ListItem, ListItemAvatar, Avatar, ListItemText, ListItemButton } from '@mui/material';
 import { ParticipantProfileDto } from '../../types/User';
 
 interface VoteListProps {
@@ -23,12 +15,19 @@ export default function VoteList({ open, onClose, title, users }: VoteListProps)
       <DialogTitle>{title}</DialogTitle>
       <DialogContent dividers>
         <List>
-          {users.map((u) => (
-            <ListItem key={u.id}>
-              <ListItemAvatar>
-                <Avatar src={u.profilePictureUrl || undefined} />
-              </ListItemAvatar>
-              <ListItemText primary={`${u.firstName} ${u.lastName}`} secondary={u.email} />
+          {users.map(u => (
+            <ListItem key={u.id} disablePadding>
+              <ListItemButton onClick={() => window.location.href = `/user/${u.id}`}>  
+                <ListItemAvatar>
+                  <Avatar src={u.profilePictureUrl || undefined}>
+                    {!u.profilePictureUrl && `${u.firstName[0]}${u.lastName[0]}`}
+                  </Avatar>
+                </ListItemAvatar>
+                <ListItemText
+                  primary={`${u.firstName} ${u.lastName}`}
+                  secondary={u.email}
+                />
+              </ListItemButton>
             </ListItem>
           ))}
         </List>

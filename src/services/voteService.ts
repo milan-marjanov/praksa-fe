@@ -1,7 +1,8 @@
 import api from '../axios/axiosClient';
-import { VoteDto } from '../types/Vote';
+import { CreateVoteDto, VoteDto } from '../types/Vote';
 
-export async function submitVote(vote: VoteDto) {
+
+export async function submitVote(vote: CreateVoteDto){
   const response = await api.post<VoteDto>('/api/events/voting', vote);
   return response.data;
 }

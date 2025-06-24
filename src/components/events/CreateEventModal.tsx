@@ -1,11 +1,21 @@
 import { useRef, useState } from 'react';
-import { Button, Modal, Box, Typography, Stack, Divider, IconButton } from '@mui/material';
+import {
+  Button,
+  Modal,
+  Box,
+  Typography,
+  Stack,
+  Divider
+} from '@mui/material';
+import { LoadingButton } from '@mui/lab';
+
 import EventModal from './EventModal';
 import {
   CreateEventDto,
   CreateEventModalProps,
   EventModalRef,
   UpdateEventDTO,
+  EventDTO,
 } from '../../types/Event';
 import TimeOptionsModal from './TimeOptionsModal';
 import { createEvent, updateEvent } from '../../services/eventService';
@@ -28,11 +38,15 @@ export default function CreateEventModal({
   event,
   open,
   onClose,
+  onEventCreated,
+  onEventUpdated,
 }: CreateEventModalProps) {
   const [slideIndex, setSlideIndex] = useState(0);
+  const [loading, setLoading] = useState(false);
   const formRef = useRef<EventModalRef>(null);
   const { eventData } = useEventForm();
   const isUpdate = !!event;
+
   const slideTitles = ['Event Info', 'Date & Time', 'Restaurant Options', 'Review & Confirm'];
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogTitle, setDialogTitle] = useState('');
@@ -42,8 +56,16 @@ export default function CreateEventModal({
   const handleValidationChange = (hasError: boolean) => {
     setValidationError(hasError);
   };
+
   const slides = [
-    <EventModal key="form" users={users} creator={creator} ref={formRef} />,
+    <EventModal
+      key="form"
+      users={users}
+      creator={creator}
+      onSubmit={async () => setSlideIndex(1)}
+      ref={formRef}
+    />,
+
     <TimeOptionsModal key="slide2" ref={formRef} />,
     <RestaurantOptionsModal key="slide3" ref={formRef} />,
     <EventDataReview key="slide3" onValidationChange={handleValidationChange} />,
@@ -73,15 +95,17 @@ export default function CreateEventModal({
     }
 
     if (slideIndex < slides.length - 1) {
+      const result = formRef.current?.validate();
+      if (result?.hasError) return;
+
       setSlideIndex(slideIndex + 1);
     }
   };
 
   const back = () => {
-    if (slideIndex > 0) {
-      setSlideIndex(slideIndex - 1);
-    }
+    if (slideIndex > 0) setSlideIndex(slideIndex - 1);
   };
+
 
   const handleClose = () => {
     setOpenDialog(false);
@@ -99,8 +123,8 @@ export default function CreateEventModal({
 
     if (eventData.timeOptionType === 'FIXED' && eventData.restaurantOptionType !== 'VOTING') {
       eventData.votingDeadline = undefined;
-    }
 
+    }
     return {
       ...eventData,
       ...(isUpdate ? {} : { creatorId: creator.id }),
@@ -180,9 +204,16 @@ export default function CreateEventModal({
               </Stack>
 
               {slideIndex === slides.length - 1 ? (
-                <Button variant="contained" onClick={confirmSaveEvent} disabled={validationError}>
-                  {isUpdate ? 'Save Changes' : 'Create Event'}
-                </Button>
+
+                
+                            <LoadingButton
+              variant="contained"
+               onClick={confirmSaveEvent} disabled={validationError}
+              loading={loading}
+              disabled={loading}                           
+            >
+              {isUpdate ? 'Save Changes' : 'Create Event'}
+            </LoadingButton>
               ) : (
                 <Button onClick={next}>Next</Button>
               )}
@@ -202,5 +233,6 @@ export default function CreateEventModal({
         {dialogContent}
       </EventConfirmDialog>
     </Box>
+
   );
 }

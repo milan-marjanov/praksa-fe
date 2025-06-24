@@ -14,9 +14,12 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import ConfirmDialog from '../../components/admin_panel/ConfirmDialog';
+import CreateEventModal from '../../components/events/CreateEventModal';
 import { EventDTO } from '../../types/Event';
 import { deleteEvent } from '../../services/eventService';
 import { useEvents } from '../../hooks/useEvents';
+import { useSetupEventForm } from '../../hooks/useSetupEventForm';
+import { useEventForm } from '../../contexts/EventContext';
 import {
   boxContainerStyle,
   cardActionsStyle,
@@ -25,9 +28,6 @@ import {
   eventDescriptionStyle,
   eventTitleStyle,
 } from '../../styles/CommonStyles';
-import CreateEventModal from '../../components/events/CreateEventModal';
-import { useSetupEventForm } from '../../hooks/useSetupEventForm';
-import { useEventForm } from '../../contexts/EventContext';
 
 export default function EventsPage() {
   const navigate = useNavigate();
@@ -48,46 +48,38 @@ export default function EventsPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const { creator, filteredUsers, loadingUsers } = useSetupEventForm();
   const [selectedEvent, setSelectedEvent] = useState<EventDTO | undefined>(undefined);
-
   const { setEventData, resetEventData } = useEventForm();
+  const [selectedEvent, setSelectedEvent] = useState<EventDTO>();
 
-  const handleEditClick = (event: EventDTO) => {
-    setSelectedEvent(event);
+  const handleEditClick = (evt: EventDTO) => {
+    setSelectedEvent(evt);
     setEventData({
-      id: event.id,
-      title: event.title,
-      description: event.description,
-      creatorId: event.creator.id,
-      participantIds: event.participants.map((p) => p.id),
-      votingDeadline: event.votingDeadline,
-      timeOptionType: event.timeOptionType,
-      timeOptions: event.timeOptions,
-      restaurantOptionType: event.restaurantOptionType,
-      restaurantOptions: event.restaurantOptions,
+      id: evt.id,
+      title: evt.title,
+      description: evt.description,
+      creatorId: evt.creator.id,
+      participantIds: evt.participants.map((p) => p.id),
+      votingDeadline: evt.votingDeadline,
+      timeOptionType: evt.timeOptionType,
+      timeOptions: evt.timeOptions,
+      restaurantOptionType: evt.restaurantOptionType,
+      restaurantOptions: evt.restaurantOptions,
     });
     setModalOpen(true);
   };
 
-  const handleDeleteClick = (id: number, title: string) => {
-    setSelectedEventId(id);
-    setSelectedEventTitle(title);
-    setOpenDialog(true);
-  };
-
   const handleConfirmDelete = async () => {
-    if (selectedEventId !== null) {
-      try {
-        await deleteEvent(selectedEventId);
-        setCreatedEvents((prev) => prev.filter((e) => e.id !== selectedEventId));
-        setParticipantEvents((prev) => prev.filter((e) => e.id !== selectedEventId));
-      } catch (error) {
-        console.error('Error deleting event:', error);
-      }
+
+    if (selectedEventId != null) {
+      await deleteEvent(selectedEventId);
+      setCreatedEvents((prev) => prev.filter((e) => e.id !== selectedEventId));
+      setParticipantEvents((prev) => prev.filter((e) => e.id !== selectedEventId));
     }
     setOpenDialog(false);
     setSelectedEventId(null);
     setSelectedEventTitle(null);
   };
+
 
   const handleCancelDelete = () => {
     setOpenDialog(false);
@@ -95,55 +87,56 @@ export default function EventsPage() {
     setSelectedEventTitle(null);
   };
 
-  const handleCardClick = (eventId: number) => {
-    //navigate(`/eventDetails/${eventId}`);
-  };
+  const handleCardClick = (eventId: number) => navigate(`/eventDetails/${eventId}`);
 
   const handleCreateClick = () => {
-    setSelectedEvent(undefined);
     resetEventData();
+    setSelectedEvent(undefined);
     setModalOpen(true);
   };
-
-  const truncateText = (text: string, maxLength: number): string =>
-    text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
+  const truncateText = (text: string, max: number) =>
+    text.length > max ? text.slice(0, max) + '…' : text;
 
   if (loading || !creator || loadingUsers) {
     return (
       <Container sx={{ mt: 4 }}>
-        <Typography>Loading events...</Typography>
+        <Typography>Loading events…</Typography>
       </Container>
     );
   }
 
-  let eventsToShow: EventDTO[];
-  switch (filter) {
-    case 'created':
-      eventsToShow = createdEvents;
-      break;
-    case 'invited':
-      eventsToShow = participantEvents.filter((e) => !createdEvents.some((c) => c.id === e.id));
-      break;
-    default:
-      eventsToShow = allEvents;
-  }
+
+  let eventsToShow = filter === 'created'
+    ? createdEvents
+    : filter === 'invited'
+    ? participantEvents.filter((e) => !createdEvents.some((c) => c.id === e.id))
+    : allEvents;
+
 
   return (
     <Container sx={{ mt: 4 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-        <Button
-          variant="contained"
-          sx={{ fontWeight: 'bold', display: 'flex', mb: 3, ml: 1 }}
-          onClick={handleCreateClick}
-        >
+        <Button variant="contained" onClick={handleCreateClick}>
           Create Event
         </Button>
         <CreateEventModal
           users={filteredUsers}
           creator={creator}
+          event={selectedEvent}
           open={modalOpen}
-          event={selectedEvent || undefined}
           onClose={() => setModalOpen(false)}
+          onEventCreated={(newEvt) => {
+            setCreatedEvents((prev) => [...prev, newEvt]);
+            setParticipantEvents((prev) => [...prev, newEvt]);
+          }}
+          onEventUpdated={(upd) => {
+            setCreatedEvents((prev) =>
+              prev.map((e) => (e.id === upd.id ? upd : e))
+            );
+            setParticipantEvents((prev) =>
+              prev.map((e) => (e.id === upd.id ? upd : e))
+            );
+          }}
         />
 
         <FormControl variant="outlined" size="small">
@@ -152,7 +145,7 @@ export default function EventsPage() {
             labelId="event-filter-label"
             value={filter}
             label="Filter"
-            onChange={(e) => setFilter(e.target.value as 'all' | 'created' | 'invited')}
+            onChange={(e) => setFilter(e.target.value as any)}
           >
             <MenuItem value="all">All</MenuItem>
             <MenuItem value="created">Created</MenuItem>
@@ -162,7 +155,7 @@ export default function EventsPage() {
       </Box>
 
       {eventsToShow.length === 0 ? (
-        <Typography variant="body1" align="center">
+        <Typography align="center">
           {filter === 'created'
             ? 'You haven’t created any events yet.'
             : filter === 'invited'
@@ -171,59 +164,57 @@ export default function EventsPage() {
         </Typography>
       ) : (
         <Box sx={boxContainerStyle}>
-          {eventsToShow.map((event: EventDTO) => {
-            const isCreator = event.creator.id === userId;
-
-            return (
-              <Card
-                key={event.id}
-                sx={eventCardStyle}
-                onClick={() => handleCardClick(event.id)}
-                style={{ cursor: 'pointer' }}
-              >
-                <CardContent sx={cardContentStyle}>
-                  <Typography variant="h6" gutterBottom sx={eventTitleStyle}>
-                    {event.title}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={eventDescriptionStyle}>
-                    {truncateText(event.description, 180)}
-                  </Typography>
-                </CardContent>
-                <CardActions sx={cardActionsStyle}>
-                  <Button
-                    variant="outlined"
-                    size="medium"
-                    disabled={!isCreator}
-                    onClick={() => handleEditClick(event)}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    color="error"
-                    size="medium"
-                    disabled={!isCreator}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (isCreator) handleDeleteClick(event.id, event.title);
-                    }}
-                  >
-                    Delete
-                  </Button>
-                </CardActions>
-              </Card>
-            );
-          })}
+          {eventsToShow.map((evt) => (
+            <Card
+              key={evt.id}
+              sx={eventCardStyle}
+              onClick={() => handleCardClick(evt.id)}
+            >
+              <CardContent sx={cardContentStyle}>
+                <Typography variant="h6" sx={eventTitleStyle}>
+                  {evt.title}
+                </Typography>
+                <Typography variant="body2" sx={eventDescriptionStyle}>
+                  {truncateText(evt.description, 180)}
+                </Typography>
+              </CardContent>
+              <CardActions sx={cardActionsStyle}>
+                <Button
+                  variant="outlined"
+                  disabled={evt.creator.id !== userId}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleEditClick(evt);
+                  }}
+                >
+                  Edit
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="error"
+                  disabled={evt.creator.id !== userId}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedEventId(evt.id);
+                    setSelectedEventTitle(evt.title);
+                    setOpenDialog(true);
+                  }}
+                >
+                  Delete
+                </Button>
+              </CardActions>
+            </Card>
+          ))}
         </Box>
       )}
 
       <ConfirmDialog
         open={openDialog}
         title="Confirm Deletion"
-        onCancel={handleCancelDelete}
+        onCancel={() => setOpenDialog(false)}
         onConfirm={handleConfirmDelete}
       >
-        Are you sure you want to delete the event <strong>{selectedEventTitle}</strong>?
+        Are you sure you want to delete “<strong>{selectedEventTitle}</strong>”?
       </ConfirmDialog>
     </Container>
   );

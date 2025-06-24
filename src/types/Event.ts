@@ -69,6 +69,8 @@ export interface CreateEventModalProps {
   event?: EventDTO;
   open: boolean;
   onClose: () => void;
+  onEventCreated?: (event: EventDTO) => void;
+  onEventUpdated?: (event: EventDTO) => void;
 }
 
 export interface UpdateEventDTO {
