@@ -42,8 +42,7 @@ const EventDataReview = forwardRef<EventModalRef, EventDataReviewProps>(
         } else if (!isValidFutureDate(votingDeadline, now)) {
           hasError = true;
         }
-      }
-
+      }onValidationChange?.(hasError);
     }, [votingDeadline, onValidationChange]);
 
     const handleCancelClose = () => {
