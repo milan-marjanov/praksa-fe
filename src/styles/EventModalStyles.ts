@@ -93,3 +93,10 @@ export const tableCellStyle = {
   textAlign: 'center',
   color: 'text.secondary',
 };
+
+export const timeOptionsTitleStyle = {
+  mt: 3,
+  mb: 3,
+  textAlign: 'center',
+  fontWeight: 'bold',
+};

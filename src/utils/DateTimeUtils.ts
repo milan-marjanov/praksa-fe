@@ -30,7 +30,13 @@ export function validateDateTime(value: string): string | null {
 
 export const formatDateTime = (dateTimeStr?: string) => {
   if (!dateTimeStr) return 'N/A';
-  // Expecting format: "YYYY-MM-DDTHH:mm:ss"
-  // We want "YYYY-MM-DD HH:mm"
   return dateTimeStr.replace('T', ' ').substring(0, 16);
 };
+
+export function validateStartEndTimes(start: string, end: string): string | null {
+  if (!start || !end) return null;
+  const startDate = new Date(start);
+  const endDate = new Date(end);
+  if (endDate <= startDate) return 'End Time must be after Start Time.';
+  return null;
+}

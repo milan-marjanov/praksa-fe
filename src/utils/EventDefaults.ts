@@ -24,14 +24,6 @@ export const initialTimeOption = {
   id: generateId(),
   startTime: '',
   endTime: '',
-  maxCapacity: undefined,
+  maxCapacity: 1,
   createdAt: new Date().toISOString(),
 };
-
-export function validateStartEndTimes(start: string, end: string): string | null {
-  if (!start || !end) return null;
-  const startDate = new Date(start);
-  const endDate = new Date(end);
-  if (endDate <= startDate) return 'End Time must be after Start Time.';
-  return null;
-}

@@ -90,18 +90,10 @@ const EventDataReview = forwardRef<EventModalRef, EventDataReviewProps>(
               <Table size="small">
                 <TableHead>
                   <TableRow>
-                    <TableCell align="center">
-                      #
-                    </TableCell>
-                    <TableCell align="center">
-                      Start Time
-                    </TableCell>
-                    <TableCell align="center">
-                      End Time
-                    </TableCell>
-                    <TableCell align="center">
-                      Max Capacity
-                    </TableCell>
+                    <TableCell align="center">#</TableCell>
+                    <TableCell align="center">Start Time</TableCell>
+                    <TableCell align="center">End Time</TableCell>
+                    <TableCell align="center">Max Capacity</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -110,7 +102,11 @@ const EventDataReview = forwardRef<EventModalRef, EventDataReviewProps>(
                       <TableCell sx={tableCellStyle}>{index + 1}</TableCell>
                       <TableCell sx={tableCellStyle}>{formatDateTime(option.startTime)}</TableCell>
                       <TableCell sx={tableCellStyle}>{formatDateTime(option.endTime)}</TableCell>
-                      <TableCell sx={tableCellStyle}>{option.maxCapacity || 'N/A'}</TableCell>
+                      <TableCell sx={tableCellStyle}>
+                        {eventData.timeOptionType !== 'CAPACITY_BASED'
+                          ? ''
+                          : option.maxCapacity || 'N/A'}
+                      </TableCell>{' '}
                     </TableRow>
                   ))}
                 </TableBody>
@@ -129,18 +125,10 @@ const EventDataReview = forwardRef<EventModalRef, EventDataReviewProps>(
               <Table size="small">
                 <TableHead>
                   <TableRow>
-                    <TableCell align="center">
-                      #
-                    </TableCell>
-                    <TableCell align="center">
-                      Name
-                    </TableCell>
-                    <TableCell align="center">
-                      Menu Image
-                    </TableCell>
-                    <TableCell align="center">
-                      Restaurant URL
-                    </TableCell>
+                    <TableCell align="center">#</TableCell>
+                    <TableCell align="center">Name</TableCell>
+                    <TableCell align="center">Menu Image</TableCell>
+                    <TableCell align="center">Restaurant URL</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>

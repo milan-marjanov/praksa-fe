@@ -4,10 +4,9 @@ import TimeOptionFieldsForm from './TimeOptionFieldsForm';
 import { Add } from '@mui/icons-material';
 import { useEventForm } from '../../contexts/EventContext';
 import { EventModalRef } from '../../types/Event';
-import { timeOptionsForm } from '../../styles/EventModalStyles';
-import { generateId, isValidFutureDate } from '../../utils/DateTimeUtils';
+import { timeOptionsForm, timeOptionsTitleStyle } from '../../styles/EventModalStyles';
+import { generateId, isValidFutureDate, validateStartEndTimes } from '../../utils/DateTimeUtils';
 import { initialTimeOption } from '../../utils/EventDefaults';
-
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 const TimeOptionsModal = forwardRef<EventModalRef, {}>((_props, ref) => {
@@ -85,11 +84,9 @@ const TimeOptionsModal = forwardRef<EventModalRef, {}>((_props, ref) => {
         errors[option.id] = `Option ${optionNumber}: End time must be a valid date in the future.`;
         hasError = true;
       }
-
-      const start = new Date(option.startTime);
-      const end = new Date(option.endTime);
-      if (start >= end) {
-        errors[option.id] = `Option ${optionNumber}: Start time must be before end time.`;
+      const startEndError = validateStartEndTimes(option.startTime, option.endTime);
+      if (startEndError) {
+        errors[option.id] = `Option ${optionNumber}: ${startEndError}`;
         hasError = true;
       }
     });
@@ -202,7 +199,7 @@ const TimeOptionsModal = forwardRef<EventModalRef, {}>((_props, ref) => {
         opt.id === id
           ? {
               ...opt,
-              [field]: field === 'maxCapacity' ? (value ? Number(value) : undefined) : value,
+              [field]: field === 'maxCapacity' ? (value ? Number(value) : 1) : value,
             }
           : opt,
       ),
@@ -264,9 +261,7 @@ const TimeOptionsModal = forwardRef<EventModalRef, {}>((_props, ref) => {
 
       {(optionType === 2 || optionType === 3) && (
         <>
-          <Typography sx={{ mt: 3, textAlign: 'center', fontWeight: 'bold', mb: 3 }}>
-            Time Options (You can add up to 6)
-          </Typography>
+          <Typography sx={timeOptionsTitleStyle}>Time Options (You can add up to 6)</Typography>
           {(eventData.timeOptions || []).map((opt, i) => (
             <TimeOptionFieldsForm
               key={opt.id}
