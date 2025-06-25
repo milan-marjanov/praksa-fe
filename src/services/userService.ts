@@ -1,4 +1,5 @@
 import api from '../axios/axiosClient';
+import { NotificationDto } from '../types/Notification';
 import {
   UserDTO,
   CreateUserDTO,
@@ -31,6 +32,21 @@ export async function getMyProfile() {
 export async function getUserProfile(id: number) {
   const response = await api.get<UserProfileDTO>(`/api/user/${id}/public-profile`);
   return response.data;
+}
+
+export async function getUserNotifications() {
+  const response = await api.get<NotificationDto[]>(`/api/notifications/user`);
+  return response.data;
+}
+
+export async function markNotificationAsRead(id: number) {
+  const response = await api.put<void>(`/api/notifications/mark-as-read/${id}`);
+  return response.data; 
+}
+
+export async function deleteNotification(id: number) {
+  const response = await api.delete<void>(`/api/notifications/notifications/${id}`);
+  return response.data;  
 }
 
 export async function updateProfile(dto: UpdateProfileRequestDTO) {

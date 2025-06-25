@@ -14,6 +14,7 @@ import ProfilePage from './pages/user/ProfilePage';
 import { AuthProvider } from './contexts/AuthContext';
 import EventDetailsPage from './pages/events/EventDetailsPage';
 import { EventFormProvider } from './contexts/EventContext';
+import Notifications from './pages/notifications/NotificationPage';
 
 export default function App() {
   return (
@@ -34,6 +35,15 @@ export default function App() {
                 element={
                   <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
                     <MyProfilePage />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/notifications"
+                element={
+                  <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                    <Notifications />
                   </ProtectedRoute>
                 }
               />

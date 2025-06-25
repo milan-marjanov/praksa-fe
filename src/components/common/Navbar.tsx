@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
+import NotificationsIcon from '@mui/icons-material/Notifications';
 import {
   AppBar,
   Toolbar,
@@ -13,6 +14,7 @@ import {
   ListItemText,
   useTheme,
   useMediaQuery,
+  Badge,
 } from '@mui/material';
 import EventIcon from '@mui/icons-material/Event';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -39,6 +41,7 @@ export default function Navbar() {
     ...(isAdmin ? [{ text: 'Admin Panel', to: '/admin' }] : []),
     { text: 'Events', to: '/createdEvents' },
     { text: 'Profile', to: '/myprofile' },
+    { text: 'Notifications', to: '/notifications', isIcon: true },
     { text: 'Logout', to: '/logout' },
   ];
 
@@ -99,11 +102,24 @@ export default function Navbar() {
 
           {showNav && !isSm && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              {navItems.map(({ text, to }) =>
+              {navItems.map(({ text, to, isIcon }) =>
                 to === '/logout' ? (
                   <Button key={to} onClick={() => handleNavClick(to)} sx={linkStyle(to)}>
                     Logout
                   </Button>
+                ) : isIcon ? (
+                  <IconButton
+                    key={to}
+                    component={RouterLink}
+                    to={to}
+                    sx={{ color: location.pathname === to ? 'black' : 'inherit' }}
+                  >
+                    
+                    <Badge badgeContent={0} color="error">
+                      <NotificationsIcon />
+                    </Badge>
+                  </IconButton>
+
                 ) : (
                   <Button key={to} component={RouterLink} to={to} sx={linkStyle(to)}>
                     {text}

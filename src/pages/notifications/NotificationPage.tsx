@@ -1,0 +1,128 @@
+import {
+  Container,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Chip,
+  Paper,
+  useTheme,
+  Box,
+  useMediaQuery
+} from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import IconButton from '@mui/material/IconButton';
+import React, { useEffect, useState } from 'react';
+import { getUserNotifications, markNotificationAsRead, deleteNotification } from '../../services/userService';
+import { NotificationDto } from '../../types/Notification';
+
+export default function Notifications() {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  const [notifications, setNotifications] = useState<NotificationDto[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const data = await getUserNotifications();
+        setNotifications(data);
+        console.log(data);
+      } catch (err) {
+        setError('Error.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNotifications();
+  }, []);
+
+  if (loading) return <p>Loading.....</p>;
+  if (error) return <p>{error}</p>;
+
+  const handleMarkAsRead = async (id: number) => {
+    try {
+      await markNotificationAsRead(id);
+      setNotifications(prev =>
+        prev.map(notif =>
+          notif.id === id ? { ...notif, isRead: true } : notif
+        )
+      );
+    } catch (error) {
+      console.error('Failed to mark as read', error);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteNotification(id);
+      setNotifications(prev => prev.filter(notif => notif.id !== id));
+    } catch (error) {
+      console.error('Failed to delete notification', error);
+    }
+  };
+
+
+  return (
+    <Container maxWidth="lg" sx={{ mt: 4 }}>
+      <Typography variant="h4" align="center" gutterBottom>
+        Notifications
+      </Typography>
+
+      <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
+        <Table size={isMobile ? 'small' : 'medium'}>
+          <TableHead>
+            <TableRow>
+              <TableCell sx={{ fontSize: isMobile ? '0.75rem' : '1rem' }}>Title</TableCell>
+              <TableCell sx={{ fontSize: isMobile ? '0.75rem' : '1rem' }}>Description</TableCell>
+              <TableCell sx={{ fontSize: isMobile ? '0.75rem' : '1rem' }}>Date</TableCell>
+              <TableCell sx={{ fontSize: isMobile ? '0.75rem' : '1rem' }}>Status</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {notifications.map((notif) => (
+              <TableRow key={notif.eventId + notif.createdAt}>
+                <TableCell sx={{ fontSize: isMobile ? '0.7rem' : '1rem' }}>{notif.title}</TableCell>
+                <TableCell sx={{ fontSize: isMobile ? '0.7rem' : '1rem' }}>{notif.text}</TableCell>
+                <TableCell sx={{ fontSize: isMobile ? '0.7rem' : '1rem' }}>
+                  {new Date(notif.createdAt).toLocaleString()}
+                </TableCell>
+                <TableCell sx={{ fontSize: isMobile ? '0.7rem' : '1rem', verticalAlign: 'middle', py: isMobile ? 0.5 : 1 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Chip
+                      label={notif.isRead ? 'Read' : 'Unread'}
+                      color={notif.isRead ? 'default' : 'success'}
+                      size={isMobile ? 'small' : 'medium'}
+                      sx={{ minWidth: '70px', justifyContent: 'center' }}
+                      onClick={() => {
+                        if (!notif.isRead) {
+                          handleMarkAsRead(notif.id)
+                        }
+                      }}
+                    />
+                    <IconButton
+                      aria-label="delete"
+                      size={isMobile ? 'small' : 'medium'}
+                      onClick={() => handleDelete(notif.id)}
+                      sx={{ ml: notif.isRead ? '3px' : '4px' }}
+                    >
+                      <DeleteIcon fontSize="inherit" />
+                    </IconButton>
+                  </Box>
+                </TableCell>
+
+
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Container>
+  );
+}
