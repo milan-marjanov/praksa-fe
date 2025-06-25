@@ -63,7 +63,7 @@ export default function Navbar() {
       };
       fetchNotifications();
     }
-  }, [notifications]);
+  }, []);
 
   const handleNavClick = (to: string) => {
     setOpen(false);

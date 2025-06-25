@@ -181,14 +181,14 @@ export default function EventDetailsPage() {
   if (event.timeOptionType !== 'CAPACITY_BASED') {
     const maxVotes = Math.max(...event.timeOptions.map(o => o.reservedCount))
     const ties = event.timeOptions.filter(o => o.reservedCount === maxVotes)
-    topTimeOption = ties[Math.floor(Math.random() * ties.length)]
+    topTimeOption = ties[0]
   }
 
   let topRestaurantOption: RestaurantOptionDto | null = null
   if (event.restaurantOptions.length > 0) {
     const maxVotes = Math.max(...event.restaurantOptions.map(o => o.votesCount))
     const ties = event.restaurantOptions.filter(o => o.votesCount === maxVotes)
-    topRestaurantOption = ties[Math.floor(Math.random() * ties.length)]
+    topRestaurantOption = ties[0]
   }
 
   return (
