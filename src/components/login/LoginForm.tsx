@@ -50,7 +50,7 @@ export default function LoginForm() {
 
       switch (decoded?.role) {
         case 'USER':
-          navigate('/myprofile');
+          navigate('/createdEvents');
           break;
         case 'ADMIN':
           navigate('/admin');

@@ -8,7 +8,7 @@ import Navbar from './components/common/Navbar';
 import theme from './theme';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import UnauthorizedPage from './pages/user/UnauthorizedPage';
-import CreatedEventsPage from './pages/events/EventsPage';
+import EventsPage from './pages/events/EventsPage';
 import MyProfilePage from './pages/user/MyProfilePage';
 import ProfilePage from './pages/user/ProfilePage';
 import { AuthProvider } from './contexts/AuthContext';
@@ -61,7 +61,7 @@ export default function App() {
                 element={
                   <EventFormProvider>
                     <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
-                      <CreatedEventsPage />
+                      <EventsPage />
                     </ProtectedRoute>
                   </EventFormProvider>
                 }

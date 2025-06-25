@@ -36,13 +36,14 @@ const EventDataReview = forwardRef<EventModalRef, EventDataReviewProps>(
       const now = new Date();
 
       let hasError = false;
-      if(eventData.timeOptionType === 'FIXED'|| eventData.restaurantOptionType !== 'VOTING'){
+      if(eventData.timeOptionType !== 'FIXED'|| eventData.restaurantOptionType === 'VOTING'){
         if (!votingDeadline) {
           hasError = true;
         } else if (!isValidFutureDate(votingDeadline, now)) {
           hasError = true;
         }
-      }onValidationChange?.(hasError);
+      }
+      onValidationChange?.(hasError);
     }, [votingDeadline, onValidationChange]);
 
     const handleCancelClose = () => {

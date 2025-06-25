@@ -120,17 +120,6 @@ export default function CreateEventModal({
     }
   };
 
-  const confirmSaveEvent = () => {
-    setDialogTitle(isUpdate ? 'Confirm Update' : 'Confirm Creation');
-    setDialogContent(
-      isUpdate
-        ? 'Do you want to save the changes you made to this event?'
-        : 'Are you sure you want to create this event with the entered details?'
-    );
-    setDialogAction(() => handleSaveEvent);
-    setOpenDialog(true);
-  };
-
   return (
     <Box style={{ padding: 40 }}>
       <Modal
@@ -166,7 +155,7 @@ export default function CreateEventModal({
               {slideIndex === slides.length - 1 ? (
                 <LoadingButton
                   variant="contained"
-                  onClick={confirmSaveEvent}
+                  onClick={handleSaveEvent}
                   disabled={validationError || loading}
                   loading={loading}
                 >
