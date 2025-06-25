@@ -1,5 +1,6 @@
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 import React from 'react';
+import { LoadingButton } from '@mui/lab';
 import { buttonStyle } from '../../styles/CommonStyles';
 
 interface ConfirmDialogProps {
@@ -10,6 +11,7 @@ interface ConfirmDialogProps {
   children?: React.ReactNode;
   confirmText?: string;
   cancelText?: string;
+  confirmLoading?: boolean;   // ← loading flag
 }
 
 export default function ConfirmDialog({
@@ -20,18 +22,30 @@ export default function ConfirmDialog({
   onConfirm,
   confirmText = 'Confirm',
   cancelText = 'Cancel',
+  confirmLoading = false,
 }: ConfirmDialogProps) {
   return (
     <Dialog open={open} onClose={onCancel}>
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>{children}</DialogContent>
       <DialogActions>
-        <Button sx={buttonStyle} color="error" onClick={onCancel}>
+        <Button
+          sx={buttonStyle}
+          color="error"
+          onClick={onCancel}
+          disabled={confirmLoading}
+        >
           {cancelText}
         </Button>
-        <Button sx={buttonStyle} onClick={onConfirm}>
+        <LoadingButton
+          sx={buttonStyle}
+          onClick={onConfirm}
+          loading={confirmLoading}
+          disabled={confirmLoading}
+          variant="contained"
+        >
           {confirmText}
-        </Button>
+        </LoadingButton>
       </DialogActions>
     </Dialog>
   );

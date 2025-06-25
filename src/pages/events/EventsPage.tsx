@@ -169,7 +169,7 @@ export default function EventsPage() {
           {eventsToShow.map((evt) => (
             <Card
               key={evt.id}
-              sx={eventCardStyle}
+              sx={{...eventCardStyle, cursor: "pointer"}}
               onClick={() => handleCardClick(evt.id)}
             >
               <CardContent sx={cardContentStyle}>

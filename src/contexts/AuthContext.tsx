@@ -12,8 +12,11 @@ const AuthContext = createContext<AuthContextType>({ user: null, loading: true }
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<MyProfileDTO | null>(null);
   const [loading, setLoading] = useState(true);
+  const token = localStorage.getItem('jwtToken');
 
   useEffect(() => {
+
+    if (!token) return;
     (async () => {
       try {
         const profile = (await getMyProfile()) as MyProfileDTO;

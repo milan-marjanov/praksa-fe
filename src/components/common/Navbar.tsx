@@ -19,6 +19,9 @@ import {
 import EventIcon from '@mui/icons-material/Event';
 import MenuIcon from '@mui/icons-material/Menu';
 import { avatarStyle } from '../../styles/CommonStyles';
+import { useEffect } from 'react';
+import { getUserNotifications } from '../../services/userService';
+import { NotificationDto } from '../../types/Notification';
 
 export default function Navbar() {
   const theme = useTheme();
@@ -28,13 +31,15 @@ export default function Navbar() {
   const token = localStorage.getItem('jwtToken');
   const isLoggedIn = Boolean(token);
   const showNav = isLoggedIn && !hidePaths.includes(location.pathname);
+  const [notifications, setNotifications] = useState<NotificationDto[]>([]);
+  const unreadCount = notifications.filter(n => !n.isRead).length;
 
   let isAdmin = false;
   if (token) {
     try {
       const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
       isAdmin = payload.role === 'ADMIN';
-    } catch {}
+    } catch { }
   }
 
   const navItems = [
@@ -47,6 +52,18 @@ export default function Navbar() {
 
   const [open, setOpen] = useState(false);
   const toggleOpen = () => setOpen((prev) => !prev);
+
+  useEffect(() => {
+    if (token == null) {
+      return;
+    } else {
+      const fetchNotifications = async () => {
+        const data = await getUserNotifications();
+        setNotifications(data);
+      };
+      fetchNotifications();
+    }
+  }, [notifications]);
 
   const handleNavClick = (to: string) => {
     setOpen(false);
@@ -114,12 +131,14 @@ export default function Navbar() {
                     to={to}
                     sx={{ color: location.pathname === to ? 'black' : 'inherit' }}
                   >
-                    
-                    <Badge badgeContent={0} color="error">
+                    <Badge
+                      badgeContent={unreadCount}
+                      color="error"
+                      invisible={unreadCount === 0}
+                    >
                       <NotificationsIcon />
                     </Badge>
                   </IconButton>
-
                 ) : (
                   <Button key={to} component={RouterLink} to={to} sx={linkStyle(to)}>
                     {text}

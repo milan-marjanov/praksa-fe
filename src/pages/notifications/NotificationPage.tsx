@@ -11,13 +11,15 @@ import {
   Paper,
   useTheme,
   Box,
-  useMediaQuery
+  useMediaQuery,
+  colors
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getUserNotifications, markNotificationAsRead, deleteNotification } from '../../services/userService';
 import { NotificationDto } from '../../types/Notification';
+import { lightBlue, lightGreen } from '@mui/material/colors';
 
 export default function Notifications() {
   const theme = useTheme();
@@ -87,10 +89,10 @@ export default function Notifications() {
           </TableHead>
           <TableBody>
             {notifications.map((notif) => (
-              <TableRow key={notif.eventId + notif.createdAt}>
-                <TableCell sx={{ fontSize: isMobile ? '0.7rem' : '1rem' }}>{notif.title}</TableCell>
-                <TableCell sx={{ fontSize: isMobile ? '0.7rem' : '1rem' }}>{notif.text}</TableCell>
-                <TableCell sx={{ fontSize: isMobile ? '0.7rem' : '1rem' }}>
+              <TableRow sx={{bgcolor: notif.isRead ? '#ffffff' : '#f0f0f0'}} key={notif.eventId + notif.createdAt}>
+                <TableCell sx={{ fontSize: isMobile ? '0.7rem' : '1rem', fontWeight: notif.isRead ? 'normal' : 'bold'}}>{notif.title}</TableCell>
+                <TableCell sx={{ fontSize: isMobile ? '0.7rem' : '1rem', fontWeight: notif.isRead ? 'normal' : 'bold'}}>{notif.text}</TableCell>
+                <TableCell sx={{ fontSize: isMobile ? '0.7rem' : '1rem', fontWeight: notif.isRead ? 'normal' : 'bold'}}>
                   {new Date(notif.createdAt).toLocaleString()}
                 </TableCell>
                 <TableCell sx={{ fontSize: isMobile ? '0.7rem' : '1rem', verticalAlign: 'middle', py: isMobile ? 0.5 : 1 }}>

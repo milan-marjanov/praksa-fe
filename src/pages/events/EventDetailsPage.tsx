@@ -57,6 +57,9 @@ export default function EventDetailsPage() {
 
   const [openDialog, setOpenDialog] = useState(false)
 
+  const [closingVoting, setClosingVoting] = useState(false);
+
+
   const openConfirm = (
     title: string,
     content: React.ReactNode,
@@ -126,6 +129,7 @@ export default function EventDetailsPage() {
 
   const handleConfirmCloseVoting = async () => {
     if (!event) return
+    setClosingVoting(true)
     try {
       const now = getCurrentDatetimeLocal()
       const dto = mapDetailsToUpdateDto(event, now)
@@ -137,6 +141,7 @@ export default function EventDetailsPage() {
     } catch (err) {
       console.error(err)
     } finally {
+      setClosingVoting(false)
       setOpenDialog(false)
     }
   }
@@ -439,6 +444,7 @@ export default function EventDetailsPage() {
         title="Confirm Close Voting"
         onCancel={handleCancelClose}
         onConfirm={handleConfirmCloseVoting}
+        confirmLoading={closingVoting}
       >
         Are you sure you want to close the voting?
       </EventConfirmDialog>

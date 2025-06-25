@@ -26,7 +26,8 @@ interface EventDataReviewProps {
 }
 
 const EventDataReview = forwardRef<EventModalRef, EventDataReviewProps>(
-  ({ onValidationChange }) => {
+  (props, ref) => {
+    const { onValidationChange } = props;
     const { eventData, setEventData } = useEventForm();
     const [openDialog, setOpenDialog] = useState(false);
     const votingDeadline = eventData.votingDeadline;
@@ -78,7 +79,7 @@ const EventDataReview = forwardRef<EventModalRef, EventDataReviewProps>(
             <ListItem>
               <ListItemText
                 primary="Description"
-                secondaryTypographyProps={{ sx: { mt: 0.5 } }}
+                secondaryTypographyProps={{ sx: { mt: 0.5 , wordBreak: "break-word"} }}
                 secondary={eventData.description || 'Not set'}
               />
             </ListItem>
