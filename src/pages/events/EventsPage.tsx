@@ -176,34 +176,32 @@ export default function EventsPage() {
                   {truncateText(evt.description, 180)}
                 </Typography>
               </CardContent>
-              <CardActions sx={cardActionsStyle}>
-                <Button
-                  variant="outlined"
-                  disabled={
-                    evt.creator.id !== userId ||
-                    !!(evt.votingDeadline && new Date(evt.votingDeadline) < new Date())
-                  }
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleEditClick(evt);
-                  }}
-                >
-                  Edit
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="error"
-                  disabled={evt.creator.id !== userId}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedEventId(evt.id);
-                    setSelectedEventTitle(evt.title);
-                    setOpenDialog(true);
-                  }}
-                >
-                  Delete
-                </Button>
-              </CardActions>
+              {evt.creator.id === userId && (
+                <CardActions sx={cardActionsStyle}>
+                  <Button
+                    variant="outlined"
+                    disabled={!!(evt.votingDeadline && new Date(evt.votingDeadline) < new Date())}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEditClick(evt);
+                    }}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedEventId(evt.id);
+                      setSelectedEventTitle(evt.title);
+                      setOpenDialog(true);
+                    }}
+                  >
+                    Delete
+                  </Button>
+                </CardActions>
+              )}
             </Card>
           ))}
         </Box>

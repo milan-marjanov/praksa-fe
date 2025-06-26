@@ -128,7 +128,6 @@ const TimeOptionsModal = forwardRef<EventModalRef, {}>((_props, ref) => {
         timeOptions: [newOption],
       });
     }
-
   }, [optionType, eventData.timeOptions, setEventData, eventData]);
 
   const handleOptionTypeChange = (value: 1 | 2 | 3) => {
