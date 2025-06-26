@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { TextField } from '@mui/material';
+import { TextField, useMediaQuery } from '@mui/material';
+import theme from '../../theme';
 
 type DateTimeFormProps = {
   label: string;
@@ -18,6 +19,7 @@ const DateTimeForm: React.FC<DateTimeFormProps> = ({
 }) => {
   const [error, setError] = useState<string | null>(null);
   const [value, setValue] = useState<string>(initialValue || '');
+  const isSm = useMediaQuery(theme.breakpoints.down('sm'));
 
   useEffect(() => {
     if (externalValue !== undefined) {
@@ -72,7 +74,7 @@ const DateTimeForm: React.FC<DateTimeFormProps> = ({
       onChange={(e) => handleChange(e.target.value)}
       error={!!error}
       helperText={error || ' '}
-      sx={{ width: '50%' }}
+      sx={{ width: isSm ? '100%' : '50%' }}
       inputProps={{
         min: minISO,
       }}

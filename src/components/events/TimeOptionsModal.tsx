@@ -1,5 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
-import { Box, Button, FormControlLabel, Radio, Typography } from '@mui/material';
+import { Box, Button, FormControlLabel, Radio, Typography, useMediaQuery } from '@mui/material';
 import TimeOptionFieldsForm from './TimeOptionFieldsForm';
 import { Add } from '@mui/icons-material';
 import { useEventForm } from '../../contexts/EventContext';
@@ -7,12 +7,14 @@ import { EventModalRef } from '../../types/Event';
 import { timeOptionsForm, timeOptionsTitleStyle } from '../../styles/EventModalStyles';
 import { generateId, isValidFutureDate, validateStartEndTimes } from '../../utils/DateTimeUtils';
 import { initialTimeOption } from '../../utils/EventDefaults';
+import theme from '../../theme';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 const TimeOptionsModal = forwardRef<EventModalRef, {}>((_props, ref) => {
   const { eventData, setEventData } = useEventForm();
   const timeOptions = eventData.timeOptions;
   const [validationErrors, setValidationErrors] = useState<Record<number | string, string>>({});
+  const isSm = useMediaQuery(theme.breakpoints.down('sm'));
 
   const [optionType, setOptionType] = useState<1 | 2 | 3>(() => {
     switch (eventData.timeOptionType) {
@@ -260,7 +262,14 @@ const TimeOptionsModal = forwardRef<EventModalRef, {}>((_props, ref) => {
 
       {(optionType === 2 || optionType === 3) && (
         <>
-          <Typography sx={timeOptionsTitleStyle}>Time Options (You can add up to 6)</Typography>
+          <Typography
+            sx={{
+              ...timeOptionsTitleStyle,
+              fontSize: isSm ? '0.985rem' : '1rem',
+            }}
+          >
+            Time Options (You can add up to 6)
+          </Typography>
           {(eventData.timeOptions || []).map((opt, i) => (
             <TimeOptionFieldsForm
               key={opt.id}
