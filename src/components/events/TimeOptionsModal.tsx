@@ -33,33 +33,12 @@ const TimeOptionsModal = forwardRef<EventModalRef, {}>((_props, ref) => {
 
   useEffect(() => {
     setValidationErrors((prevErrors) => {
-      const newErrors = { ...prevErrors };
-      delete newErrors['invalidOptions'];
+      const newErrors = Object.fromEntries(
+        Object.entries(prevErrors).filter(([key]) => key !== 'invalidOptions'),
+      );
       return newErrors;
     });
   }, [eventData.timeOptions?.length]);
-
-  useEffect(() => {
-    if (!timeOptions) return;
-
-    setValidationErrors((prevErrors) => {
-      const newErrors = { ...prevErrors };
-
-      timeOptions.forEach(({ id, startTime, endTime }) => {
-        const startValid = startTime?.trim() !== '';
-        const endValid = endTime?.trim() !== '';
-
-        if (startValid && endValid && newErrors[id]) {
-          delete newErrors[id];
-        }
-      });
-
-      return newErrors;
-    });
-  }, [
-    timeOptions?.map((opt) => opt.startTime).join('|'),
-    timeOptions?.map((opt) => opt.endTime).join('|'),
-  ]);
 
   const validateTimeOptions = (timeOptions: typeof eventData.timeOptions, now: Date) => {
     const errors: Record<string | number, string> = {};
@@ -71,22 +50,26 @@ const TimeOptionsModal = forwardRef<EventModalRef, {}>((_props, ref) => {
       if (!option.startTime || !option.endTime) {
         errors[option.id] = `Option ${optionNumber}: Both start and end times are required.`;
         hasError = true;
-        return;
       }
 
       if (!isValidFutureDate(option.startTime, now)) {
-        errors[option.id] =
-          `Option ${optionNumber}: Start time must be a valid date in the future.`;
         hasError = true;
       }
 
       if (!isValidFutureDate(option.endTime, now)) {
-        errors[option.id] = `Option ${optionNumber}: End time must be a valid date in the future.`;
         hasError = true;
       }
       const startEndError = validateStartEndTimes(option.startTime, option.endTime);
       if (startEndError) {
-        errors[option.id] = `Option ${optionNumber}: ${startEndError}`;
+        hasError = true;
+      }
+      if (
+        optionType === 3 &&
+        (option.maxCapacity === undefined ||
+          option.maxCapacity === null ||
+          option.maxCapacity.toString() === '')
+      ) {
+        errors[`maxCapacity-${option.id}`] = `Option ${optionNumber}: Max capacity is required.`;
         hasError = true;
       }
     });
@@ -194,15 +177,31 @@ const TimeOptionsModal = forwardRef<EventModalRef, {}>((_props, ref) => {
     field: 'startTime' | 'endTime' | 'maxCapacity',
     value: string,
   ) => {
-    setEventData({
-      timeOptions: (timeOptions ?? []).map((opt) =>
-        opt.id === id
-          ? {
-              ...opt,
-              [field]: field === 'maxCapacity' ? (value ? Number(value) : 1) : value,
-            }
-          : opt,
-      ),
+    const updatedOptions = (timeOptions ?? []).map((opt) =>
+      opt.id === id
+        ? {
+            ...opt,
+            [field]: value,
+          }
+        : opt,
+    );
+
+    setEventData({ timeOptions: updatedOptions });
+
+    setValidationErrors((prev) => {
+      const newErrors: Record<string | number, string> = {};
+
+      Object.entries(prev).forEach(([key, val]) => {
+        const shouldRemove =
+          (field === 'maxCapacity' && key === `maxCapacity-${id}`) ||
+          (field !== 'maxCapacity' && key === String(id));
+
+        if (!shouldRemove) {
+          newErrors[key] = val;
+        }
+      });
+
+      return newErrors;
     });
   };
 

@@ -72,8 +72,8 @@ export default function EventsPage() {
     try {
       if (selectedEventId != null) {
         await deleteEvent(selectedEventId);
-        setCreatedEvents(prev => prev.filter(e => e.id !== selectedEventId));
-        setParticipantEvents(prev => prev.filter(e => e.id !== selectedEventId));
+        setCreatedEvents((prev) => prev.filter((e) => e.id !== selectedEventId));
+        setParticipantEvents((prev) => prev.filter((e) => e.id !== selectedEventId));
       }
     } catch (err) {
       console.error('Error deleting event:', err);
@@ -107,15 +107,15 @@ export default function EventsPage() {
     filter === 'created'
       ? createdEvents
       : filter === 'invited'
-      ? participantEvents.filter((e) => !createdEvents.some((c) => c.id === e.id))
-      : allEvents;
+        ? participantEvents.filter((e) => !createdEvents.some((c) => c.id === e.id))
+        : allEvents;
 
   return (
     <Container sx={{ mt: 4 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
         <Button
           variant="contained"
-          sx={{...buttonStyle, fontWeight: 'bold', display: 'flex', mb: 3, ml: 1 }}
+          sx={{ ...buttonStyle, fontWeight: 'bold', display: 'flex', mb: 3, ml: 1 }}
           onClick={handleCreateClick}
         >
           Create Event
@@ -132,12 +132,8 @@ export default function EventsPage() {
             setParticipantEvents((prev) => [...prev, newEvt]);
           }}
           onEventUpdated={(upd: EventDTO) => {
-            setCreatedEvents((prev) =>
-              prev.map((e) => (e.id === upd.id ? upd : e))
-            );
-            setParticipantEvents((prev) =>
-              prev.map((e) => (e.id === upd.id ? upd : e))
-            );
+            setCreatedEvents((prev) => prev.map((e) => (e.id === upd.id ? upd : e)));
+            setParticipantEvents((prev) => prev.map((e) => (e.id === upd.id ? upd : e)));
           }}
         />
 
@@ -159,21 +155,21 @@ export default function EventsPage() {
       {eventsToShow.length === 0 ? (
         <Typography align="center">
           {filter === 'created'
-            ? "You haven’t created any events yet."
+            ? 'You haven’t created any events yet.'
             : filter === 'invited'
-            ? "You’re not invited to any events yet."
-            : "No events to display."}
+              ? 'You’re not invited to any events yet.'
+              : 'No events to display.'}
         </Typography>
       ) : (
         <Box sx={boxContainerStyle}>
           {eventsToShow.map((evt) => (
             <Card
               key={evt.id}
-              sx={{...eventCardStyle, cursor: "pointer"}}
+              sx={{ ...eventCardStyle, cursor: 'pointer' }}
               onClick={() => handleCardClick(evt.id)}
             >
               <CardContent sx={cardContentStyle}>
-                <Typography variant="h6" sx={{...eventTitleStyle, wordBreak:'break-word'}}>
+                <Typography variant="h6" sx={{ ...eventTitleStyle, wordBreak: 'break-word' }}>
                   {evt.title}
                 </Typography>
                 <Typography variant="body2" sx={eventDescriptionStyle}>
@@ -183,7 +179,10 @@ export default function EventsPage() {
               <CardActions sx={cardActionsStyle}>
                 <Button
                   variant="outlined"
-                  disabled={evt.creator.id !== userId || !!(evt.votingDeadline && new Date(evt.votingDeadline) < new Date())}
+                  disabled={
+                    evt.creator.id !== userId ||
+                    !!(evt.votingDeadline && new Date(evt.votingDeadline) < new Date())
+                  }
                   onClick={(e) => {
                     e.stopPropagation();
                     handleEditClick(evt);
@@ -221,4 +220,3 @@ export default function EventsPage() {
     </Container>
   );
 }
-

@@ -1,20 +1,16 @@
-import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
-import { Box, Typography, IconButton, Button } from '@mui/material'
-import InfoIcon from '@mui/icons-material/Info'
-import { getEventDetails, updateEvent } from '../../services/eventService'
-import { submitVote } from '../../services/voteService'
-import {
-  EventDetailsDto,
-  TimeOptionDto,
-  RestaurantOptionDto,
-} from '../../types/Event'
-import ParticipantsList from '../../components/events/ParticipantsListProps'
-import TimeOptionItem from '../../components/events/TimeOptionItem'
-import RestaurantOptionItem from '../../components/events/RestaurantOptionItem'
-import VoteList from '../../components/events/VoteList'
-import ConfirmOption from '../../components/events/ConfirmOption'
-import RestaurantInfoDialog from '../../components/events/RestaurantInfoDialog'
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { Box, Typography, IconButton, Button } from '@mui/material';
+import InfoIcon from '@mui/icons-material/Info';
+import { getEventDetails, updateEvent } from '../../services/eventService';
+import { submitVote } from '../../services/voteService';
+import { EventDetailsDto, TimeOptionDto, RestaurantOptionDto } from '../../types/Event';
+import ParticipantsList from '../../components/events/ParticipantsListProps';
+import TimeOptionItem from '../../components/events/TimeOptionItem';
+import RestaurantOptionItem from '../../components/events/RestaurantOptionItem';
+import VoteList from '../../components/events/VoteList';
+import ConfirmOption from '../../components/events/ConfirmOption';
+import RestaurantInfoDialog from '../../components/events/RestaurantInfoDialog';
 import {
   pageContainer,
   headerBox,
@@ -22,57 +18,52 @@ import {
   panelBox,
   mapItemBox,
   buttonStyle,
-} from '../../styles/CommonStyles'
-import { mapDetailsToUpdateDto } from '../../utils/EventMappers'
-import { getCurrentDatetimeLocal } from '../../utils/DateTimeUtils'
-import { ParticipantProfileDto } from '../../types/User'
-import { CreateVoteDto } from '../../types/Vote'
-import EventConfirmDialog from '../../components/events/EventConfirmDialog'
-import { toast } from 'react-toastify'
-import { useEvents } from '../../hooks/useEvents'
+} from '../../styles/CommonStyles';
+import { mapDetailsToUpdateDto } from '../../utils/EventMappers';
+import { getCurrentDatetimeLocal } from '../../utils/DateTimeUtils';
+import { ParticipantProfileDto } from '../../types/User';
+import { CreateVoteDto } from '../../types/Vote';
+import EventConfirmDialog from '../../components/events/EventConfirmDialog';
+import { toast } from 'react-toastify';
+import { useEvents } from '../../hooks/useEvents';
 
 export default function EventDetailsPage() {
-  const { id } = useParams<{ id: string }>()
+  const { id } = useParams<{ id: string }>();
 
-  const [event, setEvent] = useState<EventDetailsDto | null>(null)
-  const [selectedTime, setSelectedTime] = useState<number | null>(null)
-  const [selectedRestaurant, setSelectedRestaurant] = useState<number | null>(null)
+  const [event, setEvent] = useState<EventDetailsDto | null>(null);
+  const [selectedTime, setSelectedTime] = useState<number | null>(null);
+  const [selectedRestaurant, setSelectedRestaurant] = useState<number | null>(null);
 
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const { userId } = useEvents()
+  const { userId } = useEvents();
 
-  const [voteListOpen, setVoteListOpen] = useState(false)
-  const [modalUsers, setModalUsers] = useState<ParticipantProfileDto[]>([])
-  const [modalTitle, setModalTitle] = useState('')
+  const [voteListOpen, setVoteListOpen] = useState(false);
+  const [modalUsers, setModalUsers] = useState<ParticipantProfileDto[]>([]);
+  const [modalTitle, setModalTitle] = useState('');
 
-  const [confirmOpen, setConfirmOpen] = useState(false)
-  const [confirmTitle, setConfirmTitle] = useState('')
-  const [confirmContent, setConfirmContent] = useState<React.ReactNode>(null)
-  const [onConfirmAction, setOnConfirmAction] = useState<() => void>(() => {})
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmTitle, setConfirmTitle] = useState('');
+  const [confirmContent, setConfirmContent] = useState<React.ReactNode>(null);
+  const [onConfirmAction, setOnConfirmAction] = useState<() => void>(() => {});
 
-  const [restaurantInfoOpen, setRestaurantInfoOpen] = useState(false)
-  const [restaurantForInfo, setRestaurantForInfo] = useState<RestaurantOptionDto | null>(null)
+  const [restaurantInfoOpen, setRestaurantInfoOpen] = useState(false);
+  const [restaurantForInfo, setRestaurantForInfo] = useState<RestaurantOptionDto | null>(null);
 
-  const [openDialog, setOpenDialog] = useState(false)
+  const [openDialog, setOpenDialog] = useState(false);
 
   const [closingVoting, setClosingVoting] = useState(false);
 
-
-  const openConfirm = (
-    title: string,
-    content: React.ReactNode,
-    action: () => void
-  ) => {
-    setConfirmTitle(title)
-    setConfirmContent(content)
+  const openConfirm = (title: string, content: React.ReactNode, action: () => void) => {
+    setConfirmTitle(title);
+    setConfirmContent(content);
     setOnConfirmAction(() => () => {
-      action()
-      setConfirmOpen(false)
-    })
-    setConfirmOpen(true)
-  }
+      action();
+      setConfirmOpen(false);
+    });
+    setConfirmOpen(true);
+  };
 
   const handleTimeSelect = (opt: TimeOptionDto) =>
     openConfirm(
@@ -85,16 +76,16 @@ export default function EventDetailsPage() {
           eventId: event!.id,
           timeOptionId: selectedTime === opt.id ? null : opt.id,
           restaurantOptionId: selectedRestaurant,
-        }
-        await submitVote(dto)
-        const updated = await getEventDetails(event!.id)
+        };
+        await submitVote(dto);
+        const updated = await getEventDetails(event!.id);
         if (updated) {
-          setEvent(updated)
-          setSelectedTime(updated.currentVote?.timeOptionId ?? null)
-          setSelectedRestaurant(updated.currentVote?.restaurantOptionId ?? null)
+          setEvent(updated);
+          setSelectedTime(updated.currentVote?.timeOptionId ?? null);
+          setSelectedRestaurant(updated.currentVote?.restaurantOptionId ?? null);
         }
-      }
-    )
+      },
+    );
 
   const handleRestaurantSelect = (opt: RestaurantOptionDto) =>
     openConfirm(
@@ -107,88 +98,87 @@ export default function EventDetailsPage() {
           eventId: event!.id,
           timeOptionId: selectedTime,
           restaurantOptionId: selectedRestaurant === opt.id ? null : opt.id,
-        }
-        await submitVote(dto)
-        const updated = await getEventDetails(event!.id)
+        };
+        await submitVote(dto);
+        const updated = await getEventDetails(event!.id);
         if (updated) {
-          setEvent(updated)
-          setSelectedTime(updated.currentVote?.timeOptionId ?? null)
-          setSelectedRestaurant(updated.currentVote?.restaurantOptionId ?? null)
+          setEvent(updated);
+          setSelectedTime(updated.currentVote?.timeOptionId ?? null);
+          setSelectedRestaurant(updated.currentVote?.restaurantOptionId ?? null);
         }
-      }
-    )
+      },
+    );
 
   const handleViewRestaurantInfo = (opt: RestaurantOptionDto) => {
-    setRestaurantForInfo(opt)
-    setRestaurantInfoOpen(true)
-  }
+    setRestaurantForInfo(opt);
+    setRestaurantInfoOpen(true);
+  };
 
   const handleCancelClose = () => {
-    setOpenDialog(false)
-  }
+    setOpenDialog(false);
+  };
 
   const handleConfirmCloseVoting = async () => {
-    if (!event) return
-    setClosingVoting(true)
+    if (!event) return;
+    setClosingVoting(true);
     try {
-      const now = getCurrentDatetimeLocal()
-      const dto = mapDetailsToUpdateDto(event, now)
-      await updateEvent(event.id, dto)
-      setEvent(prev =>
-        prev ? { ...prev, votingDeadline: now } : prev
-      )
-      toast.success('Successfully closed voting!')
+      const now = getCurrentDatetimeLocal();
+      const dto = mapDetailsToUpdateDto(event, now);
+      await updateEvent(event.id, dto);
+      setEvent((prev) => (prev ? { ...prev, votingDeadline: now } : prev));
+      toast.success('Successfully closed voting!');
     } catch (err) {
-      console.error(err)
+      console.error(err);
     } finally {
-      setClosingVoting(false)
-      setOpenDialog(false)
+      setClosingVoting(false);
+      setOpenDialog(false);
     }
-  }
+  };
 
   useEffect(() => {
-    if (!id) return
-    setLoading(true)
-    setError(null)
-    ;(async () => {
+    if (!id) return;
+    setLoading(true);
+    setError(null);
+    (async () => {
       try {
-        const data = await getEventDetails(Number(id))
+        const data = await getEventDetails(Number(id));
         if (data) {
-          setEvent(data)
-          setSelectedTime(data.currentVote?.timeOptionId ?? null)
-          setSelectedRestaurant(data.currentVote?.restaurantOptionId ?? null)
+          setEvent(data);
+          setSelectedTime(data.currentVote?.timeOptionId ?? null);
+          setSelectedRestaurant(data.currentVote?.restaurantOptionId ?? null);
         } else {
-          setError('Event not found')
+          setError('Event not found');
         }
       } catch (e) {
-        console.error(e)
-        setError('Failed to load event')
+        console.error(e);
+        setError('Failed to load event');
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    })()
-  }, [id])
+    })();
+  }, [id]);
 
-  if (loading) return <Typography>Loading...</Typography>
-  if (error) return <Typography color="error">{error}</Typography>
-  if (!event) return <Typography>No event data</Typography>
+  if (loading) return <Typography>Loading...</Typography>;
+  if (error) return <Typography color="error">{error}</Typography>;
+  if (!event) return <Typography>No event data</Typography>;
 
-  const isTimeFixed = event.timeOptionType === 'FIXED' && event.timeOptions.length === 1
-  const isRestFixed = event.restaurantOptionType === 'FIXED' && event.restaurantOptions.length === 1
-  const isVotingClosed = new Date(event.votingDeadline) <= new Date(getCurrentDatetimeLocal())
+  const isTimeFixed = event.timeOptionType === 'FIXED' && event.timeOptions.length === 1;
+  const isRestFixed =
+    event.restaurantOptionType === 'FIXED' && event.restaurantOptions.length === 1;
+  const isVotingClosed = new Date(event.votingDeadline) <= new Date(getCurrentDatetimeLocal());
 
-  let topTimeOption: TimeOptionDto | null = null
+  let topTimeOption: TimeOptionDto | null = null;
   if (event.timeOptionType !== 'CAPACITY_BASED') {
-    const maxVotes = Math.max(...event.timeOptions.map(o => o.reservedCount))
-    const ties = event.timeOptions.filter(o => o.reservedCount === maxVotes)
-    topTimeOption = ties[0]
+    const maxVotes = Math.max(...event.timeOptions.map((o) => o.reservedCount));
+    const ties = event.timeOptions.filter((o) => o.reservedCount === maxVotes);
+    topTimeOption = ties[0];
   }
 
-  let topRestaurantOption: RestaurantOptionDto | null = null
+  let topRestaurantOption: RestaurantOptionDto | null = null;
   if (event.restaurantOptions.length > 0) {
-    const maxVotes = Math.max(...event.restaurantOptions.map(o => o.votesCount))
-    const ties = event.restaurantOptions.filter(o => o.votesCount === maxVotes)
-    topRestaurantOption = ties[0]
+    const maxVotes = Math.max(...event.restaurantOptions.map((o) => o.votesCount));
+    const ties = event.restaurantOptions.filter((o) => o.votesCount === maxVotes);
+    topRestaurantOption = ties[0];
   }
 
   return (
@@ -233,16 +223,16 @@ export default function EventDetailsPage() {
             <Typography variant="subtitle1" align="center" fontWeight="bold" mb={1}>
               Description
             </Typography>
-            <Typography
-              sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', textAlign: 'left' }}
-            >
+            <Typography sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', textAlign: 'left' }}>
               {event.description}
             </Typography>
           </Box>
 
           <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={3}>
             <Box sx={panelBox} flex={event.restaurantOptionType === 'NONE' ? 2 : 1}>
-              <Typography variant="h6" mb={2}>Time</Typography>
+              <Typography variant="h6" mb={2}>
+                Time
+              </Typography>
 
               {isTimeFixed ? (
                 <Box sx={{ ...mapItemBox, display: 'flex', justifyContent: 'center' }}>
@@ -260,7 +250,7 @@ export default function EventDetailsPage() {
                         gap: 2,
                       }}
                     >
-                      {event.timeOptions.map(opt => (
+                      {event.timeOptions.map((opt) => (
                         <Box key={opt.id} sx={mapItemBox}>
                           <TimeOptionItem
                             option={opt}
@@ -275,7 +265,7 @@ export default function EventDetailsPage() {
                     </Box>
                   ) : (
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                      {event.timeOptions.map(opt => (
+                      {event.timeOptions.map((opt) => (
                         <Box key={opt.id} sx={mapItemBox}>
                           <TimeOptionItem
                             option={opt}
@@ -306,7 +296,7 @@ export default function EventDetailsPage() {
                     gap: 2,
                   }}
                 >
-                  {event.timeOptions.map(opt => (
+                  {event.timeOptions.map((opt) => (
                     <Box key={opt.id} sx={mapItemBox}>
                       <TimeOptionItem
                         option={opt}
@@ -318,9 +308,9 @@ export default function EventDetailsPage() {
                         }
                         onSelect={() => handleTimeSelect(opt)}
                         onViewVotes={(t, u) => {
-                          setModalTitle(t)
-                          setModalUsers(u)
-                          setVoteListOpen(true)
+                          setModalTitle(t);
+                          setModalUsers(u);
+                          setVoteListOpen(true);
                         }}
                       />
                     </Box>
@@ -328,7 +318,7 @@ export default function EventDetailsPage() {
                 </Box>
               ) : (
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  {event.timeOptions.map(opt => (
+                  {event.timeOptions.map((opt) => (
                     <Box key={opt.id} sx={mapItemBox}>
                       <TimeOptionItem
                         option={opt}
@@ -340,9 +330,9 @@ export default function EventDetailsPage() {
                         }
                         onSelect={() => handleTimeSelect(opt)}
                         onViewVotes={(t, u) => {
-                          setModalTitle(t)
-                          setModalUsers(u)
-                          setVoteListOpen(true)
+                          setModalTitle(t);
+                          setModalUsers(u);
+                          setVoteListOpen(true);
                         }}
                       />
                     </Box>
@@ -353,7 +343,9 @@ export default function EventDetailsPage() {
 
             {event.restaurantOptionType !== 'NONE' && (
               <Box sx={panelBox} flex={1}>
-                <Typography variant="h6" mb={2}>Restaurant</Typography>
+                <Typography variant="h6" mb={2}>
+                  Restaurant
+                </Typography>
 
                 {isRestFixed ? (
                   <Box
@@ -383,9 +375,7 @@ export default function EventDetailsPage() {
                         justifyContent: 'center',
                       }}
                     >
-                      <Typography fontWeight="bold">
-                        {topRestaurantOption.name}
-                      </Typography>
+                      <Typography fontWeight="bold">{topRestaurantOption.name}</Typography>
                       <IconButton
                         size="small"
                         sx={{ ml: 1 }}
@@ -396,7 +386,7 @@ export default function EventDetailsPage() {
                     </Box>
                   )
                 ) : (
-                  event.restaurantOptions.map(opt => (
+                  event.restaurantOptions.map((opt) => (
                     <Box key={opt.id} sx={mapItemBox}>
                       <RestaurantOptionItem
                         option={opt}
@@ -453,12 +443,12 @@ export default function EventDetailsPage() {
         <RestaurantInfoDialog
           open={restaurantInfoOpen}
           onClose={() => {
-            setRestaurantInfoOpen(false)
-            setRestaurantForInfo(null)
+            setRestaurantInfoOpen(false);
+            setRestaurantForInfo(null);
           }}
           restaurant={restaurantForInfo}
         />
       )}
     </Box>
-  )
+  );
 }

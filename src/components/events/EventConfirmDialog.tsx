@@ -11,7 +11,7 @@ interface ConfirmDialogProps {
   children?: React.ReactNode;
   confirmText?: string;
   cancelText?: string;
-  confirmLoading?: boolean;   // ← loading flag
+  confirmLoading?: boolean; // ← loading flag
 }
 
 export default function ConfirmDialog({
@@ -29,12 +29,7 @@ export default function ConfirmDialog({
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>{children}</DialogContent>
       <DialogActions>
-        <Button
-          sx={buttonStyle}
-          color="error"
-          onClick={onCancel}
-          disabled={confirmLoading}
-        >
+        <Button sx={buttonStyle} color="error" onClick={onCancel} disabled={confirmLoading}>
           {cancelText}
         </Button>
         <LoadingButton

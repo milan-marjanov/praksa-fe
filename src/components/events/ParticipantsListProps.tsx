@@ -1,9 +1,9 @@
-import { Box, Typography, Avatar } from '@mui/material'
-import { ParticipantProfileDto } from '../../types/User'
-import { participantsStyle } from '../../styles/CommonStyles'
+import { Box, Typography, Avatar } from '@mui/material';
+import { ParticipantProfileDto } from '../../types/User';
+import { participantsStyle } from '../../styles/CommonStyles';
 
 interface ParticipantsListProps {
-  participants: ParticipantProfileDto[]
+  participants: ParticipantProfileDto[];
 }
 
 export default function ParticipantsList({ participants }: ParticipantsListProps) {
@@ -26,7 +26,7 @@ export default function ParticipantsList({ participants }: ParticipantsListProps
               alignItems: 'center',
               columnGap: { xs: 3, sm: 2 },
               py: 1,
-              pl: { xs: 2, sm: 3 }, 
+              pl: { xs: 2, sm: 3 },
               pr: 2,
               borderBottom: '1px solid #ddd',
               cursor: 'pointer',
@@ -55,5 +55,5 @@ export default function ParticipantsList({ participants }: ParticipantsListProps
         ))
       )}
     </Box>
-  )
+  );
 }
