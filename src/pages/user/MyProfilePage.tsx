@@ -24,6 +24,7 @@ const MyProfilePage: React.FC = () => {
   const [openUpdate, setOpenUpdate] = useState(false);
   const [openChangePwd, setOpenChangePwd] = useState(false);
   const [openChangePfp, setOpenChangePfp] = useState(false);
+  const [userId, setUserId] = useState<number | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -35,38 +36,63 @@ const MyProfilePage: React.FC = () => {
       } catch (e) {
         console.error('Error loading profile data', e);
       }
+
+      const userIdFromT = getUserIdFromToken();
+      if (userIdFromT !== null) {
+        setUserId(userIdFromT);
+      }
+
       const defaultUrl = 'https://example.com/default-profile.png';
-      const imageUrl = await getProfileImage();
-      setProfilePictureUrl(imageUrl || defaultUrl);
+
+      if (userIdFromT) {
+        const imageUrl = await getProfileImage(userIdFromT);
+        setProfilePictureUrl(imageUrl || defaultUrl);
+      } else {
+        setProfilePictureUrl(defaultUrl);
+      }
     })();
   }, []);
+
+  function getUserIdFromToken(): number | null {
+    const token = localStorage.getItem('jwtToken');
+    return token ? JSON.parse(atob(token.split('.')[1])).id : null;
+  }
 
   const handleUpdate = async (data: UpdateProfileRequestDTO & { profilePicture?: File }) => {
     const oldEmail = email;
     try {
       if (data.email !== oldEmail && data.profilePicture) {
         await uploadProfilePicture({ profilePicture: data.profilePicture });
-        const newUrl = await getProfileImage();
-        setProfilePictureUrl(newUrl || profilePictureUrl);
+        if (userId !== null) {
+          const newUrl = await getProfileImage(userId);
+          setProfilePictureUrl(newUrl || profilePictureUrl);
+        }
       }
+
       const updated = await updateProfile({
         firstName: data.firstName,
         lastName: data.lastName,
         email: data.email,
       });
+
       setFirstName(updated.firstName);
       setLastName(updated.lastName);
       setEmail(updated.email);
+
       if (data.email === oldEmail && data.profilePicture) {
         await uploadProfilePicture({ profilePicture: data.profilePicture });
-        const newUrl = await getProfileImage();
-        setProfilePictureUrl(newUrl || profilePictureUrl);
+        if (userId !== null) {
+          const newUrl = await getProfileImage(userId);
+          setProfilePictureUrl(newUrl || profilePictureUrl);
+        }
       }
+
       if (data.email !== oldEmail) {
         localStorage.removeItem('jwtToken');
         navigate('/login', { replace: true });
         return;
       }
+
       setOpenUpdate(false);
     } catch (error) {
       console.error('Error updating profile', error);
@@ -83,8 +109,10 @@ const MyProfilePage: React.FC = () => {
   const handleUploadPfp = async (file: File) => {
     try {
       await uploadProfilePicture({ profilePicture: file });
-      const newUrl = await getProfileImage();
-      setProfilePictureUrl(newUrl || profilePictureUrl);
+      if (userId !== null) {
+        const newUrl = await getProfileImage(userId);
+        setProfilePictureUrl(newUrl || profilePictureUrl);
+      }
     } catch (error) {
       console.error('Error uploading picture', error);
     } finally {
