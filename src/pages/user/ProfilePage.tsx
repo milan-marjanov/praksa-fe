@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Box, Avatar, Typography, Button, CircularProgress } from '@mui/material';
 import useProfile from '../../hooks/useProfile';
-import { buttonStyle } from '../../styles/CommonStyles';
+import { buttonStyle, cardForPublicProfile } from '../../styles/CommonStyles';
 
 const defaultAvatar = '/default-avatar.png';
 
@@ -45,8 +45,9 @@ const ProfilePage: React.FC = () => {
 
   return (
     <Container
+
       maxWidth="sm"
-      sx={{ my: 10, p: 4, bgcolor: 'background.paper', borderRadius: 2, boxShadow: 3 }}
+      sx={cardForPublicProfile}
     >
       <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
         <Avatar

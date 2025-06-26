@@ -195,3 +195,13 @@ export const panelBox: SxProps<Theme> = {
 export const mapItemBox: SxProps<Theme> = {
   mb: 2,
 };
+
+export const cardForPublicProfile = {
+  width: { xs: '80%', sm: 550 },
+  mx: 'auto',
+  my: { xs: 6, sm: 10 },
+  p: { xs: 2, sm: 4 },
+  bgcolor: 'background.paper',
+  borderRadius: 2,
+  boxShadow: 3
+}
