@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
@@ -14,7 +14,6 @@ import {
   TableBody,
   Table,
 } from '@mui/material';
-import { EventModalRef } from '../../types/Event';
 import { useEventForm } from '../../contexts/EventContext';
 import EventConfirmDialog from './EventConfirmDialog';
 import { formatDateTime, isValidFutureDate } from '../../utils/DateTimeUtils';
@@ -25,7 +24,7 @@ interface EventDataReviewProps {
   onValidationChange?: (hasError: boolean) => void;
 }
 
-const EventDataReview = forwardRef<EventModalRef, EventDataReviewProps>((props, ref) => {
+const EventDataReview = (props: EventDataReviewProps) => {
   const { onValidationChange } = props;
   const { eventData, setEventData } = useEventForm();
   const [openDialog, setOpenDialog] = useState(false);
@@ -179,6 +178,6 @@ const EventDataReview = forwardRef<EventModalRef, EventDataReviewProps>((props, 
       </EventConfirmDialog>
     </Box>
   );
-});
+};
 
 export default EventDataReview;
