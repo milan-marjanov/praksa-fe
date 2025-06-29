@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -15,7 +15,6 @@ import {
   Table,
 } from '@mui/material';
 import { useEventForm } from '../../contexts/EventContext';
-import EventConfirmDialog from './EventConfirmDialog';
 import { formatDateTime, isValidFutureDate } from '../../utils/DateTimeUtils';
 import DateTimeForm from './DateTimeForm';
 import { labelAbove, tableCellStyle } from '../../styles/EventModalStyles';
@@ -27,7 +26,6 @@ interface EventDataReviewProps {
 const EventDataReview = (props: EventDataReviewProps) => {
   const { onValidationChange } = props;
   const { eventData, setEventData } = useEventForm();
-  const [openDialog, setOpenDialog] = useState(false);
   const votingDeadline = eventData.votingDeadline;
   onValidationChange?.(false);
 
@@ -45,13 +43,6 @@ const EventDataReview = (props: EventDataReviewProps) => {
     onValidationChange?.(hasError);
   }, [votingDeadline, onValidationChange]);
 
-  const handleCancelClose = () => {
-    setOpenDialog(false);
-  };
-
-  const handleConfirmClose = () => {
-    setOpenDialog(false);
-  };
 
   const handleVotingDeadlineChange = (newDeadline: string) => {
     setEventData({
@@ -167,15 +158,6 @@ const EventDataReview = (props: EventDataReviewProps) => {
           />
         </>
       )}
-
-      <EventConfirmDialog
-        open={openDialog}
-        title="Confirm Close Voting"
-        onCancel={handleCancelClose}
-        onConfirm={handleConfirmClose}
-      >
-        Are you sure you want to close the voting?
-      </EventConfirmDialog>
     </Box>
   );
 };

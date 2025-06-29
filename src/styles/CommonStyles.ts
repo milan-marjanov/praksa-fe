@@ -38,7 +38,7 @@ export const buttonStyle: SxProps<Theme> = {
 export const eventCardStyle = {
   display: 'flex',
   flexDirection: 'column',
-  height: '250px',
+  height: '260px',
   borderRadius: 2,
   boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
   transition: 'transform 0.2s, box-shadow 0.2s',
@@ -57,9 +57,9 @@ export const boxContainerStyle = {
 
 export const cardContentStyle = {
   flex: '1 1 auto',
-  overflowY: 'auto',
   padding: '16px 16px 0 16px',
-  scrollbarWidth: 'thin',
+    backgroundColor: '#faf8e6',
+
 };
 
 export const cardActionsStyle = {
@@ -67,18 +67,17 @@ export const cardActionsStyle = {
   gap: 1,
   pb: 2,
   mt: 'auto',
+      backgroundColor: '#faf8e6',
+
 };
 
-export const eventTitleStyle = {
-  color: 'black',
-  fontWeight: 700,
-  fontSize: '1.25rem',
-  letterSpacing: '0.05em',
-  textTransform: 'capitalize',
-  mb: 1,
-  mx: 1,
-  borderBottom: '2px solid black',
-  paddingBottom: '4px',
+export const eventTitleStyle = { 
+  color: 'white',
+  fontWeight: 700, 
+  fontSize: '1.25rem', 
+  textAlign: 'center',
+  wordBreak: 'break-word',
+  
 };
 
 export const eventDescriptionStyle = {
@@ -101,9 +100,9 @@ export const eventBoxStyle = {
 };
 
 export const eventHeaderStyle = {
-  paddingBottom: '20px',
-  marginBottom: '20px',
-  textAlign: 'center',
+  backgroundColor: 'primary.main',
+  width: '100%',
+  padding: '8px 12px',
 };
 
 export const eventTitleCenterStyle = {
