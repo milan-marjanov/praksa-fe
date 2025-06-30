@@ -58,8 +58,7 @@ export const boxContainerStyle = {
 export const cardContentStyle = {
   flex: '1 1 auto',
   padding: '16px 16px 0 16px',
-    backgroundColor: '#faf8e6',
-
+  backgroundColor: '#faf8e6',
 };
 
 export const cardActionsStyle = {
@@ -67,17 +66,15 @@ export const cardActionsStyle = {
   gap: 1,
   pb: 2,
   mt: 'auto',
-      backgroundColor: '#faf8e6',
-
+  backgroundColor: '#faf8e6',
 };
 
-export const eventTitleStyle = { 
+export const eventTitleStyle = {
   color: 'white',
-  fontWeight: 700, 
-  fontSize: '1.25rem', 
+  fontWeight: 700,
+  fontSize: '1.25rem',
   textAlign: 'center',
   wordBreak: 'break-word',
-  
 };
 
 export const eventDescriptionStyle = {
@@ -103,6 +100,18 @@ export const eventHeaderStyle = {
   backgroundColor: 'primary.main',
   width: '100%',
   padding: '8px 12px',
+};
+
+export const eventDetailstHeaderStyle = {
+  backgroundColor: 'primary.main',
+  width: '100%',
+  padding: '8px 12px',
+  borderTopLeftRadius: 8,
+  borderTopRightRadius: 8,
+  borderBottomLeftRadius: 0,
+  borderBottomRightRadius: 0,
+  minHeight: '50px',
+  boxSizing: 'border-box',
 };
 
 export const eventTitleCenterStyle = {

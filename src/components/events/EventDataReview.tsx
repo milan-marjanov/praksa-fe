@@ -43,7 +43,6 @@ const EventDataReview = (props: EventDataReviewProps) => {
     onValidationChange?.(hasError);
   }, [votingDeadline, onValidationChange]);
 
-
   const handleVotingDeadlineChange = (newDeadline: string) => {
     setEventData({
       ...eventData,

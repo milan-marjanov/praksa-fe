@@ -14,10 +14,11 @@ import RestaurantInfoDialog from '../../components/events/RestaurantInfoDialog';
 import {
   pageContainer,
   headerBox,
-  headerTitle,
   panelBox,
   mapItemBox,
   buttonStyle,
+  eventTitleStyle,
+  eventDetailstHeaderStyle,
 } from '../../styles/CommonStyles';
 import { mapDetailsToUpdateDto } from '../../utils/EventMappers';
 import { getCurrentDatetimeLocal } from '../../utils/DateTimeUtils';
@@ -183,23 +184,56 @@ export default function EventDetailsPage() {
 
   return (
     <Box sx={pageContainer}>
-      <Box sx={headerBox}>
-        <Typography variant="h4" sx={headerTitle}>
-          {event.title}
-        </Typography>
+      <Box
+        sx={{
+          ...headerBox,
+          display: 'flex',
+          flexDirection: { xs: 'column', md: 'row' },
+          gap: 2,
+          width: '100%',
+        }}
+      >
+        <Box
+          sx={{
+            ...eventDetailstHeaderStyle,
+            borderBottomLeftRadius: 8,
+            borderBottomRightRadius: 8,
+            width: { xs: '100%', md: '73%' },
+            textAlign: { xs: 'center', md: 'left' },
+            p: 2,
+            wordBreak: 'break-word',
+            whiteSpace: 'normal',
+            mt: 1.5,
+          }}
+        >
+          <Typography
+            sx={{
+              ...eventTitleStyle,
+              whiteSpace: 'normal',
+              wordBreak: 'break-word',
+              fontSize: '1.75rem',
+            }}
+          >
+            {event.title}
+          </Typography>
+        </Box>
+
         {event.creatorId === userId && (
           <Box
             sx={{
-              ...headerBox,
+              width: { xs: '100%', md: '30%' },
               display: 'flex',
+              justifyContent: 'center',
               alignItems: 'center',
-              justifyContent: 'space-between',
+              mt: { xs: 1, md: 1.5 },
+              py: 1,
             }}
           >
             <Button
               variant="contained"
               size="small"
-              sx={{ ...buttonStyle, mt: 2 }}
+              color="error"
+              sx={buttonStyle}
               onClick={() => setOpenDialog(true)}
               disabled={isVotingClosed}
             >
@@ -214,159 +248,164 @@ export default function EventDetailsPage() {
           <Box
             sx={{
               ...panelBox,
-              textAlign: 'left',
+              p: 0,
               height: { xs: 200, md: '40vh' },
               maxHeight: 400,
-              overflowY: 'auto',
+              display: 'flex',
+              flexDirection: 'column',
             }}
           >
-            <Typography variant="subtitle1" align="center" fontWeight="bold" mb={1}>
-              Description
-            </Typography>
-            <Typography sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', textAlign: 'left' }}>
-              {event.description}
-            </Typography>
+            <Box sx={eventDetailstHeaderStyle}>
+              <Typography variant="h6" sx={eventTitleStyle}>
+                Description
+              </Typography>
+            </Box>
+
+            <Box
+              sx={{
+                overflowY: 'auto',
+                scrollbarWidth: 'thin',
+              }}
+            >
+              <Typography
+                sx={{
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-word',
+                  textAlign: 'justify',
+                  px: 2,
+                  py: 1.5,
+                }}
+              >
+                {event.description}
+              </Typography>
+            </Box>
           </Box>
 
           <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={3}>
-            <Box sx={panelBox} flex={event.restaurantOptionType === 'NONE' ? 2 : 1}>
-              <Typography variant="h6" mb={2}>
-                Time
-              </Typography>
-
-              {isTimeFixed ? (
-                <Box sx={{ ...mapItemBox, display: 'flex', justifyContent: 'center' }}>
-                  <Typography>
-                    {new Date(event.timeOptions[0].startTime).toLocaleString()}
-                  </Typography>
-                </Box>
-              ) : isVotingClosed ? (
-                event.timeOptionType === 'CAPACITY_BASED' ? (
-                  event.restaurantOptionType === 'NONE' ? (
-                    <Box
-                      sx={{
-                        display: 'grid',
-                        gridTemplateColumns: { xs: '1fr', md: 'repeat(2,1fr)' },
-                        gap: 2,
-                      }}
-                    >
-                      {event.timeOptions.map((opt) => (
-                        <Box key={opt.id} sx={mapItemBox}>
-                          <TimeOptionItem
-                            option={opt}
-                            optionType={event.timeOptionType}
-                            isSelected={false}
-                            disabled={true}
-                            onSelect={() => {}}
-                            onViewVotes={() => {}}
-                          />
-                        </Box>
-                      ))}
-                    </Box>
+            <Box sx={{ ...panelBox, p: 0 }} flex={event.restaurantOptionType === 'NONE' ? 2 : 1}>
+              <Box sx={eventDetailstHeaderStyle}>
+                <Typography variant="h6" sx={eventTitleStyle}>
+                  Time
+                </Typography>
+              </Box>
+              <Box sx={{ m: 2 }}>
+                {isTimeFixed ? (
+                  <Box sx={{ ...mapItemBox, display: 'flex', justifyContent: 'center' }}>
+                    <Typography>
+                      {new Date(event.timeOptions[0].startTime).toLocaleString()}
+                    </Typography>
+                  </Box>
+                ) : isVotingClosed ? (
+                  event.timeOptionType === 'CAPACITY_BASED' ? (
+                    event.restaurantOptionType === 'NONE' ? (
+                      <Box
+                        sx={{
+                          display: 'grid',
+                          gridTemplateColumns: { xs: '1fr', md: 'repeat(2,1fr)' },
+                          gap: 2,
+                        }}
+                      >
+                        {event.timeOptions.map((opt) => (
+                          <Box key={opt.id} sx={mapItemBox}>
+                            <TimeOptionItem
+                              option={opt}
+                              optionType={event.timeOptionType}
+                              isSelected={false}
+                              disabled={true}
+                              onSelect={() => {}}
+                              onViewVotes={() => {}}
+                            />
+                          </Box>
+                        ))}
+                      </Box>
+                    ) : (
+                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        {event.timeOptions.map((opt) => (
+                          <Box key={opt.id} sx={mapItemBox}>
+                            <TimeOptionItem
+                              option={opt}
+                              optionType={event.timeOptionType}
+                              isSelected={false}
+                              disabled={true}
+                              onSelect={() => {}}
+                              onViewVotes={() => {}}
+                            />
+                          </Box>
+                        ))}
+                      </Box>
+                    )
                   ) : (
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                      {event.timeOptions.map((opt) => (
-                        <Box key={opt.id} sx={mapItemBox}>
-                          <TimeOptionItem
-                            option={opt}
-                            optionType={event.timeOptionType}
-                            isSelected={false}
-                            disabled={true}
-                            onSelect={() => {}}
-                            onViewVotes={() => {}}
-                          />
-                        </Box>
-                      ))}
-                    </Box>
+                    topTimeOption && (
+                      <Box sx={{ ...mapItemBox, display: 'flex', justifyContent: 'center' }}>
+                        <Typography fontWeight="bold">
+                          {new Date(topTimeOption.startTime).toLocaleString()}
+                        </Typography>
+                      </Box>
+                    )
                   )
+                ) : event.restaurantOptionType === 'NONE' ? (
+                  <Box
+                    sx={{
+                      display: 'grid',
+                      gridTemplateColumns: { xs: '1fr', md: 'repeat(2,1fr)' },
+                      gap: 2,
+                    }}
+                  >
+                    {event.timeOptions.map((opt) => (
+                      <Box key={opt.id} sx={mapItemBox}>
+                        <TimeOptionItem
+                          option={opt}
+                          optionType={event.timeOptionType}
+                          isSelected={selectedTime === opt.id}
+                          disabled={
+                            event.timeOptionType === 'CAPACITY_BASED' &&
+                            opt.reservedCount >= (opt.maxCapacity ?? Infinity)
+                          }
+                          onSelect={() => handleTimeSelect(opt)}
+                          onViewVotes={(t, u) => {
+                            setModalTitle(t);
+                            setModalUsers(u);
+                            setVoteListOpen(true);
+                          }}
+                        />
+                      </Box>
+                    ))}
+                  </Box>
                 ) : (
-                  topTimeOption && (
-                    <Box sx={{ ...mapItemBox, display: 'flex', justifyContent: 'center' }}>
-                      <Typography fontWeight="bold">
-                        {new Date(topTimeOption.startTime).toLocaleString()}
-                      </Typography>
-                    </Box>
-                  )
-                )
-              ) : event.restaurantOptionType === 'NONE' ? (
-                <Box
-                  sx={{
-                    display: 'grid',
-                    gridTemplateColumns: { xs: '1fr', md: 'repeat(2,1fr)' },
-                    gap: 2,
-                  }}
-                >
-                  {event.timeOptions.map((opt) => (
-                    <Box key={opt.id} sx={mapItemBox}>
-                      <TimeOptionItem
-                        option={opt}
-                        optionType={event.timeOptionType}
-                        isSelected={selectedTime === opt.id}
-                        disabled={
-                          event.timeOptionType === 'CAPACITY_BASED' &&
-                          opt.reservedCount >= (opt.maxCapacity ?? Infinity)
-                        }
-                        onSelect={() => handleTimeSelect(opt)}
-                        onViewVotes={(t, u) => {
-                          setModalTitle(t);
-                          setModalUsers(u);
-                          setVoteListOpen(true);
-                        }}
-                      />
-                    </Box>
-                  ))}
-                </Box>
-              ) : (
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  {event.timeOptions.map((opt) => (
-                    <Box key={opt.id} sx={mapItemBox}>
-                      <TimeOptionItem
-                        option={opt}
-                        optionType={event.timeOptionType}
-                        isSelected={selectedTime === opt.id}
-                        disabled={
-                          event.timeOptionType === 'CAPACITY_BASED' &&
-                          opt.reservedCount >= (opt.maxCapacity ?? Infinity)
-                        }
-                        onSelect={() => handleTimeSelect(opt)}
-                        onViewVotes={(t, u) => {
-                          setModalTitle(t);
-                          setModalUsers(u);
-                          setVoteListOpen(true);
-                        }}
-                      />
-                    </Box>
-                  ))}
-                </Box>
-              )}
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    {event.timeOptions.map((opt) => (
+                      <Box key={opt.id} sx={mapItemBox}>
+                        <TimeOptionItem
+                          option={opt}
+                          optionType={event.timeOptionType}
+                          isSelected={selectedTime === opt.id}
+                          disabled={
+                            event.timeOptionType === 'CAPACITY_BASED' &&
+                            opt.reservedCount >= (opt.maxCapacity ?? Infinity)
+                          }
+                          onSelect={() => handleTimeSelect(opt)}
+                          onViewVotes={(t, u) => {
+                            setModalTitle(t);
+                            setModalUsers(u);
+                            setVoteListOpen(true);
+                          }}
+                        />
+                      </Box>
+                    ))}
+                  </Box>
+                )}
+              </Box>
             </Box>
 
             {event.restaurantOptionType !== 'NONE' && (
-              <Box sx={panelBox} flex={1}>
-                <Typography variant="h6" mb={2}>
-                  Restaurant
-                </Typography>
-
-                {isRestFixed ? (
-                  <Box
-                    sx={{
-                      ...mapItemBox,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <Typography>{event.restaurantOptions[0].name}</Typography>
-                    <IconButton
-                      size="small"
-                      sx={{ ml: 1 }}
-                      onClick={() => handleViewRestaurantInfo(event.restaurantOptions[0])}
-                    >
-                      <InfoIcon fontSize="small" />
-                    </IconButton>
-                  </Box>
-                ) : isVotingClosed ? (
-                  topRestaurantOption && (
+              <Box sx={{ ...panelBox, p: 0 }} flex={1}>
+                <Box sx={eventDetailstHeaderStyle}>
+                  <Typography variant="h6" sx={eventTitleStyle}>
+                    Restaurant
+                  </Typography>
+                </Box>
+                <Box sx={{ my: 2, ml: 2, mr: 3 }}>
+                  {isRestFixed ? (
                     <Box
                       sx={{
                         ...mapItemBox,
@@ -375,28 +414,48 @@ export default function EventDetailsPage() {
                         justifyContent: 'center',
                       }}
                     >
-                      <Typography fontWeight="bold">{topRestaurantOption.name}</Typography>
+                      <Typography>{event.restaurantOptions[0].name}</Typography>
                       <IconButton
                         size="small"
                         sx={{ ml: 1 }}
-                        onClick={() => handleViewRestaurantInfo(topRestaurantOption!)}
+                        onClick={() => handleViewRestaurantInfo(event.restaurantOptions[0])}
                       >
                         <InfoIcon fontSize="small" />
                       </IconButton>
                     </Box>
-                  )
-                ) : (
-                  event.restaurantOptions.map((opt) => (
-                    <Box key={opt.id} sx={mapItemBox}>
-                      <RestaurantOptionItem
-                        option={opt}
-                        optionType={event.restaurantOptionType}
-                        isSelected={selectedRestaurant === opt.id}
-                        onSelect={() => handleRestaurantSelect(opt)}
-                      />
-                    </Box>
-                  ))
-                )}
+                  ) : isVotingClosed ? (
+                    topRestaurantOption && (
+                      <Box
+                        sx={{
+                          ...mapItemBox,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <Typography fontWeight="bold">{topRestaurantOption.name}</Typography>
+                        <IconButton
+                          size="small"
+                          sx={{ ml: 1 }}
+                          onClick={() => handleViewRestaurantInfo(topRestaurantOption!)}
+                        >
+                          <InfoIcon fontSize="small" />
+                        </IconButton>
+                      </Box>
+                    )
+                  ) : (
+                    event.restaurantOptions.map((opt) => (
+                      <Box key={opt.id} sx={mapItemBox}>
+                        <RestaurantOptionItem
+                          option={opt}
+                          optionType={event.restaurantOptionType}
+                          isSelected={selectedRestaurant === opt.id}
+                          onSelect={() => handleRestaurantSelect(opt)}
+                        />
+                      </Box>
+                    ))
+                  )}{' '}
+                </Box>
               </Box>
             )}
           </Box>
@@ -404,7 +463,6 @@ export default function EventDetailsPage() {
 
         <Box
           sx={{
-            ...panelBox,
             flex: 0.8,
             height: { md: 'calc(40vh + 35vh + 25px)' },
             overflowY: 'auto',

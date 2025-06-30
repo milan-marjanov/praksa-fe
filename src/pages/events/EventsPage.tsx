@@ -11,6 +11,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Tooltip,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import ConfirmDialog from '../../components/admin_panel/ConfirmDialog';
@@ -116,7 +117,15 @@ export default function EventsPage() {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
         <Button
           variant="contained"
-          sx={{ ...buttonStyle, fontWeight: 'bold', width:'150px', height:'53px', display: 'flex', mb: 3, ml: 1 }}
+          sx={{
+            ...buttonStyle,
+            fontWeight: 'bold',
+            width: '150px',
+            height: '53px',
+            display: 'flex',
+            mb: 3,
+            ml: 1,
+          }}
           onClick={handleCreateClick}
         >
           Create Event
@@ -144,7 +153,7 @@ export default function EventsPage() {
             labelId="event-filter-label"
             value={filter}
             label="Filter"
-            sx={{...buttonStyle, width:'150px', height:'55px', padding:0}}
+            sx={{ ...buttonStyle, width: '150px', height: '55px', padding: 0 }}
             onChange={(e) => setFilter(e.target.value as any)}
           >
             <MenuItem value="all">All</MenuItem>
@@ -171,12 +180,11 @@ export default function EventsPage() {
               onClick={() => handleCardClick(evt.id)}
             >
               <Box sx={eventHeaderStyle}>
-                <Typography
-                  variant="h6"
-                  sx={eventTitleStyle}
-                >
-                  {truncateText(evt.title, 30)}
-                </Typography>
+                <Tooltip title={evt.title} placement="bottom-end">
+                  <Typography variant="h6" sx={eventTitleStyle}>
+                    {truncateText(evt.title, 30)}
+                  </Typography>
+                </Tooltip>
               </Box>
               <CardContent sx={cardContentStyle}>
                 <Typography variant="body2" sx={eventDescriptionStyle}>
