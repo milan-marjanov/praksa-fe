@@ -30,6 +30,9 @@ import { CreateVoteDto } from '../../types/Vote'
 import EventConfirmDialog from '../../components/events/EventConfirmDialog'
 import { toast } from 'react-toastify'
 import { useEvents } from '../../hooks/useEvents'
+import ChatEvent from '../../components/chat-event/ChatEvent'
+import { Dialog, DialogContent ,DialogTitle} from '@mui/material'
+
 
 export default function EventDetailsPage() {
   const { id } = useParams<{ id: string }>()
@@ -50,7 +53,7 @@ export default function EventDetailsPage() {
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [confirmTitle, setConfirmTitle] = useState('')
   const [confirmContent, setConfirmContent] = useState<React.ReactNode>(null)
-  const [onConfirmAction, setOnConfirmAction] = useState<() => void>(() => {})
+  const [onConfirmAction, setOnConfirmAction] = useState<() => void>(() => { })
 
   const [restaurantInfoOpen, setRestaurantInfoOpen] = useState(false)
   const [restaurantForInfo, setRestaurantForInfo] = useState<RestaurantOptionDto | null>(null)
@@ -58,6 +61,9 @@ export default function EventDetailsPage() {
   const [openDialog, setOpenDialog] = useState(false)
 
   const [closingVoting, setClosingVoting] = useState(false);
+
+  const [showChat, setShowChat] = useState(false)
+
 
 
   const openConfirm = (
@@ -77,8 +83,7 @@ export default function EventDetailsPage() {
   const handleTimeSelect = (opt: TimeOptionDto) =>
     openConfirm(
       selectedTime === opt.id ? 'Cancel reservation?' : 'Confirm reservation',
-      `Are you sure you want to ${
-        selectedTime === opt.id ? 'cancel' : 'reserve'
+      `Are you sure you want to ${selectedTime === opt.id ? 'cancel' : 'reserve'
       } ${new Date(opt.startTime).toLocaleString()}?`,
       async () => {
         const dto: CreateVoteDto = {
@@ -99,8 +104,7 @@ export default function EventDetailsPage() {
   const handleRestaurantSelect = (opt: RestaurantOptionDto) =>
     openConfirm(
       selectedRestaurant === opt.id ? 'Cancel vote?' : 'Confirm vote',
-      `Are you sure you want to ${
-        selectedRestaurant === opt.id ? 'cancel your vote for' : 'vote for'
+      `Are you sure you want to ${selectedRestaurant === opt.id ? 'cancel your vote for' : 'vote for'
       } "${opt.name}"?`,
       async () => {
         const dto: CreateVoteDto = {
@@ -150,23 +154,23 @@ export default function EventDetailsPage() {
     if (!id) return
     setLoading(true)
     setError(null)
-    ;(async () => {
-      try {
-        const data = await getEventDetails(Number(id))
-        if (data) {
-          setEvent(data)
-          setSelectedTime(data.currentVote?.timeOptionId ?? null)
-          setSelectedRestaurant(data.currentVote?.restaurantOptionId ?? null)
-        } else {
-          setError('Event not found')
+      ; (async () => {
+        try {
+          const data = await getEventDetails(Number(id))
+          if (data) {
+            setEvent(data)
+            setSelectedTime(data.currentVote?.timeOptionId ?? null)
+            setSelectedRestaurant(data.currentVote?.restaurantOptionId ?? null)
+          } else {
+            setError('Event not found')
+          }
+        } catch (e) {
+          console.error(e)
+          setError('Failed to load event')
+        } finally {
+          setLoading(false)
         }
-      } catch (e) {
-        console.error(e)
-        setError('Failed to load event')
-      } finally {
-        setLoading(false)
-      }
-    })()
+      })()
   }, [id])
 
   if (loading) return <Typography>Loading...</Typography>
@@ -197,7 +201,7 @@ export default function EventDetailsPage() {
         <Typography variant="h4" sx={headerTitle}>
           {event.title}
         </Typography>
-        {event.creatorId === userId && (
+  
           <Box
             sx={{
               ...headerBox,
@@ -206,6 +210,7 @@ export default function EventDetailsPage() {
               justifyContent: 'space-between',
             }}
           >
+                  {event.creatorId === userId && (
             <Button
               variant="contained"
               size="small"
@@ -215,8 +220,47 @@ export default function EventDetailsPage() {
             >
               Close Voting
             </Button>
+             )} 
+            <Button
+              variant="contained"
+              size="small"
+              sx={{ ...buttonStyle, mt: 2 }}
+              onClick={() => setShowChat(true)}
+            >
+              Chat
+            </Button>
+
+            <Dialog
+              open={showChat}
+              onClose={() => setShowChat(false)}
+              fullWidth
+              maxWidth="sm"
+              
+            >
+              <DialogTitle sx={{ m: 0, p: 2 }}>
+                <IconButton
+                  aria-label="close"
+                  onClick={() => setShowChat(false)}
+                  sx={{
+                    position: 'absolute',
+                    right: 8,
+                    top: 8,
+                    color: (theme) => theme.palette.grey[500],
+                  }}
+                >
+                  ×
+                </IconButton>
+              </DialogTitle>
+
+              <DialogContent sx={{ padding: 0 }}>
+                <ChatEvent eventId={event!.id} />
+              </DialogContent>
+            </Dialog>
+
+
+
           </Box>
-        )}
+        
       </Box>
 
       <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={3}>
@@ -267,8 +311,8 @@ export default function EventDetailsPage() {
                             optionType={event.timeOptionType}
                             isSelected={false}
                             disabled={true}
-                            onSelect={() => {}}
-                            onViewVotes={() => {}}
+                            onSelect={() => { }}
+                            onViewVotes={() => { }}
                           />
                         </Box>
                       ))}
@@ -282,8 +326,8 @@ export default function EventDetailsPage() {
                             optionType={event.timeOptionType}
                             isSelected={false}
                             disabled={true}
-                            onSelect={() => {}}
-                            onViewVotes={() => {}}
+                            onSelect={() => { }}
+                            onViewVotes={() => { }}
                           />
                         </Box>
                       ))}
