@@ -8,7 +8,7 @@ import {
   input,
   sendButton,
 } from '../../styles/CommonStyles';
-
+import SendIcon from '@mui/icons-material/Send';
 
 
 interface ChatEventProps {
@@ -129,8 +129,12 @@ const ChatEvent: React.FC<ChatEventProps> = ({ eventId }) => {
           placeholder="Enter message..."
           sx={input}
         />
-        <Button onClick={handleSend} sx={sendButton} variant="contained">
-          Send
+        <Button
+          onClick={handleSend}
+          sx={sendButton}
+          variant="contained"
+        >
+          <SendIcon />
         </Button>
       </Box>
     </Box>

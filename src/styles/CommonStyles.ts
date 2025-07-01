@@ -227,6 +227,7 @@ export const messageBubble: SxProps<Theme> = {
 export const inputContainer: SxProps<Theme> = {
   display: 'flex',
   gap: 1, 
+  padding:2
 };
 
 export const input: SxProps<Theme> = {
@@ -237,13 +238,20 @@ export const input: SxProps<Theme> = {
 };
 
 export const sendButton: SxProps<Theme> = {
-  padding: '5px 10px',
-  borderRadius: 1.5,
+ mt: 1,
+  padding: '6px',         
+  borderRadius: '50%',     
   backgroundColor: '#007bff',
   color: 'white',
   border: 'none',
-  minWidth: '32px',        
+  width: '40px',          
+  height: '40px',          
+  minWidth: '40px',        
+  minHeight: '40px',      
   cursor: 'pointer',
+  display: 'flex',         
+  alignItems: 'center',
+  justifyContent: 'center',
   '&:hover': {
     backgroundColor: '#0056b3',
   },
