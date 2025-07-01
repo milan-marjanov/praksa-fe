@@ -253,7 +253,7 @@ export default function EventDetailsPage() {
               </DialogTitle>
 
               <DialogContent sx={{ padding: 0 }}>
-                <ChatEvent eventId={event!.id} />
+                <ChatEvent eventId={event!.id} title={event!.title} />
               </DialogContent>
             </Dialog>
 

@@ -1,19 +1,26 @@
-interface UserMessageDto {
+export interface UserMessageDto {
   id: number;
   firstName: string;
   lastName: string;
 }
 
-interface MessageDto {
+export interface MessageDto {
   id: number;
   text: string;
-  sentAt: string; 
+  sentAt: string;
   user: UserMessageDto;
   repliedToMessage?: MessageDto | null;
 }
 
-interface ChatDto {
+export interface ChatDto {
   id: number;
   eventId: number;
   messages: MessageDto[];
+}
+
+export interface CreateMessageDto {
+  text: string;
+  userId: number;
+  repliedToMessageId?: number | null;
+  chatId: number;
 }

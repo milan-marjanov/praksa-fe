@@ -210,15 +210,19 @@ export const messagesContainer: SxProps<Theme> = {
   height: 500,
   overflowY: 'auto',
   border: '1px solid #ccc',
-  padding: 2, 
-  borderRadius: 2, 
+  padding: 2,
+  borderRadius: 2,
   backgroundColor: '#f9f9f9',
+
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 0.5, 
 };
 
 export const messageBubble: SxProps<Theme> = {
   backgroundColor: '#d1e7dd',
   padding: '8px 12px',
-  borderRadius: 15,
+  borderRadius: 2,
   marginBottom: 2, 
   alignSelf: 'flex-start',
   maxWidth: '80%',
@@ -230,7 +234,7 @@ export const inputContainer: SxProps<Theme> = {
   padding:2
 };
 
-export const input: SxProps<Theme> = {
+export const input1: SxProps<Theme> = {
   flex: 1,
   padding: 1,
   borderRadius: 1.5, 
@@ -238,7 +242,7 @@ export const input: SxProps<Theme> = {
 };
 
 export const sendButton: SxProps<Theme> = {
- mt: 1,
+ mt: 2.5,
   padding: '6px',         
   borderRadius: '50%',     
   backgroundColor: '#007bff',
