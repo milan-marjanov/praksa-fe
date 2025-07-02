@@ -1,15 +1,6 @@
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  List,
-  ListItem,
-  ListItemAvatar,
-  Avatar,
-  ListItemText,
-  ListItemButton,
-} from '@mui/material';
-import { ParticipantProfileDto } from '../../types/User';
+import { Dialog, DialogTitle, DialogContent, List, ListItem, ListItemAvatar, Avatar, ListItemText, ListItemButton } from '@mui/material';
+import { ParticipantProfileDto } from '../../../types/User';
+import { useNavigate } from 'react-router-dom';
 
 interface VoteListProps {
   open: boolean;
@@ -19,6 +10,8 @@ interface VoteListProps {
 }
 
 export default function VoteList({ open, onClose, title, users }: VoteListProps) {
+  const navigate = useNavigate();
+
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
       <DialogTitle>{title}</DialogTitle>
@@ -26,13 +19,15 @@ export default function VoteList({ open, onClose, title, users }: VoteListProps)
         <List>
           {users.map((u) => (
             <ListItem key={u.id} disablePadding>
-              <ListItemButton onClick={() => (window.location.href = `/user/${u.id}`)}>
+              <ListItemButton onClick={() => navigate(`/user/${u.id}`)}>  
                 <ListItemAvatar>
                   <Avatar src={u.profilePictureUrl || undefined}>
                     {!u.profilePictureUrl && `${u.firstName[0]}${u.lastName[0]}`}
                   </Avatar>
                 </ListItemAvatar>
-                <ListItemText primary={`${u.firstName} ${u.lastName}`} secondary={u.email} />
+                <ListItemText
+                  primary={`${u.firstName} ${u.lastName}`}
+                />
               </ListItemButton>
             </ListItem>
           ))}

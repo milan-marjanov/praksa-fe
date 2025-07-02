@@ -1,18 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Box, Typography, Button, Avatar, IconButton } from '@mui/material';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
-import { buttonStyle } from '../../styles/CommonStyles';
-
-const style = {
-  position: 'absolute' as const,
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  bgcolor: 'background.paper',
-  p: 4,
-  borderRadius: 2,
-  boxShadow: 24,
-};
+import { buttonStyle, modalStyle } from '../../styles/CommonStyles';
 
 export interface ChangePfpModalProps {
   open: boolean;
@@ -75,7 +64,7 @@ export function ChangePfpModal({
 
   return (
     <Modal open={open} onClose={onClose}>
-      <Box sx={style}>
+      <Box sx={modalStyle}>
         <Typography variant="h6" gutterBottom>
           Promeni profilnu sliku
         </Typography>
@@ -105,7 +94,12 @@ export function ChangePfpModal({
           <Button sx={{ ...buttonStyle, mr: 1 }} onClick={onClose}>
             Cancel
           </Button>
-          <Button variant="contained" sx={buttonStyle} onClick={handleSave}>
+          <Button
+            variant="contained"
+            sx={buttonStyle}
+            onClick={handleSave}
+            disabled={!removed && !file}
+          >
             Save
           </Button>
         </Box>

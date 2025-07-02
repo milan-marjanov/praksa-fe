@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { Button, Modal, Box, Typography, Stack, Divider, IconButton } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import EventModal from './EventModal';
+import EventModal from '../../components/events/EventModal';
 import {
   CreateEventDto,
   CreateEventModalProps,
@@ -9,13 +9,13 @@ import {
   UpdateEventDTO,
   EventDTO,
 } from '../../types/Event';
-import TimeOptionsModal from './TimeOptionsModal';
+import TimeOptionsModal from '../../components/events/TimeOptionsModal';
 import { createEvent, updateEvent } from '../../services/eventService';
 import { useEventForm } from '../../contexts/EventContext';
 import { toast } from 'react-toastify';
 import CloseIcon from '@mui/icons-material/Close';
-import EventConfirmDialog from './EventConfirmDialog';
-import RestaurantOptionsModal from './RestaurantOptionsModal';
+import EventConfirmDialog from '../../components/events/EventConfirmDialog';
+import RestaurantOptionsModal from '../../components/events/RestaurantOptionsModal';
 import {
   closeButtonStyle,
   modalBoxStyle,

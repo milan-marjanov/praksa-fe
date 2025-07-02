@@ -2,8 +2,6 @@ import React, { useEffect, useState, useRef } from "react";
 import { Box, Button, TextField, Typography } from '@mui/material';
 import {
   chatContainer,
-  messagesContainer,
-  messageBubble,
   inputContainer,
   input1,
   sendButton,
@@ -16,12 +14,10 @@ import { getChatByEventId } from '../../services/eventService';
 import { JwtDecoded } from "../../types/User";
 import { jwtDecode } from "jwt-decode";
 
-
 interface ChatEventProps {
   eventId: number;
   title:string;
 }
-
 
 const ChatEvent: React.FC<ChatEventProps> = ({ eventId,title }) => {
   const [connected, setConnected] = useState(false);

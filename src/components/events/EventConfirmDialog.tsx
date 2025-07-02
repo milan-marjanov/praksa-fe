@@ -11,7 +11,7 @@ interface ConfirmDialogProps {
   children?: React.ReactNode;
   confirmText?: string;
   cancelText?: string;
-  confirmLoading?: boolean; // ← loading flag
+  confirmLoading?: boolean;
 }
 
 export default function ConfirmDialog({

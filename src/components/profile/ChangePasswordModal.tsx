@@ -11,19 +11,7 @@ import {
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { buttonStyle } from '../../styles/CommonStyles';
-
-const modalStyle = {
-  position: 'absolute' as const,
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  bgcolor: 'background.paper',
-  p: 4,
-  borderRadius: 2,
-  boxShadow: 24,
-  width: { xs: '90%', sm: 400 },
-};
+import { buttonStyle, modalStyle } from '../../styles/CommonStyles';
 
 export interface ChangePasswordModalProps {
   open: boolean;
@@ -32,7 +20,7 @@ export interface ChangePasswordModalProps {
     oldPassword: string;
     newPassword: string;
     newPasswordConfirm: string;
-  }): Promise<unknown>;
+  }): Promise<void>;
 }
 
 export function ChangePasswordModal({ open, onClose, onChangePassword }: ChangePasswordModalProps) {
@@ -91,7 +79,7 @@ export function ChangePasswordModal({ open, onClose, onChangePassword }: ChangeP
       if (err instanceof Error) {
         setErrors({ oldPassword: err.message });
       } else {
-        setErrors({ oldPassword: 'Došlo je do nepoznate greške' });
+        setErrors({ oldPassword: 'Something went wrong' });
       }
     }
   };

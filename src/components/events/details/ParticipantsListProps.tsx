@@ -1,12 +1,15 @@
-import { Box, Typography, Avatar } from '@mui/material';
-import { ParticipantProfileDto } from '../../types/User';
-import { eventDetailstHeaderStyle, eventTitleStyle, panelBox } from '../../styles/CommonStyles';
+import { Box, Typography, Avatar } from '@mui/material'
+import { ParticipantProfileDto } from '../../../types/User'
+import { eventDetailstHeaderStyle, eventTitleStyle, panelBox } from '../../../styles/CommonStyles'
+import { useNavigate } from 'react-router-dom';
 
 interface ParticipantsListProps {
-  participants: ParticipantProfileDto[];
+  participants: ParticipantProfileDto[]
 }
 
 export default function ParticipantsList({ participants }: ParticipantsListProps) {
+  const navigate = useNavigate();
+  
   return (
     <Box sx={{ ...panelBox, p: 0, height: '100%', overflowY: 'auto' }}>
       <Box sx={eventDetailstHeaderStyle}>
@@ -23,14 +26,14 @@ export default function ParticipantsList({ participants }: ParticipantsListProps
           participants.map((participant) => (
             <Box
               key={participant.id}
-              onClick={() => (window.location.href = `/user/${participant.id}`)}
+              onClick={() => navigate(`/user/${participant.id}`)}
               sx={{
                 display: 'grid',
                 gridTemplateColumns: '40px 1fr',
                 alignItems: 'center',
                 columnGap: { xs: 3, sm: 2 },
                 py: 1,
-                pl: { xs: 2, sm: 3 },
+                pl: { xs: 2, sm: 3 }, 
                 pr: 2,
                 borderBottom: '1px solid #ddd',
                 cursor: 'pointer',
@@ -60,5 +63,5 @@ export default function ParticipantsList({ participants }: ParticipantsListProps
         )}
       </Box>
     </Box>
-  );
+  )
 }

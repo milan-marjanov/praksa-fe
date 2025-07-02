@@ -36,6 +36,30 @@ export const buttonStyle: SxProps<Theme> = {
   marginRight: '5px',
 };
 
+export const AddUserModalStyle = {
+  position: 'absolute' as const,
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  bgcolor: 'background.paper',
+  p: 4,
+  borderRadius: 1,
+  boxShadow: 24,
+};
+
+export const userListMobilePaper = {
+  p: 1,
+  display: 'flex',
+  alignItems: 'center',
+};
+
+export const userListMobileInfoBox = {
+  flexGrow: 1,
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-start',
+};
+
 export const eventCardStyle = {
   display: 'flex',
   flexDirection: 'column',
@@ -75,7 +99,10 @@ export const eventTitleStyle = {
   fontWeight: 700,
   fontSize: '1.25rem',
   textAlign: 'center',
+  letterSpacing: '0.05em',
   wordBreak: 'break-word',
+  textTransform: 'capitalize',
+  mx: 1,
 };
 
 export const eventDescriptionStyle = {
@@ -85,6 +112,17 @@ export const eventDescriptionStyle = {
   whiteSpace: 'normal',
   mx: 1,
 };
+
+export const modalStyle: SxProps<Theme> = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  bgcolor: 'background.paper',
+  p: 4,
+  borderRadius: 2,
+  boxShadow: 24,
+}
 
 export const eventContainerStyle = {
   padding: '40px 16px',
@@ -101,18 +139,6 @@ export const eventHeaderStyle = {
   backgroundColor: 'primary.main',
   width: '100%',
   padding: '8px 12px',
-};
-
-export const eventDetailstHeaderStyle = {
-  backgroundColor: 'primary.main',
-  width: '100%',
-  padding: '8px 12px',
-  borderTopLeftRadius: 8,
-  borderTopRightRadius: 8,
-  borderBottomLeftRadius: 0,
-  borderBottomRightRadius: 0,
-  minHeight: '50px',
-  boxSizing: 'border-box',
 };
 
 export const eventTitleCenterStyle = {
@@ -184,6 +210,13 @@ export const headerBox: SxProps<Theme> = {
   mb: 3,
 };
 
+export const headerBox2: SxProps<Theme> = {
+  ...headerBox,
+  flexDirection: { xs: 'column', md: 'row' },
+  gap: 2,
+  width: '100%',
+}
+
 export const headerTitle: SxProps<Theme> = {
   flex: 2,
   textAlign: 'center',
@@ -201,9 +234,94 @@ export const panelBox: SxProps<Theme> = {
   borderRadius: 1,
 };
 
+export const panelBox2: SxProps<Theme> = {
+  p: 0,
+  border: 1,
+  borderColor: 'divider',
+  borderRadius: 1,
+  height: { xs: 200, md: '40vh' },
+  maxHeight: 400,
+  display: 'flex',
+  flexDirection: 'column',
+};
+
 export const mapItemBox: SxProps<Theme> = {
   mb: 2,
 };
+
+export const toggleButtonStyleTime: SxProps<Theme> = {
+  minWidth: 210,
+  maxWidth: 210,
+  justifyContent: 'flex-start',
+  textTransform: 'none',
+  whiteSpace: 'normal',
+  overflowWrap: 'break-word',
+  wordBreak: "break-all",
+  borderRadius: 2,
+  border: '1px solid',
+  borderColor: '#ccc',
+  backgroundColor: '#e0efb1',
+  color: 'inherit',
+  transition: 'all 0.2s ease',
+  '&.Mui-selected': {
+    backgroundColor: 'primary.main',
+    color: '#fff',
+    borderColor: 'primary.main',
+  },
+};
+
+export const toggleButtonStyleRestaurant: SxProps<Theme> = {
+  minWidth: 150,
+  maxWidth: 150,
+  justifyContent: 'flex-start',
+  textTransform: 'none',
+  whiteSpace: 'normal',
+  overflowWrap: 'break-word',
+  wordBreak: "break-all",
+  borderRadius: 2,
+  border: '1px solid',
+  borderColor: '#ccc',
+  backgroundColor: '#e0efb1',
+  color: 'inherit',
+  transition: 'all 0.2s ease',
+  '&.Mui-selected': {
+    backgroundColor: 'primary.main',
+    color: '#fff',
+    borderColor: 'primary.main',
+  },
+};
+
+export const nameContainer = {
+  maxWidth: 170,
+  whiteSpace: 'normal' as const,
+  wordBreak: 'break-word' as const,
+  textAlign: 'center' as const,
+  mr: 5,
+};
+
+export const eventDetailstHeaderStyle = {
+  backgroundColor: 'primary.main',
+  width: '100%',
+  padding: '8px 12px',
+  borderTopLeftRadius: 8,
+  borderTopRightRadius: 8,
+  borderBottomLeftRadius: 0,
+  borderBottomRightRadius: 0,
+  minHeight: '50px',
+  boxSizing: 'border-box',
+};
+
+export const eventDetailstHeaderStyle2 = {
+  ...eventDetailstHeaderStyle,
+  borderBottomLeftRadius: 8,
+  borderBottomRightRadius: 8,
+  width: { xs: '100%', md: '73%' },
+  textAlign: { xs: 'center', md: 'left' },
+  p: 2,
+  wordBreak: 'break-word',
+  whiteSpace: 'normal',
+  mt: 1.5,
+}
 
 export const chatContainer: SxProps<Theme> = {
   display: 'flex',

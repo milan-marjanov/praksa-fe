@@ -12,7 +12,6 @@ import {
   useTheme,
   Box,
   useMediaQuery,
-  colors,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
@@ -23,7 +22,6 @@ import {
   deleteNotification,
 } from '../../services/userService';
 import { NotificationDto } from '../../types/Notification';
-import { lightBlue, lightGreen } from '@mui/material/colors';
 
 export default function Notifications() {
   const theme = useTheme();
