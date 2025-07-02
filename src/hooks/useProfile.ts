@@ -30,4 +30,3 @@ export default function useProfile(userId?: number): Result {
   }, [userId]);
   return { data, loading, error };
 }
-

@@ -1,27 +1,27 @@
 import { useRef, useState } from 'react';
 import { Button, Modal, Box, Typography, Stack, Divider, IconButton } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import EventModal from '../../components/events/EventModal';
+import EventModal from '../../events/create/EventModal';
 import {
   CreateEventDto,
   CreateEventModalProps,
   EventModalRef,
   UpdateEventDTO,
   EventDTO,
-} from '../../types/Event';
-import TimeOptionsModal from '../../components/events/TimeOptionsModal';
-import { createEvent, updateEvent } from '../../services/eventService';
-import { useEventForm } from '../../contexts/EventContext';
+} from '../../../types/Event';
+import TimeOptionsModal from '../../events/create/TimeOptionsModal';
+import { createEvent, updateEvent } from '../../../services/eventService';
+import { useEventForm } from '../../../contexts/EventContext';
 import { toast } from 'react-toastify';
 import CloseIcon from '@mui/icons-material/Close';
-import EventConfirmDialog from '../../components/events/EventConfirmDialog';
-import RestaurantOptionsModal from '../../components/events/RestaurantOptionsModal';
+import EventConfirmDialog from '../../events/create/EventConfirmDialog';
+import RestaurantOptionsModal from '../../events/create/RestaurantOptionsModal';
 import {
   closeButtonStyle,
   modalBoxStyle,
   modalScrollbarStyle,
   slideIndicatorStyle,
-} from '../../styles/EventModalStyles';
+} from '../../../styles/EventModalStyles';
 import EventDataReview from './EventDataReview';
 
 export default function CreateEventModal({

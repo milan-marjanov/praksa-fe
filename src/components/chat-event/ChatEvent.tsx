@@ -1,28 +1,23 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from 'react';
 import { Box, Button, TextField, Typography } from '@mui/material';
-import {
-  chatContainer,
-  inputContainer,
-  input1,
-  sendButton,
-} from '../../styles/CommonStyles';
+import { chatContainer, inputContainer, input1, sendButton } from '../../styles/CommonStyles';
 import SendIcon from '@mui/icons-material/Send';
 import { CreateMessageDto, MessageDto } from '../../types/chat';
-import SockJS from "sockjs-client";
-import { Client } from "@stomp/stompjs";
+import SockJS from 'sockjs-client';
+import { Client } from '@stomp/stompjs';
 import { getChatByEventId } from '../../services/eventService';
-import { JwtDecoded } from "../../types/User";
-import { jwtDecode } from "jwt-decode";
+import { JwtDecoded } from '../../types/User';
+import { jwtDecode } from 'jwt-decode';
 
 interface ChatEventProps {
   eventId: number;
-  title:string;
+  title: string;
 }
 
-const ChatEvent: React.FC<ChatEventProps> = ({ eventId,title }) => {
+const ChatEvent: React.FC<ChatEventProps> = ({ eventId, title }) => {
   const [connected, setConnected] = useState(false);
   const [messages, setMessages] = useState<MessageDto[]>([]);
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState('');
   const stompClientRef = useRef<Client | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
 
@@ -39,18 +34,18 @@ const ChatEvent: React.FC<ChatEventProps> = ({ eventId,title }) => {
         }
       })
       .catch((err) => {
-        console.error("Error loading chat messages:", err);
+        console.error('Error loading chat messages:', err);
       });
   }, [eventId]);
 
   useEffect(() => {
-    const socket = new SockJS("http://localhost:8080/ws-chat");
+    const socket = new SockJS('http://localhost:8080/ws-chat');
     const stompClient = new Client({
       webSocketFactory: () => socket,
       debug: (str) => console.log(str),
       onConnect: () => {
         setConnected(true);
-        stompClient.subscribe("/topic/chat", (message) => {
+        stompClient.subscribe('/topic/chat', (message) => {
           if (message.body) {
             const msg: MessageDto = JSON.parse(message.body);
             setMessages((prev) => [...prev, msg]);
@@ -58,11 +53,11 @@ const ChatEvent: React.FC<ChatEventProps> = ({ eventId,title }) => {
         });
       },
       onStompError: (frame) => {
-        console.error("Broker error: " + frame.headers["message"]);
-        console.error("Details: " + frame.body);
+        console.error('Broker error: ' + frame.headers['message']);
+        console.error('Details: ' + frame.body);
       },
       onWebSocketError: (evt) => {
-        console.error("WebSocket error", evt);
+        console.error('WebSocket error', evt);
       },
       reconnectDelay: 5000,
     });
@@ -87,11 +82,11 @@ const ChatEvent: React.FC<ChatEventProps> = ({ eventId,title }) => {
     };
 
     stompClientRef.current.publish({
-      destination: "/app/chat.sendMessage",
+      destination: '/app/chat.sendMessage',
       body: JSON.stringify(msgObj),
     });
-    console.log("Sent message:", msgObj);
-    setInput("");
+    console.log('Sent message:', msgObj);
+    setInput('');
   };
 
   return (
@@ -100,18 +95,19 @@ const ChatEvent: React.FC<ChatEventProps> = ({ eventId,title }) => {
         {title}
       </Typography>
 
+      <Box
+        sx={{
+          height: 500,
+          overflowY: 'auto',
+          border: '1px solid #ccc',
+          padding: 2,
+          borderRadius: 2,
+          backgroundColor: '#f9f9f9',
 
-      <Box sx={{
-        height: 500,
-        overflowY: 'auto',
-        border: '1px solid #ccc',
-        padding: 2,
-        borderRadius: 2,
-        backgroundColor: '#f9f9f9',
-
-        display: 'flex',
-        flexDirection: 'column',
-      }}>
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
         {messages.length === 0 ? (
           <Typography color="text.secondary">No messages yet.</Typography>
         ) : (
@@ -138,7 +134,6 @@ const ChatEvent: React.FC<ChatEventProps> = ({ eventId,title }) => {
                 {msg.text}
               </Typography>
             </Box>
-
           ))
         )}
       </Box>
@@ -154,18 +149,12 @@ const ChatEvent: React.FC<ChatEventProps> = ({ eventId,title }) => {
           multiline
           minRows={2}
         />
-        <Button
-          onClick={sendMessage}
-          sx={sendButton}
-          variant="contained"
-        >
+        <Button onClick={sendMessage} sx={sendButton} variant="contained">
           <SendIcon />
         </Button>
       </Box>
-
     </Box>
   );
-
 };
 
 export default ChatEvent;

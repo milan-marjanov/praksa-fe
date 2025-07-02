@@ -1,8 +1,8 @@
 import { useState, useMemo } from 'react';
 import { Box, Typography, TextField, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { TimeOption } from '../../types/Event';
-import { validateDateTime, validateStartEndTimes } from '../../utils/DateTimeUtils';
+import { TimeOption } from '../../../types/Event';
+import { validateDateTime, validateStartEndTimes } from '../../../utils/DateTimeUtils';
 
 type TimeOptionFormProps = {
   opt: TimeOption;

@@ -16,7 +16,7 @@ export default function LoginForm() {
   const [error, setError] = useState('');
   const [errors, setErrors] = useState({ email: false, password: false });
 
-  const {setUserId} = useAuth();
+  const { setUserId } = useAuth();
 
   const navigate = useNavigate();
 
@@ -52,7 +52,7 @@ export default function LoginForm() {
       const decoded = jwtDecode<JwtDecoded>(token);
 
       setUserId(decoded.id);
-      console.log("DECODED " + JSON.stringify(decoded));
+      console.log('DECODED ' + JSON.stringify(decoded));
 
       switch (decoded?.role) {
         case 'USER':

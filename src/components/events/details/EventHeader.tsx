@@ -1,42 +1,45 @@
-import { Box, Typography, Button, Tooltip, Dialog, DialogTitle, IconButton, DialogContent } from '@mui/material'
-import { useEventDetailsContext } from '../../../contexts/EventDetailsContext'
-import { useEvents } from '../../../hooks/useEvents'
+import {
+  Box,
+  Typography,
+  Button,
+  Tooltip,
+  Dialog,
+  DialogTitle,
+  IconButton,
+  DialogContent,
+} from '@mui/material';
+import { useEventDetailsContext } from '../../../contexts/EventDetailsContext';
+import { useEvents } from '../../../hooks/useEvents';
 import {
   buttonStyle,
   eventTitleStyle,
   eventDetailstHeaderStyle2,
   headerBox2,
-} from '../../../styles/CommonStyles'
-import { useState } from 'react'
-import ChatEvent from '../../../components/chat-event/ChatEvent'
+} from '../../../styles/CommonStyles';
+import { useState } from 'react';
+import ChatEvent from '../../../components/chat-event/ChatEvent';
 
 export default function EventHeader() {
-  const {
-    event,
-    selectedTime,
-    selectedRestaurant,
-    openCloseVotingConfirm,
-  } = useEventDetailsContext()
-  const { userId } = useEvents()
+  const { event, selectedTime, selectedRestaurant, openCloseVotingConfirm } =
+    useEventDetailsContext();
+  const { userId } = useEvents();
 
-  if (!event) return null
+  if (!event) return null;
 
-  const isVotingClosed = new Date(event.votingDeadline) <= new Date()
-  const needsTimeVote = event.timeOptionType !== 'FIXED'
-  const needsRestVote = event.restaurantOptionType === 'VOTING'
-  const hasVotedTime = !needsTimeVote || selectedTime !== null
-  const hasVotedRestaurant = !needsRestVote || selectedRestaurant !== null
-  const canCloseVoting = !isVotingClosed && hasVotedTime && hasVotedRestaurant
-  const hasAnyVoting = needsTimeVote || needsRestVote
+  const isVotingClosed = new Date(event.votingDeadline) <= new Date();
+  const needsTimeVote = event.timeOptionType !== 'FIXED';
+  const needsRestVote = event.restaurantOptionType === 'VOTING';
+  const hasVotedTime = !needsTimeVote || selectedTime !== null;
+  const hasVotedRestaurant = !needsRestVote || selectedRestaurant !== null;
+  const canCloseVoting = !isVotingClosed && hasVotedTime && hasVotedRestaurant;
+  const hasAnyVoting = needsTimeVote || needsRestVote;
 
-  const [showChat, setShowChat] = useState(false)
+  const [showChat, setShowChat] = useState(false);
 
   return (
     <Box sx={headerBox2}>
       <Box sx={eventDetailstHeaderStyle2}>
-        <Typography sx={{ ...eventTitleStyle, fontSize: '1.75rem' }}>
-          {event.title}
-        </Typography>
+        <Typography sx={{ ...eventTitleStyle, fontSize: '1.75rem' }}>{event.title}</Typography>
       </Box>
 
       {event.creatorId === userId && (
@@ -52,11 +55,7 @@ export default function EventHeader() {
         >
           {hasAnyVoting && (
             <Tooltip
-              title={
-                (!hasVotedTime || !hasVotedRestaurant)
-                  ? 'Cast your vote before closing.'
-                  : ''
-              }
+              title={!hasVotedTime || !hasVotedRestaurant ? 'Cast your vote before closing.' : ''}
             >
               <span>
                 <Button
@@ -82,12 +81,7 @@ export default function EventHeader() {
             Chat
           </Button>
 
-          <Dialog
-            open={showChat}
-            onClose={() => setShowChat(false)}
-            fullWidth
-            maxWidth="sm"
-          >
+          <Dialog open={showChat} onClose={() => setShowChat(false)} fullWidth maxWidth="sm">
             <DialogTitle sx={{ m: 0, p: 2 }}>
               <IconButton
                 aria-label="close"
@@ -96,7 +90,7 @@ export default function EventHeader() {
                   position: 'absolute',
                   right: 8,
                   top: 8,
-                  color: theme => theme.palette.grey[500],
+                  color: (theme) => theme.palette.grey[500],
                 }}
               >
                 ×
@@ -110,5 +104,5 @@ export default function EventHeader() {
         </Box>
       )}
     </Box>
-  )
+  );
 }

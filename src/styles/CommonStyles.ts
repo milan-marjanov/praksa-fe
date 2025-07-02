@@ -80,8 +80,8 @@ export const cardForPublicProfile = {
   p: { xs: 2, sm: 4 },
   bgcolor: 'background.paper',
   borderRadius: 2,
-  boxShadow: 3
-}
+  boxShadow: 3,
+};
 
 export const boxContainerStyle = {
   display: 'grid',
@@ -132,7 +132,7 @@ export const modalStyle: SxProps<Theme> = {
   p: 4,
   borderRadius: 2,
   boxShadow: 24,
-}
+};
 
 export const eventContainerStyle = {
   padding: '40px 16px',
@@ -225,7 +225,7 @@ export const headerBox2: SxProps<Theme> = {
   flexDirection: { xs: 'column', md: 'row' },
   gap: 2,
   width: '100%',
-}
+};
 
 export const headerTitle: SxProps<Theme> = {
   flex: 2,
@@ -266,7 +266,7 @@ export const toggleButtonStyleTime: SxProps<Theme> = {
   textTransform: 'none',
   whiteSpace: 'normal',
   overflowWrap: 'break-word',
-  wordBreak: "break-all",
+  wordBreak: 'break-all',
   borderRadius: 2,
   border: '1px solid',
   borderColor: '#ccc',
@@ -287,7 +287,7 @@ export const toggleButtonStyleRestaurant: SxProps<Theme> = {
   textTransform: 'none',
   whiteSpace: 'normal',
   overflowWrap: 'break-word',
-  wordBreak: "break-all",
+  wordBreak: 'break-all',
   borderRadius: 2,
   border: '1px solid',
   borderColor: '#ccc',
@@ -331,12 +331,12 @@ export const eventDetailstHeaderStyle2 = {
   wordBreak: 'break-word',
   whiteSpace: 'normal',
   mt: 1.5,
-}
+};
 
 export const chatContainer: SxProps<Theme> = {
   display: 'flex',
   flexDirection: 'column',
-  gap: 2, 
+  gap: 2,
   width: '100%',
   maxWidth: 400,
   margin: '0 auto',
@@ -352,44 +352,44 @@ export const messagesContainer: SxProps<Theme> = {
 
   display: 'flex',
   flexDirection: 'column',
-  gap: 0.5, 
+  gap: 0.5,
 };
 
 export const messageBubble: SxProps<Theme> = {
   backgroundColor: '#d1e7dd',
   padding: '8px 12px',
   borderRadius: 2,
-  marginBottom: 2, 
+  marginBottom: 2,
   alignSelf: 'flex-start',
   maxWidth: '80%',
 };
 
 export const inputContainer: SxProps<Theme> = {
   display: 'flex',
-  gap: 1, 
-  padding:2
+  gap: 1,
+  padding: 2,
 };
 
 export const input1: SxProps<Theme> = {
   flex: 1,
   padding: 1,
-  borderRadius: 1.5, 
+  borderRadius: 1.5,
   border: '1px solid #ccc',
 };
 
 export const sendButton: SxProps<Theme> = {
- mt: 2.5,
-  padding: '6px',         
-  borderRadius: '50%',     
+  mt: 2.5,
+  padding: '6px',
+  borderRadius: '50%',
   backgroundColor: '#007bff',
   color: 'white',
   border: 'none',
-  width: '40px',          
-  height: '40px',          
-  minWidth: '40px',        
-  minHeight: '40px',      
+  width: '40px',
+  height: '40px',
+  minWidth: '40px',
+  minHeight: '40px',
   cursor: 'pointer',
-  display: 'flex',         
+  display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   '&:hover': {

@@ -2,12 +2,12 @@ import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { Box, Button, FormControlLabel, Radio, Typography, useMediaQuery } from '@mui/material';
 import TimeOptionFieldsForm from './TimeOptionFieldsForm';
 import { Add } from '@mui/icons-material';
-import { useEventForm } from '../../contexts/EventContext';
-import { EventModalRef } from '../../types/Event';
-import { timeOptionsForm, timeOptionsTitleStyle } from '../../styles/EventModalStyles';
-import { generateId, isValidFutureDate, validateStartEndTimes } from '../../utils/DateTimeUtils';
-import { initialTimeOption } from '../../utils/EventDefaults';
-import theme from '../../theme';
+import { useEventForm } from '../../../contexts/EventContext';
+import { EventModalRef } from '../../../types/Event';
+import { timeOptionsForm, timeOptionsTitleStyle } from '../../../styles/EventModalStyles';
+import { generateId, isValidFutureDate, validateStartEndTimes } from '../../../utils/DateTimeUtils';
+import { initialTimeOption } from '../../../utils/EventDefaults';
+import theme from '../../../theme';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 const TimeOptionsModal = forwardRef<EventModalRef, {}>((_props, ref) => {

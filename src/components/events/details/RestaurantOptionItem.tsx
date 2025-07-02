@@ -1,18 +1,22 @@
-import { Box, Typography, Avatar, IconButton, ToggleButton } from '@mui/material'
-import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu'
-import LanguageIcon from '@mui/icons-material/Language'
-import { RestaurantOptionDto, RestaurantOptionType } from '../../../types/Event'
-import { ParticipantProfileDto } from '../../../types/User'
-import { toggleButtonStyleRestaurant, nameContainer, mapItemBox } from '../../../styles/CommonStyles'
+import { Box, Typography, Avatar, IconButton, ToggleButton } from '@mui/material';
+import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu';
+import LanguageIcon from '@mui/icons-material/Language';
+import { RestaurantOptionDto, RestaurantOptionType } from '../../../types/Event';
+import { ParticipantProfileDto } from '../../../types/User';
+import {
+  toggleButtonStyleRestaurant,
+  nameContainer,
+  mapItemBox,
+} from '../../../styles/CommonStyles';
 
 interface Props {
-  option: RestaurantOptionDto
-  optionType: RestaurantOptionType
-  selectedId: number | null
-  isClosed: boolean
-  onSelect: (opt: RestaurantOptionDto) => void
-  onViewVotes: (title: string, users: ParticipantProfileDto[]) => void
-  showVotes?: boolean
+  option: RestaurantOptionDto;
+  optionType: RestaurantOptionType;
+  selectedId: number | null;
+  isClosed: boolean;
+  onSelect: (opt: RestaurantOptionDto) => void;
+  onViewVotes: (title: string, users: ParticipantProfileDto[]) => void;
+  showVotes?: boolean;
 }
 
 export default function RestaurantOptionItem({
@@ -23,12 +27,12 @@ export default function RestaurantOptionItem({
   onViewVotes,
   showVotes = true,
 }: Props) {
-  const { id, name, votesCount, votedUsers, menuImageUrl, restaurantUrl } = option
+  const { id, name, votesCount, votedUsers, menuImageUrl, restaurantUrl } = option;
 
-  const isSelected = !isClosed && selectedId === id
-  const displayVoters = votedUsers.slice(0, 2)
-  const remainingCount = votedUsers.length - displayVoters.length
-  const title = `Votes for ${name}`
+  const isSelected = !isClosed && selectedId === id;
+  const displayVoters = votedUsers.slice(0, 2);
+  const remainingCount = votedUsers.length - displayVoters.length;
+  const title = `Votes for ${name}`;
 
   return (
     <Box sx={{ ...mapItemBox, display: 'flex', alignItems: 'center', py: 1 }}>
@@ -84,7 +88,7 @@ export default function RestaurantOptionItem({
                 sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', gap: 0.5 }}
                 onClick={() => onViewVotes(title, votedUsers)}
               >
-                {displayVoters.map(u => (
+                {displayVoters.map((u) => (
                   <Avatar
                     key={u.id}
                     src={u.profilePictureUrl ?? undefined}
@@ -99,5 +103,5 @@ export default function RestaurantOptionItem({
         )}
       </Box>
     </Box>
-  )
+  );
 }

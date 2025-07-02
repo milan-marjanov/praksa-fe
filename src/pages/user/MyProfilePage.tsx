@@ -1,13 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Container, Box, Avatar, Typography, Button, IconButton, CircularProgress } from '@mui/material';
+import {
+  Container,
+  Box,
+  Avatar,
+  Typography,
+  Button,
+  IconButton,
+  CircularProgress,
+} from '@mui/material';
 import useProfile from '../../hooks/useProfile';
-import type { MyProfileDTO, PasswordChangeRequestDTO, UpdateProfileRequestDTO } from '../../types/User';
+import type {
+  MyProfileDTO,
+  PasswordChangeRequestDTO,
+  UpdateProfileRequestDTO,
+} from '../../types/User';
 import { UpdateProfileModal } from '../../components/profile/UpdateProfileModal';
 import { ChangePasswordModal } from '../../components/profile/ChangePasswordModal';
 import { ChangePfpModal } from '../../components/profile/ChangePfpModal';
 import { buttonStyle } from '../../styles/CommonStyles';
-import { uploadProfilePicture, getProfileImage, updateProfile, changePassword, removeProfilePicture } from '../../services/userService';
+import {
+  uploadProfilePicture,
+  getProfileImage,
+  updateProfile,
+  changePassword,
+  removeProfilePicture,
+} from '../../services/userService';
 import { toast } from 'react-toastify';
 
 const defaultAvatar = 'https://example.com/default-profile.png';
@@ -41,7 +59,7 @@ const MyProfilePage: React.FC = () => {
   useEffect(() => {
     if (data) {
       const { firstName, lastName, email } = data as MyProfileDTO;
-      setProfile(p => ({ ...p, firstName, lastName, email }));
+      setProfile((p) => ({ ...p, firstName, lastName, email }));
     }
   }, [data]);
 
@@ -50,7 +68,7 @@ const MyProfilePage: React.FC = () => {
     let active = true;
 
     if (userId === null) {
-      setProfile(p => ({ ...p, profilePictureUrl: defaultAvatar }));
+      setProfile((p) => ({ ...p, profilePictureUrl: defaultAvatar }));
       return;
     }
 
@@ -58,18 +76,20 @@ const MyProfilePage: React.FC = () => {
       try {
         const imageUrl = await getProfileImage(userId);
         if (active) {
-          setProfile(p => ({ ...p, profilePictureUrl: imageUrl || defaultAvatar }));
-        } else{
-          setProfile(p => ({ ...p, profilePictureUrl: defaultAvatar }));
+          setProfile((p) => ({ ...p, profilePictureUrl: imageUrl || defaultAvatar }));
+        } else {
+          setProfile((p) => ({ ...p, profilePictureUrl: defaultAvatar }));
         }
       } catch {
         if (active) {
-          setProfile(p => ({ ...p, profilePictureUrl: defaultAvatar }));
+          setProfile((p) => ({ ...p, profilePictureUrl: defaultAvatar }));
         }
       }
     })();
 
-    return () => { active = false; };
+    return () => {
+      active = false;
+    };
   }, [data, userId]);
 
   if (loading) {
@@ -93,9 +113,7 @@ const MyProfilePage: React.FC = () => {
     );
   }
 
-  const handleUpdate = async (
-    form: UpdateProfileRequestDTO & { profilePicture?: File }
-  ) => {
+  const handleUpdate = async (form: UpdateProfileRequestDTO & { profilePicture?: File }) => {
     const oldEmail = profile.email;
     try {
       const updated: MyProfileDTO = await updateProfile({
@@ -103,7 +121,7 @@ const MyProfilePage: React.FC = () => {
         lastName: form.lastName,
         email: form.email,
       });
-      setProfile(p => ({
+      setProfile((p) => ({
         ...p,
         firstName: updated.firstName,
         lastName: updated.lastName,
@@ -113,7 +131,7 @@ const MyProfilePage: React.FC = () => {
       if (form.profilePicture && userId !== null) {
         await uploadProfilePicture({ profilePicture: form.profilePicture });
         const newUrl = await getProfileImage(userId);
-        setProfile(p => ({ ...p, profilePictureUrl: newUrl || p.profilePictureUrl }));
+        setProfile((p) => ({ ...p, profilePictureUrl: newUrl || p.profilePictureUrl }));
       }
 
       if (updated.email !== oldEmail) {
@@ -145,7 +163,7 @@ const MyProfilePage: React.FC = () => {
     try {
       await uploadProfilePicture({ profilePicture: file });
       const newUrl = await getProfileImage(userId);
-      setProfile(p => ({ ...p, profilePictureUrl: newUrl || p.profilePictureUrl }));
+      setProfile((p) => ({ ...p, profilePictureUrl: newUrl || p.profilePictureUrl }));
     } catch (err) {
       console.error('Error uploading picture', err);
       toast.error('Failed to upload picture');
@@ -181,18 +199,10 @@ const MyProfilePage: React.FC = () => {
       </Box>
 
       <Box display="flex" justifyContent="center" gap={2} mt={4}>
-        <Button
-          variant="contained"
-          sx={buttonStyle}
-          onClick={() => setOpenModal('update')}
-        >
+        <Button variant="contained" sx={buttonStyle} onClick={() => setOpenModal('update')}>
           Update Profile
         </Button>
-        <Button
-          variant="contained"
-          sx={buttonStyle}
-          onClick={() => setOpenModal('pwd')}
-        >
+        <Button variant="contained" sx={buttonStyle} onClick={() => setOpenModal('pwd')}>
           Change Password
         </Button>
       </Box>
@@ -222,7 +232,7 @@ const MyProfilePage: React.FC = () => {
         onUpload={handleUploadPfp}
         onRemove={async () => {
           await removeProfilePicture();
-          setProfile(p => ({ ...p, profilePictureUrl: null }));
+          setProfile((p) => ({ ...p, profilePictureUrl: null }));
         }}
       />
     </Container>

@@ -1,16 +1,16 @@
-import { Box, Typography, Avatar } from '@mui/material'
-import ToggleButton from '@mui/material/ToggleButton'
-import { TimeOptionDto, TimeOptionType } from '../../../types/Event'
-import { ParticipantProfileDto } from '../../../types/User'
-import { toggleButtonStyleTime, mapItemBox } from '../../../styles/CommonStyles'
+import { Box, Typography, Avatar } from '@mui/material';
+import ToggleButton from '@mui/material/ToggleButton';
+import { TimeOptionDto, TimeOptionType } from '../../../types/Event';
+import { ParticipantProfileDto } from '../../../types/User';
+import { toggleButtonStyleTime, mapItemBox } from '../../../styles/CommonStyles';
 
 interface Props {
-  option: TimeOptionDto
-  optionType: TimeOptionType
-  selectedId: number | null
-  isClosed: boolean
-  onSelect: (opt: TimeOptionDto) => void
-  onViewVotes: (title: string, users: ParticipantProfileDto[]) => void
+  option: TimeOptionDto;
+  optionType: TimeOptionType;
+  selectedId: number | null;
+  isClosed: boolean;
+  onSelect: (opt: TimeOptionDto) => void;
+  onViewVotes: (title: string, users: ParticipantProfileDto[]) => void;
 }
 
 export default function TimeOptionItem({
@@ -21,21 +21,20 @@ export default function TimeOptionItem({
   onSelect,
   onViewVotes,
 }: Props) {
-  const { id, startTime, reservedCount, maxCapacity, votesCount, votedUsers } = option
+  const { id, startTime, reservedCount, maxCapacity, votesCount, votedUsers } = option;
 
-  const isSelected = !isClosed && selectedId === id
-  const capacityFull = optionType === 'CAPACITY_BASED' && reservedCount >= (maxCapacity ?? Infinity)
-  const disabled = isClosed || (capacityFull && !isSelected)
-  const showAsText = optionType === 'FIXED' || disabled
-  const dateLabel = new Date(startTime).toLocaleString()
+  const isSelected = !isClosed && selectedId === id;
+  const capacityFull =
+    optionType === 'CAPACITY_BASED' && reservedCount >= (maxCapacity ?? Infinity);
+  const disabled = isClosed || (capacityFull && !isSelected);
+  const showAsText = optionType === 'FIXED' || disabled;
+  const dateLabel = new Date(startTime).toLocaleString();
   const title =
-    optionType === 'CAPACITY_BASED'
-      ? `Reservations for ${dateLabel}`
-      : `Votes for ${dateLabel}`
+    optionType === 'CAPACITY_BASED' ? `Reservations for ${dateLabel}` : `Votes for ${dateLabel}`;
 
-  const displayVoters = votedUsers.slice(0, 2)
-  const remainingCount = votedUsers.length - displayVoters.length
-  const showVotes = !(optionType === 'FIXED' && votedUsers.length === 0)
+  const displayVoters = votedUsers.slice(0, 2);
+  const remainingCount = votedUsers.length - displayVoters.length;
+  const showVotes = !(optionType === 'FIXED' && votedUsers.length === 0);
 
   return (
     <Box
@@ -78,7 +77,7 @@ export default function TimeOptionItem({
             sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', ml: 1 }}
             onClick={() => onViewVotes(title, votedUsers)}
           >
-            {displayVoters.map(u => (
+            {displayVoters.map((u) => (
               <Avatar
                 key={u.id}
                 src={u.profilePictureUrl ?? undefined}
@@ -95,5 +94,5 @@ export default function TimeOptionItem({
         )}
       </Box>
     </Box>
-  )
+  );
 }

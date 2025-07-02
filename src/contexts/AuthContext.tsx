@@ -9,7 +9,12 @@ interface AuthContextType {
   setUserId: Function;
 }
 
-const AuthContext = createContext<AuthContextType>({ user: null, loading: true , userId: null, setUserId: () => {}});
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  loading: true,
+  userId: null,
+  setUserId: () => {},
+});
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<MyProfileDTO | null>(null);
@@ -30,7 +35,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     })();
   }, []);
-  return <AuthContext.Provider value={{ user, loading , userId , setUserId}}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user, loading, userId, setUserId }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 export const useAuth = () => useContext(AuthContext);

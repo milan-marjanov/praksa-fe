@@ -1,6 +1,6 @@
 import React from 'react';
 import TextField from '@mui/material/TextField';
-import { RestaurantOption } from '../../types/Event';
+import { RestaurantOption } from '../../../types/Event';
 
 interface Props {
   index: number;

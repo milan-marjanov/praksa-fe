@@ -20,7 +20,6 @@ import { createNotificationClient } from './notificationSocket';
 import { jwtDecode } from 'jwt-decode';
 import { JwtDecoded } from './types/User';
 
-
 export default function App() {
   const { setNotifications, setUnreadCount } = useNotificationContext();
   const [id, setUserId] = useState<number | null>(null);

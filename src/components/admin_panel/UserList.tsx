@@ -46,12 +46,18 @@ export default function UserList({ users, onDelete }: UserListProps) {
           {users.map((user) => (
             <ListItem key={user.id} disablePadding>
               <ListItemButton onClick={() => navigate(`/user/${user.id}`)}>
-                <ListItemText primary={`${user.firstName} ${user.lastName}`} secondary={user.email} />
+                <ListItemText
+                  primary={`${user.firstName} ${user.lastName}`}
+                  secondary={user.email}
+                />
               </ListItemButton>
               <Button
                 sx={{ ...buttonStyle, py: 0.5, px: 2, minWidth: 'auto' }}
                 size="small"
-                onClick={(e) => { e.stopPropagation(); onDelete(user.id); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(user.id);
+                }}
               >
                 <DeleteIcon />
               </Button>

@@ -44,10 +44,7 @@ const ProfilePage: React.FC = () => {
   }
 
   return (
-    <Container
-      maxWidth="sm"
-      sx={cardForPublicProfile}
-    >
+    <Container maxWidth="sm" sx={cardForPublicProfile}>
       <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
         <Avatar
           src={avatarSrc}

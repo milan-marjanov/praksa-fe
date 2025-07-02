@@ -58,12 +58,11 @@ export default function Navbar() {
     const fetchNotifications = async () => {
       const data = await getUserNotifications();
       setNotifications(data);
-      const unread = data.filter(n => !n.isRead).length;
+      const unread = data.filter((n) => !n.isRead).length;
       setUnreadCount(unread);
     };
 
     fetchNotifications();
-
   }, []);
 
   const handleNavClick = (to: string) => {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
-import { buttonStyle } from '../../styles/CommonStyles';
+import { buttonStyle } from '../../../styles/CommonStyles';
 
 interface ConfirmOptionProps {
   open: boolean;

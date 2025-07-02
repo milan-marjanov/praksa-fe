@@ -1,34 +1,29 @@
-import { Box, Typography } from '@mui/material'
-import { useEventDetailsContext } from '../../../contexts/EventDetailsContext'
-import RestaurantOptionItem from './RestaurantOptionItem'
+import { Box, Typography } from '@mui/material';
+import { useEventDetailsContext } from '../../../contexts/EventDetailsContext';
+import RestaurantOptionItem from './RestaurantOptionItem';
 import {
   panelBox,
   mapItemBox,
   eventDetailstHeaderStyle,
   eventTitleStyle,
-} from '../../../styles/CommonStyles'
-import { ParticipantProfileDto } from '../../../types/User'
-import { RestaurantOptionDto } from '../../../types/Event'
+} from '../../../styles/CommonStyles';
+import { ParticipantProfileDto } from '../../../types/User';
+import { RestaurantOptionDto } from '../../../types/Event';
 
 export default function RestaurantVotingPanel() {
-  const {
-    event,
-    selectedRestaurant,
-    voteRestaurant,
-    openConfirm,
-    openVoteList,
-  } = useEventDetailsContext()
+  const { event, selectedRestaurant, voteRestaurant, openConfirm, openVoteList } =
+    useEventDetailsContext();
 
-  if (!event) return null
+  if (!event) return null;
 
   const isRestFixed =
-    event.restaurantOptionType === 'FIXED' && event.restaurantOptions.length === 1
-  const isVotingClosed = new Date(event.votingDeadline) <= new Date()
+    event.restaurantOptionType === 'FIXED' && event.restaurantOptions.length === 1;
+  const isVotingClosed = new Date(event.votingDeadline) <= new Date();
 
   const topRestaurantOption = event.restaurantOptions.reduce<RestaurantOptionDto>(
     (a, b) => (b.votesCount > a.votesCount ? b : a),
-    event.restaurantOptions[0]
-  )
+    event.restaurantOptions[0],
+  );
 
   const handleRestaurantSelect = (opt: RestaurantOptionDto) =>
     openConfirm(
@@ -36,11 +31,10 @@ export default function RestaurantVotingPanel() {
       `Are you sure you want to ${
         selectedRestaurant === opt.id ? 'cancel your vote for' : 'vote for'
       } "${opt.name}"?`,
-      () => voteRestaurant(opt)
-    )
+      () => voteRestaurant(opt),
+    );
 
-  const showVotes = (title: string, users: ParticipantProfileDto[]) =>
-    openVoteList(title, users)
+  const showVotes = (title: string, users: ParticipantProfileDto[]) => openVoteList(title, users);
 
   return (
     <Box
@@ -78,7 +72,7 @@ export default function RestaurantVotingPanel() {
             onViewVotes={showVotes}
           />
         ) : (
-          event.restaurantOptions.map(opt => (
+          event.restaurantOptions.map((opt) => (
             <Box key={opt.id} sx={mapItemBox}>
               <RestaurantOptionItem
                 option={opt}
@@ -93,5 +87,5 @@ export default function RestaurantVotingPanel() {
         )}
       </Box>
     </Box>
-  )
+  );
 }

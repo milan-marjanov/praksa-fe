@@ -14,10 +14,10 @@ import {
   TableBody,
   Table,
 } from '@mui/material';
-import { useEventForm } from '../../contexts/EventContext';
-import { formatDateTime, isValidFutureDate } from '../../utils/DateTimeUtils';
+import { useEventForm } from '../../../contexts/EventContext';
+import { formatDateTime, isValidFutureDate } from '../../../utils/DateTimeUtils';
 import DateTimeForm from './DateTimeForm';
-import { labelAbove, tableCellStyle } from '../../styles/EventModalStyles';
+import { labelAbove, tableCellStyle } from '../../../styles/EventModalStyles';
 
 interface EventDataReviewProps {
   onValidationChange?: (hasError: boolean) => void;
@@ -94,8 +94,8 @@ const EventDataReview = (props: EventDataReviewProps) => {
                     <TableCell sx={tableCellStyle}>{formatDateTime(option.endTime)}</TableCell>
                     <TableCell sx={tableCellStyle}>
                       {eventData.timeOptionType !== 'CAPACITY_BASED'
-                          ? 'N/A'
-                          : option.maxCapacity || 'N/A'}
+                        ? 'N/A'
+                        : option.maxCapacity || 'N/A'}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -128,7 +128,6 @@ const EventDataReview = (props: EventDataReviewProps) => {
                     <TableCell sx={tableCellStyle}>{restaurant.name}</TableCell>
                     <TableCell sx={tableCellStyle}>{restaurant.menuImageUrl || 'N/A'}</TableCell>
                     <TableCell sx={tableCellStyle}>{restaurant.restaurantUrl || 'N/A'}</TableCell>
->>>>>>> development
                   </TableRow>
                 ))}
               </TableBody>

@@ -13,10 +13,10 @@ import {
   Box,
 } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material/Select';
-import { EventModalProps, EventModalRef, ParticipantDto } from '../../types/Event';
-import { useEventForm } from '../../contexts/EventContext';
-import { eventDescriptionStyle, eventModalContainerStyle } from '../../styles/EventModalStyles';
-import { maxDescriptionChars } from '../../utils/EventDefaults';
+import { EventModalProps, EventModalRef, ParticipantDto } from '../../../types/Event';
+import { useEventForm } from '../../../contexts/EventContext';
+import { eventDescriptionStyle, eventModalContainerStyle } from '../../../styles/EventModalStyles';
+import { maxDescriptionChars } from '../../../utils/EventDefaults';
 
 const EventModal = forwardRef<EventModalRef, EventModalProps>(({ users, creator }, ref) => {
   const { eventData, setEventData } = useEventForm();

@@ -43,9 +43,7 @@ export default function AddUserModal({ open, onClose, onAdd }: AddUserModalProps
     },
   ];
 
-  const handleChange = (name: keyof typeof values) => (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleChange = (name: keyof typeof values) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setValues((prev) => ({ ...prev, [name]: val }));
     setSubmitError(null);

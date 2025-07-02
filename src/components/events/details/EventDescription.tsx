@@ -1,14 +1,10 @@
-import { Box, Typography } from '@mui/material'
-import {
-  panelBox2,
-  eventDetailstHeaderStyle,
-  eventTitleStyle,
-} from '../../../styles/CommonStyles'
-import { useEventDetailsContext } from '../../../contexts/EventDetailsContext'
+import { Box, Typography } from '@mui/material';
+import { panelBox2, eventDetailstHeaderStyle, eventTitleStyle } from '../../../styles/CommonStyles';
+import { useEventDetailsContext } from '../../../contexts/EventDetailsContext';
 
 export default function EventDescription() {
-  const { event } = useEventDetailsContext()
-  if (!event) return null
+  const { event } = useEventDetailsContext();
+  if (!event) return null;
 
   return (
     <Box sx={panelBox2}>
@@ -31,5 +27,5 @@ export default function EventDescription() {
         </Typography>
       </Box>
     </Box>
-  )
+  );
 }

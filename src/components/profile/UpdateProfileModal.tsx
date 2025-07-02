@@ -21,7 +21,12 @@ export interface UpdateProfileModalProps {
   };
 }
 
-export function UpdateProfileModal({ open, onClose, onUpdate, initialValues }: UpdateProfileModalProps) {
+export function UpdateProfileModal({
+  open,
+  onClose,
+  onUpdate,
+  initialValues,
+}: UpdateProfileModalProps) {
   const [form, setForm] = useState({
     firstName: '',
     lastName: '',
@@ -44,9 +49,8 @@ export function UpdateProfileModal({ open, onClose, onUpdate, initialValues }: U
     }
   }, [open, initialValues]);
 
-  const handleChange = (key: keyof typeof form) =>
-    (e: React.ChangeEvent<HTMLInputElement>) =>
-      setForm(f => ({ ...f, [key]: e.target.value }));
+  const handleChange = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
+    setForm((f) => ({ ...f, [key]: e.target.value }));
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0] ?? null;
@@ -69,10 +73,13 @@ export function UpdateProfileModal({ open, onClose, onUpdate, initialValues }: U
       });
       onClose();
     } catch (err: unknown) {
-      setStatus({ loading: false, error: err instanceof Error ? err.message : 'Error updating profile' });
+      setStatus({
+        loading: false,
+        error: err instanceof Error ? err.message : 'Error updating profile',
+      });
       return;
     }
-    setStatus(s => ({ ...s, loading: false }));
+    setStatus((s) => ({ ...s, loading: false }));
   };
 
   const isDirty =
@@ -126,11 +133,7 @@ export function UpdateProfileModal({ open, onClose, onUpdate, initialValues }: U
         )}
 
         <Box display="flex" justifyContent="flex-end">
-          <Button
-            sx={{ ...buttonStyle, mr: 1 }}
-            onClick={onClose}
-            disabled={status.loading}
-          >
+          <Button sx={{ ...buttonStyle, mr: 1 }} onClick={onClose} disabled={status.loading}>
             Cancel
           </Button>
           <LoadingButton

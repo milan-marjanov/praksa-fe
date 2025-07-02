@@ -2,8 +2,8 @@ import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { Box, IconButton, Button, Typography, FormControlLabel, Radio } from '@mui/material';
 import { Add, Delete } from '@mui/icons-material';
 import RestaurantFieldsForm from './RestaurantFieldsForm';
-import { EventModalRef, RestaurantOption } from '../../types/Event';
-import { useEventForm } from '../../contexts/EventContext';
+import { EventModalRef, RestaurantOption } from '../../../types/Event';
+import { useEventForm } from '../../../contexts/EventContext';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 const RestaurantOptionsModal = forwardRef<EventModalRef, {}>((_props, ref) => {

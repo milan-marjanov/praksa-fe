@@ -1,7 +1,12 @@
 import api from '../axios/axiosClient';
 import { ChatDto } from '../types/chat';
-import { CreateEventDto, UserEventsResponseDTO, UpdateEventDTO, EventDetailsDto, EventDTO } from '../types/Event';
-
+import {
+  CreateEventDto,
+  UserEventsResponseDTO,
+  UpdateEventDTO,
+  EventDetailsDto,
+  EventDTO,
+} from '../types/Event';
 
 export const fetchUserEvents = async (userId: number): Promise<UserEventsResponseDTO> => {
   const response = await api.get<UserEventsResponseDTO>(`/api/events/fetchUserEvents/${userId}`);
@@ -29,5 +34,5 @@ export const getEventDetails = async (eventId: number) => {
 
 export const getChatByEventId = async (eventId: number) => {
   const response = await api.get<ChatDto>(`/api/chats/event/${eventId}`);
-  return response.data; 
+  return response.data;
 };

@@ -11,16 +11,18 @@ import {
   Paper,
   useTheme,
   Box,
-  useMediaQuery
+  useMediaQuery,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
 import { useEffect, useState } from 'react';
-import { getUserNotifications, markNotificationAsRead, deleteNotification } from '../../services/userService';
+import {
+  getUserNotifications,
+  markNotificationAsRead,
+  deleteNotification,
+} from '../../services/userService';
 import { useNotificationContext } from '../../contexts/NotificationContext';
 import { useNavigate } from 'react-router-dom';
-import { NotificationDto } from '../../types/Notification';
-
 
 export default function Notifications() {
   const theme = useTheme();
@@ -54,7 +56,7 @@ export default function Notifications() {
       setNotifications((prev) =>
         prev.map((notif) => (notif.id === id ? { ...notif, isRead: true } : notif)),
       );
-      setUnreadCount(prev => Math.max(0, prev - 1));
+      setUnreadCount((prev) => Math.max(0, prev - 1));
     } catch (error) {
       console.error('Failed to mark as read', error);
     }
@@ -87,24 +89,14 @@ export default function Notifications() {
           </TableHead>
           <TableBody>
             {notifications.map((notif) => (
-              <TableRow sx={{
-                bgcolor: notif.isRead ? '#ffffff' : '#f0f0f0', cursor: 'pointer', '&:hover': { backgroundColor: '#e0e0e0' }
-              }}
+              <TableRow
+                sx={{
+                  bgcolor: notif.isRead ? '#ffffff' : '#f0f0f0',
+                  cursor: 'pointer',
+                  '&:hover': { backgroundColor: '#e0e0e0' },
+                }}
                 key={notif.eventId + notif.createdAt}
                 onClick={() => navigate(`/eventDetails/${notif.eventId}`)}
-              >
-                <TableCell sx={{ fontSize: isMobile ? '0.7rem' : '1rem', fontWeight: notif.isRead ? 'normal' : 'bold' }}>{notif.title}</TableCell>
-                <TableCell sx={{ fontSize: isMobile ? '0.7rem' : '1rem', fontWeight: notif.isRead ? 'normal' : 'bold' }}>{notif.text}</TableCell>
-                <TableCell sx={{ fontSize: isMobile ? '0.7rem' : '1rem', fontWeight: notif.isRead ? 'normal' : 'bold' }}>
-                  {new Date(notif.createdAt).toLocaleString()}
-                </TableCell>
-                <TableCell sx={{ fontSize: isMobile ? '0.7rem' : '1rem', verticalAlign: 'middle', py: isMobile ? 0.5 : 1 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
-                    onClick={(e) => e.stopPropagation()}
-                  >
-              <TableRow
-                sx={{ bgcolor: notif.isRead ? '#ffffff' : '#f0f0f0' }}
-                key={notif.eventId + notif.createdAt}
               >
                 <TableCell
                   sx={{
@@ -137,7 +129,10 @@ export default function Notifications() {
                     py: isMobile ? 0.5 : 1,
                   }}
                 >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Box
+                    sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <Chip
                       label={notif.isRead ? 'Read' : 'Unread'}
                       color={notif.isRead ? 'default' : 'success'}

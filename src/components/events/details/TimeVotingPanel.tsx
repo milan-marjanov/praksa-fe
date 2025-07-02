@@ -1,34 +1,27 @@
-import { Box, Typography } from '@mui/material'
-import { useEventDetailsContext } from '../../../contexts/EventDetailsContext'
-import TimeOptionItem from './TimeOptionItem'
+import { Box, Typography } from '@mui/material';
+import { useEventDetailsContext } from '../../../contexts/EventDetailsContext';
+import TimeOptionItem from './TimeOptionItem';
 import {
   panelBox,
   mapItemBox,
   eventDetailstHeaderStyle,
   eventTitleStyle,
-} from '../../../styles/CommonStyles'
-import { ParticipantProfileDto } from '../../../types/User'
-import { TimeOptionDto } from '../../../types/Event'
+} from '../../../styles/CommonStyles';
+import { ParticipantProfileDto } from '../../../types/User';
+import { TimeOptionDto } from '../../../types/Event';
 
 export default function TimeVotingPanel() {
-  const {
-    event,
-    selectedTime,
-    voteTime,
-    openConfirm,
-    openVoteList,
-  } = useEventDetailsContext()
+  const { event, selectedTime, voteTime, openConfirm, openVoteList } = useEventDetailsContext();
 
-  if (!event) return null
+  if (!event) return null;
 
-  const isTimeFixed =
-    event.timeOptionType === 'FIXED' && event.timeOptions.length === 1
-  const isVotingClosed = new Date(event.votingDeadline) <= new Date()
+  const isTimeFixed = event.timeOptionType === 'FIXED' && event.timeOptions.length === 1;
+  const isVotingClosed = new Date(event.votingDeadline) <= new Date();
 
   const topTimeOption = event.timeOptions.reduce<TimeOptionDto>(
     (a, b) => (b.votesCount > a.votesCount ? b : a),
-    event.timeOptions[0]
-  )
+    event.timeOptions[0],
+  );
 
   const handleTimeSelect = (opt: TimeOptionDto) =>
     openConfirm(
@@ -36,11 +29,10 @@ export default function TimeVotingPanel() {
       `Are you sure you want to ${
         selectedTime === opt.id ? 'cancel' : 'reserve'
       } ${new Date(opt.startTime).toLocaleString()}?`,
-      () => voteTime(opt)
-    )
+      () => voteTime(opt),
+    );
 
-  const showVotes = (title: string, users: ParticipantProfileDto[]) =>
-    openVoteList(title, users)
+  const showVotes = (title: string, users: ParticipantProfileDto[]) => openVoteList(title, users);
 
   return (
     <Box
@@ -60,9 +52,7 @@ export default function TimeVotingPanel() {
       <Box sx={{ m: 2 }}>
         {isTimeFixed ? (
           <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-            <Typography>
-              {new Date(event.timeOptions[0].startTime).toLocaleString()}
-            </Typography>
+            <Typography>{new Date(event.timeOptions[0].startTime).toLocaleString()}</Typography>
           </Box>
         ) : isVotingClosed && event.timeOptionType === 'VOTING' ? (
           <Box sx={mapItemBox}>
@@ -76,7 +66,7 @@ export default function TimeVotingPanel() {
             />
           </Box>
         ) : (
-          event.timeOptions.map(opt => (
+          event.timeOptions.map((opt) => (
             <Box key={opt.id} sx={mapItemBox}>
               <TimeOptionItem
                 option={opt}
@@ -91,5 +81,5 @@ export default function TimeVotingPanel() {
         )}
       </Box>
     </Box>
-  )
+  );
 }
