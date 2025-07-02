@@ -14,9 +14,15 @@ const defaultAvatar = 'https://example.com/default-profile.png';
 
 type ModalType = 'update' | 'pwd' | 'pfp' | null;
 
+const getUserIdFromToken = (): number | null => {
+  const token = localStorage.getItem('jwtToken');
+  return token ? JSON.parse(atob(token.split('.')[1])).id : null;
+};
+
 const MyProfilePage: React.FC = () => {
   const navigate = useNavigate();
   const { data, loading, error } = useProfile();
+  const userId = getUserIdFromToken();
 
   const [profile, setProfile] = useState<{
     firstName: string;
@@ -42,16 +48,29 @@ const MyProfilePage: React.FC = () => {
   useEffect(() => {
     if (!data) return;
     let active = true;
+
+    if (userId === null) {
+      setProfile(p => ({ ...p, profilePictureUrl: defaultAvatar }));
+      return;
+    }
+
     (async () => {
       try {
-        const imageUrl = await getProfileImage();
-        if (active) setProfile(p => ({ ...p, profilePictureUrl: imageUrl || defaultAvatar }));
+        const imageUrl = await getProfileImage(userId);
+        if (active) {
+          setProfile(p => ({ ...p, profilePictureUrl: imageUrl || defaultAvatar }));
+        } else{
+          setProfile(p => ({ ...p, profilePictureUrl: defaultAvatar }));
+        }
       } catch {
-        if (active) setProfile(p => ({ ...p, profilePictureUrl: defaultAvatar }));
+        if (active) {
+          setProfile(p => ({ ...p, profilePictureUrl: defaultAvatar }));
+        }
       }
     })();
+
     return () => { active = false; };
-  }, [data]);
+  }, [data, userId]);
 
   if (loading) {
     return (
@@ -90,11 +109,13 @@ const MyProfilePage: React.FC = () => {
         lastName: updated.lastName,
         email: updated.email,
       }));
-      if (form.profilePicture) {
+
+      if (form.profilePicture && userId !== null) {
         await uploadProfilePicture({ profilePicture: form.profilePicture });
-        const newUrl = await getProfileImage();
+        const newUrl = await getProfileImage(userId);
         setProfile(p => ({ ...p, profilePictureUrl: newUrl || p.profilePictureUrl }));
       }
+
       if (updated.email !== oldEmail) {
         localStorage.removeItem('jwtToken');
         navigate('/login', { replace: true });
@@ -120,9 +141,10 @@ const MyProfilePage: React.FC = () => {
   };
 
   const handleUploadPfp = async (file: File) => {
+    if (userId === null) return;
     try {
       await uploadProfilePicture({ profilePicture: file });
-      const newUrl = await getProfileImage();
+      const newUrl = await getProfileImage(userId);
       setProfile(p => ({ ...p, profilePictureUrl: newUrl || p.profilePictureUrl }));
     } catch (err) {
       console.error('Error uploading picture', err);

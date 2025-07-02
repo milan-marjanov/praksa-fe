@@ -59,7 +59,15 @@ export default function RestaurantVotingPanel() {
       </Box>
       <Box sx={{ m: 2 }}>
         {isRestFixed ? (
-          <Typography>{event.restaurantOptions[0].name}</Typography>
+          <RestaurantOptionItem
+            option={event.restaurantOptions[0]}
+            optionType={event.restaurantOptionType}
+            selectedId={null}
+            isClosed={true}
+            onSelect={() => {}}
+            onViewVotes={showVotes}
+            showVotes={false}
+          />
         ) : isVotingClosed ? (
           <RestaurantOptionItem
             option={topRestaurantOption}

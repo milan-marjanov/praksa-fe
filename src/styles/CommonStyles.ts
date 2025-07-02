@@ -73,6 +73,16 @@ export const eventCardStyle = {
   },
 };
 
+export const cardForPublicProfile = {
+  width: { xs: '80%', sm: 550 },
+  mx: 'auto',
+  my: { xs: 6, sm: 10 },
+  p: { xs: 2, sm: 4 },
+  bgcolor: 'background.paper',
+  borderRadius: 2,
+  boxShadow: 3
+}
+
 export const boxContainerStyle = {
   display: 'grid',
   gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',

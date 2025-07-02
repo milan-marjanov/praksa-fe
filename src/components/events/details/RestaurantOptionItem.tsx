@@ -12,6 +12,7 @@ interface Props {
   isClosed: boolean
   onSelect: (opt: RestaurantOptionDto) => void
   onViewVotes: (title: string, users: ParticipantProfileDto[]) => void
+  showVotes?: boolean
 }
 
 export default function RestaurantOptionItem({
@@ -20,20 +21,20 @@ export default function RestaurantOptionItem({
   isClosed,
   onSelect,
   onViewVotes,
+  showVotes = true,
 }: Props) {
   const { id, name, votesCount, votedUsers, menuImageUrl, restaurantUrl } = option
 
   const isSelected = !isClosed && selectedId === id
-  const disabled = isClosed
   const displayVoters = votedUsers.slice(0, 2)
   const remainingCount = votedUsers.length - displayVoters.length
   const title = `Votes for ${name}`
 
   return (
     <Box sx={{ ...mapItemBox, display: 'flex', alignItems: 'center', py: 1 }}>
-      {disabled ? (
+      {isClosed ? (
         <Box sx={nameContainer}>
-          <Typography fontWeight="bold">{name}</Typography>
+          <Typography>{name}</Typography>
         </Box>
       ) : (
         <ToggleButton
@@ -72,27 +73,31 @@ export default function RestaurantOptionItem({
           </IconButton>
         )}
 
-        <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }}>
-          Votes: {votesCount}
-        </Typography>
+        {showVotes && (
+          <>
+            <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }}>
+              Votes: {votesCount}
+            </Typography>
 
-        {votedUsers.length > 0 && (
-          <Box
-            sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', gap: 0.5 }}
-            onClick={() => onViewVotes(title, votedUsers)}
-          >
-            {displayVoters.map(u => (
-              <Avatar
-                key={u.id}
-                src={u.profilePictureUrl ?? undefined}
-                alt={`${u.firstName} ${u.lastName}`}
-                sx={{ width: 32, height: 32, mr: -1, border: '2px solid white' }}
-              />
-            ))}
-            {remainingCount > 0 && <Typography variant="body2">+{remainingCount}</Typography>}
-          </Box>
+            {votedUsers.length > 0 && (
+              <Box
+                sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', gap: 0.5 }}
+                onClick={() => onViewVotes(title, votedUsers)}
+              >
+                {displayVoters.map(u => (
+                  <Avatar
+                    key={u.id}
+                    src={u.profilePictureUrl ?? undefined}
+                    alt={`${u.firstName} ${u.lastName}`}
+                    sx={{ width: 32, height: 32, mr: -1, border: '2px solid white' }}
+                  />
+                ))}
+                {remainingCount > 0 && <Typography variant="body2">+{remainingCount}</Typography>}
+              </Box>
+            )}
+          </>
         )}
       </Box>
     </Box>
-)
+  )
 }

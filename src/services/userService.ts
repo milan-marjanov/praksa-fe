@@ -66,8 +66,8 @@ export async function uploadProfilePicture(dto: ChangeProfilePictureDTO) {
   });
 }
 
-export async function getProfileImage() {
-  const response = await api.get<Blob>('/api/user/image', { responseType: 'blob' });
+export async function getProfileImage(id: number) {
+  const response = await api.get<Blob>(`/api/user/image/${id}`, { responseType: 'blob' });
   return URL.createObjectURL(response.data);
 }
 
