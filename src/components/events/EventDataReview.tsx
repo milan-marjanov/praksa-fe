@@ -55,7 +55,6 @@ const EventDataReview = (props: EventDataReviewProps) => {
       <Paper variant="outlined" sx={{ p: 2, bgcolor: '#f5f5dc' }}>
         <Typography variant="h6">Event Info</Typography>
         <Divider sx={{ my: 1 }} />
-
         <List sx={{ ml: -1, mt: -1 }}>
           <ListItem>
             <ListItemText
@@ -95,9 +94,9 @@ const EventDataReview = (props: EventDataReviewProps) => {
                     <TableCell sx={tableCellStyle}>{formatDateTime(option.endTime)}</TableCell>
                     <TableCell sx={tableCellStyle}>
                       {eventData.timeOptionType !== 'CAPACITY_BASED'
-                        ? ''
-                        : option.maxCapacity || 'N/A'}
-                    </TableCell>{' '}
+                          ? 'N/A'
+                          : option.maxCapacity || 'N/A'}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -129,6 +128,7 @@ const EventDataReview = (props: EventDataReviewProps) => {
                     <TableCell sx={tableCellStyle}>{restaurant.name}</TableCell>
                     <TableCell sx={tableCellStyle}>{restaurant.menuImageUrl || 'N/A'}</TableCell>
                     <TableCell sx={tableCellStyle}>{restaurant.restaurantUrl || 'N/A'}</TableCell>
+>>>>>>> development
                   </TableRow>
                 ))}
               </TableBody>

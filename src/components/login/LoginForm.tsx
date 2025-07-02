@@ -8,12 +8,15 @@ import Typography from '@mui/material/Typography';
 import { jwtDecode } from 'jwt-decode';
 import { JwtDecoded } from '../../types/User';
 import { buttonStyle } from '../../styles/CommonStyles';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [errors, setErrors] = useState({ email: false, password: false });
+
+  const {setUserId} = useAuth();
 
   const navigate = useNavigate();
 
@@ -47,6 +50,9 @@ export default function LoginForm() {
       }
 
       const decoded = jwtDecode<JwtDecoded>(token);
+
+      setUserId(decoded.id);
+      console.log("DECODED " + JSON.stringify(decoded));
 
       switch (decoded?.role) {
         case 'USER':

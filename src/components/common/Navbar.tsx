@@ -21,7 +21,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { avatarStyle } from '../../styles/CommonStyles';
 import { useEffect } from 'react';
 import { getUserNotifications } from '../../services/userService';
-import { NotificationDto } from '../../types/Notification';
+import { useNotificationContext } from '../../contexts/NotificationContext';
 
 export default function Navbar() {
   const theme = useTheme();
@@ -31,8 +31,7 @@ export default function Navbar() {
   const token = localStorage.getItem('jwtToken');
   const isLoggedIn = Boolean(token);
   const showNav = isLoggedIn && !hidePaths.includes(location.pathname);
-  const [notifications, setNotifications] = useState<NotificationDto[]>([]);
-  const unreadCount = notifications.filter((n) => !n.isRead).length;
+  const { setNotifications, unreadCount, setUnreadCount } = useNotificationContext();
 
   let isAdmin = false;
   if (token) {
@@ -54,15 +53,17 @@ export default function Navbar() {
   const toggleOpen = () => setOpen((prev) => !prev);
 
   useEffect(() => {
-    if (token == null) {
-      return;
-    } else {
-      const fetchNotifications = async () => {
-        const data = await getUserNotifications();
-        setNotifications(data);
-      };
-      fetchNotifications();
-    }
+    const token = localStorage.getItem('jwtToken');
+    if (!token) return;
+    const fetchNotifications = async () => {
+      const data = await getUserNotifications();
+      setNotifications(data);
+      const unread = data.filter(n => !n.isRead).length;
+      setUnreadCount(unread);
+    };
+
+    fetchNotifications();
+
   }, []);
 
   const handleNavClick = (to: string) => {
@@ -126,12 +127,25 @@ export default function Navbar() {
                   </Button>
                 ) : isIcon ? (
                   <IconButton
-                    key={to}
                     component={RouterLink}
-                    to={to}
-                    sx={{ color: location.pathname === to ? 'black' : 'inherit' }}
+                    to="/notifications"
+                    sx={{
+                      color: location.pathname === '/notifications' ? 'black' : 'inherit',
+                    }}
                   >
-                    <Badge badgeContent={unreadCount} color="error" invisible={unreadCount === 0}>
+                    <Badge
+                      badgeContent={unreadCount}
+                      color="error"
+                      overlap="circular"
+                      sx={{
+                        '& .MuiBadge-badge': {
+                          minWidth: 16,
+                          height: 16,
+                          fontSize: '0.75rem',
+                          padding: 0,
+                        },
+                      }}
+                    >
                       <NotificationsIcon />
                     </Badge>
                   </IconButton>
