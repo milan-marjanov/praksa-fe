@@ -33,6 +33,7 @@ export const buttonStyle: SxProps<Theme> = {
   fontSize: '1rem',
   padding: '8px 20px',
   borderRadius: 1,
+  marginRight: '5px',
 };
 
 export const eventCardStyle = {
@@ -202,4 +203,68 @@ export const panelBox: SxProps<Theme> = {
 
 export const mapItemBox: SxProps<Theme> = {
   mb: 2,
+};
+
+export const chatContainer: SxProps<Theme> = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 2, 
+  width: '100%',
+  maxWidth: 400,
+  margin: '0 auto',
+};
+
+export const messagesContainer: SxProps<Theme> = {
+  height: 500,
+  overflowY: 'auto',
+  border: '1px solid #ccc',
+  padding: 2,
+  borderRadius: 2,
+  backgroundColor: '#f9f9f9',
+
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 0.5, 
+};
+
+export const messageBubble: SxProps<Theme> = {
+  backgroundColor: '#d1e7dd',
+  padding: '8px 12px',
+  borderRadius: 2,
+  marginBottom: 2, 
+  alignSelf: 'flex-start',
+  maxWidth: '80%',
+};
+
+export const inputContainer: SxProps<Theme> = {
+  display: 'flex',
+  gap: 1, 
+  padding:2
+};
+
+export const input1: SxProps<Theme> = {
+  flex: 1,
+  padding: 1,
+  borderRadius: 1.5, 
+  border: '1px solid #ccc',
+};
+
+export const sendButton: SxProps<Theme> = {
+ mt: 2.5,
+  padding: '6px',         
+  borderRadius: '50%',     
+  backgroundColor: '#007bff',
+  color: 'white',
+  border: 'none',
+  width: '40px',          
+  height: '40px',          
+  minWidth: '40px',        
+  minHeight: '40px',      
+  cursor: 'pointer',
+  display: 'flex',         
+  alignItems: 'center',
+  justifyContent: 'center',
+  '&:hover': {
+    backgroundColor: '#0056b3',
+  },
 };
