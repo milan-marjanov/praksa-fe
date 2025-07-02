@@ -21,8 +21,15 @@ export default function RestaurantInfoDialog({ open, onClose, restaurant }: Prop
       <DialogTitle>{restaurant.name}</DialogTitle>
       <DialogContent dividers>
         <Typography variant="body2" gutterBottom>
-          Menu: <a href={restaurant.menuImageUrl} target="_blank" rel="noreferrer">{restaurant.menuImageUrl}</a><br/>
-          Website: <a href={restaurant.restaurantUrl} target="_blank" rel="noreferrer">{restaurant.restaurantUrl}</a>
+          Menu:{' '}
+          <a href={restaurant.menuImageUrl} target="_blank" rel="noreferrer">
+            {restaurant.menuImageUrl}
+          </a>
+          <br />
+          Website:{' '}
+          <a href={restaurant.restaurantUrl} target="_blank" rel="noreferrer">
+            {restaurant.restaurantUrl}
+          </a>
         </Typography>
       </DialogContent>
       <DialogActions>

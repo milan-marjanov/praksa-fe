@@ -32,14 +32,14 @@ export default function Navbar() {
   const isLoggedIn = Boolean(token);
   const showNav = isLoggedIn && !hidePaths.includes(location.pathname);
   const [notifications, setNotifications] = useState<NotificationDto[]>([]);
-  const unreadCount = notifications.filter(n => !n.isRead).length;
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   let isAdmin = false;
   if (token) {
     try {
       const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
       isAdmin = payload.role === 'ADMIN';
-    } catch { }
+    } catch {}
   }
 
   const navItems = [
@@ -131,11 +131,7 @@ export default function Navbar() {
                     to={to}
                     sx={{ color: location.pathname === to ? 'black' : 'inherit' }}
                   >
-                    <Badge
-                      badgeContent={unreadCount}
-                      color="error"
-                      invisible={unreadCount === 0}
-                    >
+                    <Badge badgeContent={unreadCount} color="error" invisible={unreadCount === 0}>
                       <NotificationsIcon />
                     </Badge>
                   </IconButton>

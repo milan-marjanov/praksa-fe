@@ -2,6 +2,7 @@ import api from '../axios/axiosClient';
 import { ChatDto } from '../types/chat';
 import { CreateEventDto, UserEventsResponseDTO, UpdateEventDTO, EventDetailsDto, EventDTO } from '../types/Event';
 
+
 export const fetchUserEvents = async (userId: number): Promise<UserEventsResponseDTO> => {
   const response = await api.get<UserEventsResponseDTO>(`/api/events/fetchUserEvents/${userId}`);
   return response.data;

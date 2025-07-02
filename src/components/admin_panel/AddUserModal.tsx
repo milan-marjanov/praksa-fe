@@ -90,7 +90,7 @@ export default function AddUserModal({ open, onClose, onAdd }: AddUserModalProps
             sx={buttonStyle}
             onClick={handleAdd}
             loading={loading}
-            disabled={loading} 
+            disabled={loading}
           >
             Add User
           </LoadingButton>

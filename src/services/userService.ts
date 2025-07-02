@@ -41,12 +41,12 @@ export async function getUserNotifications() {
 
 export async function markNotificationAsRead(id: number) {
   const response = await api.put<void>(`/api/notifications/mark-as-read/${id}`);
-  return response.data; 
+  return response.data;
 }
 
 export async function deleteNotification(id: number) {
   const response = await api.delete<void>(`/api/notifications/notifications/${id}`);
-  return response.data;  
+  return response.data;
 }
 
 export async function updateProfile(dto: UpdateProfileRequestDTO) {
@@ -67,9 +67,8 @@ export async function uploadProfilePicture(dto: ChangeProfilePictureDTO) {
 }
 
 export async function getProfileImage() {
-  const response = await api.get<Blob>('/api/user/image', { responseType: 'blob',});
+  const response = await api.get<Blob>('/api/user/image', { responseType: 'blob' });
   return URL.createObjectURL(response.data);
-  
 }
 
 export async function updateProfileWithPicture(

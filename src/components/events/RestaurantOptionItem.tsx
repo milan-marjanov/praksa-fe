@@ -36,7 +36,6 @@ export default function RestaurantOptionItem({ option, optionType, isSelected, o
 
   const isFixed = optionType === 'FIXED';
 
-
   return (
     <>
       <Box sx={{ display: 'flex', alignItems: 'center', py: 1 }}>

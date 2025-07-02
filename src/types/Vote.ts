@@ -7,7 +7,7 @@ export interface VoteDto {
 }
 
 export interface CreateVoteDto {
-  eventId: number
-  timeOptionId: number | null
-  restaurantOptionId: number | null
+  eventId: number;
+  timeOptionId: number | null;
+  restaurantOptionId: number | null;
 }

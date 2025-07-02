@@ -19,7 +19,7 @@ export const isValidFutureDate = (dateString: string, now: Date): boolean => {
 };
 
 export function validateDateTime(value: string): string | null {
-  if (!value) return 'This field is required.';
+  if (!value) return '';
   const date = new Date(value);
   if (isNaN(date.getTime())) return 'Invalid date/time format.';
   const now = new Date();
