@@ -11,17 +11,20 @@ import { ParticipantProfileDto } from '../../../types/User';
 import { TimeOptionDto } from '../../../types/Event';
 
 export default function TimeVotingPanel() {
-  const { event, selectedTime, voteTime, openConfirm, openVoteList } = useEventDetailsContext();
+  const { event, selectedTime, voteTime, openConfirm, openVoteList } =
+    useEventDetailsContext();
 
   if (!event) return null;
 
-  const isTimeFixed = event.timeOptionType === 'FIXED' && event.timeOptions.length === 1;
+  const isTimeFixed =
+    event.timeOptionType === 'FIXED' && event.timeOptions.length === 1;
   const isVotingClosed = new Date(event.votingDeadline) <= new Date();
-
-  const topTimeOption = event.timeOptions.reduce<TimeOptionDto>(
-    (a, b) => (b.votesCount > a.votesCount ? b : a),
-    event.timeOptions[0],
+  const maxVotes = Math.max(...event.timeOptions.map(o => o.votesCount));
+  const tiedOptions = event.timeOptions.filter(o => o.votesCount === maxVotes);
+  const creatorVote = tiedOptions.find(o =>
+    o.votedUsers.some(u => u.id === event.creatorId)
   );
+  const topTimeOption = creatorVote || tiedOptions[0];
 
   const handleTimeSelect = (opt: TimeOptionDto) =>
     openConfirm(
@@ -32,7 +35,8 @@ export default function TimeVotingPanel() {
       () => voteTime(opt),
     );
 
-  const showVotes = (title: string, users: ParticipantProfileDto[]) => openVoteList(title, users);
+  const showVotes = (title: string, users: ParticipantProfileDto[]) =>
+    openVoteList(title, users);
 
   return (
     <Box
@@ -52,7 +56,9 @@ export default function TimeVotingPanel() {
       <Box sx={{ m: 2 }}>
         {isTimeFixed ? (
           <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-            <Typography>{new Date(event.timeOptions[0].startTime).toLocaleString()}</Typography>
+            <Typography>
+              {new Date(event.timeOptions[0].startTime).toLocaleString()}
+            </Typography>
           </Box>
         ) : isVotingClosed && event.timeOptionType === 'VOTING' ? (
           <Box sx={mapItemBox}>
@@ -66,7 +72,7 @@ export default function TimeVotingPanel() {
             />
           </Box>
         ) : (
-          event.timeOptions.map((opt) => (
+          event.timeOptions.map(opt => (
             <Box key={opt.id} sx={mapItemBox}>
               <TimeOptionItem
                 option={opt}

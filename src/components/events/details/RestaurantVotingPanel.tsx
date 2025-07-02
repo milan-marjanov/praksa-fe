@@ -19,11 +19,12 @@ export default function RestaurantVotingPanel() {
   const isRestFixed =
     event.restaurantOptionType === 'FIXED' && event.restaurantOptions.length === 1;
   const isVotingClosed = new Date(event.votingDeadline) <= new Date();
-
-  const topRestaurantOption = event.restaurantOptions.reduce<RestaurantOptionDto>(
-    (a, b) => (b.votesCount > a.votesCount ? b : a),
-    event.restaurantOptions[0],
+  const maxVotes = Math.max(...event.restaurantOptions.map(o => o.votesCount));
+  const tiedOptions = event.restaurantOptions.filter(o => o.votesCount === maxVotes);
+  const creatorVote = tiedOptions.find(o =>
+    o.votedUsers.some(u => u.id === event.creatorId)
   );
+  const topRestaurantOption = creatorVote || tiedOptions[0];
 
   const handleRestaurantSelect = (opt: RestaurantOptionDto) =>
     openConfirm(
@@ -34,7 +35,8 @@ export default function RestaurantVotingPanel() {
       () => voteRestaurant(opt),
     );
 
-  const showVotes = (title: string, users: ParticipantProfileDto[]) => openVoteList(title, users);
+  const showVotes = (title: string, users: ParticipantProfileDto[]) =>
+    openVoteList(title, users);
 
   return (
     <Box
@@ -72,7 +74,7 @@ export default function RestaurantVotingPanel() {
             onViewVotes={showVotes}
           />
         ) : (
-          event.restaurantOptions.map((opt) => (
+          event.restaurantOptions.map(opt => (
             <Box key={opt.id} sx={mapItemBox}>
               <RestaurantOptionItem
                 option={opt}
