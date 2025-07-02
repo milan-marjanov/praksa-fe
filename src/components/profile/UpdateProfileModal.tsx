@@ -1,19 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Box, Typography, TextField, Button, Avatar, IconButton } from '@mui/material';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
-import { buttonStyle } from '../../styles/CommonStyles';
+import { buttonStyle, modalStyle } from '../../styles/CommonStyles';
 import { LoadingButton } from '@mui/lab';
-
-const style = {
-  position: 'absolute' as const,
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  bgcolor: 'background.paper',
-  p: 4,
-  borderRadius: 2,
-  boxShadow: 24,
-};
 
 export interface UpdateProfileModalProps {
   open: boolean;
@@ -32,114 +21,124 @@ export interface UpdateProfileModalProps {
   };
 }
 
-export function UpdateProfileModal({
-  open,
-  onClose,
-  onUpdate,
-  initialValues,
-}: UpdateProfileModalProps) {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [profileFile, setProfileFile] = useState<File | null>(null);
-  const [avatarPreview, setAvatarPreview] = useState<string | undefined>(undefined);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+export function UpdateProfileModal({ open, onClose, onUpdate, initialValues }: UpdateProfileModalProps) {
+  const [form, setForm] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+  });
+  const [file, setFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | undefined>(undefined);
+  const [status, setStatus] = useState({ loading: false, error: '' });
 
   useEffect(() => {
     if (open) {
-      setFirstName(initialValues.firstName);
-      setLastName(initialValues.lastName);
-      setEmail(initialValues.email);
-      setAvatarPreview(initialValues.avatarUrl);
-      setProfileFile(null);
-      setError(null);
-      setLoading(false);
+      setForm({
+        firstName: initialValues.firstName,
+        lastName: initialValues.lastName,
+        email: initialValues.email,
+      });
+      setPreview(initialValues.avatarUrl);
+      setFile(null);
+      setStatus({ loading: false, error: '' });
     }
   }, [open, initialValues]);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files?.[0]) return;
-    const file = e.target.files[0];
-    setProfileFile(file);
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === 'string') {
-        setAvatarPreview(reader.result);
-      }
-    };
-    reader.readAsDataURL(file);
-  };
+  const handleChange = (key: keyof typeof form) =>
+    (e: React.ChangeEvent<HTMLInputElement>) =>
+      setForm(f => ({ ...f, [key]: e.target.value }));
 
-  const handleUpdate = async () => {
-    setError(null);
-    setLoading(true);
-    try {
-      await onUpdate({
-        firstName,
-        lastName,
-        email,
-        profilePicture: profileFile || undefined,
-      });
-      onClose();
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message || 'Error updating profile');
-      }
-    } finally {
-      setLoading(false);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0] ?? null;
+    setFile(f);
+    if (f) {
+      const reader = new FileReader();
+      reader.onload = () => typeof reader.result === 'string' && setPreview(reader.result);
+      reader.readAsDataURL(f);
     }
   };
 
+  const handleUpdate = async () => {
+    setStatus({ loading: true, error: '' });
+    try {
+      await onUpdate({
+        firstName: form.firstName.trim(),
+        lastName: form.lastName.trim(),
+        email: form.email.trim(),
+        profilePicture: file ?? undefined,
+      });
+      onClose();
+    } catch (err: unknown) {
+      setStatus({ loading: false, error: err instanceof Error ? err.message : 'Error updating profile' });
+      return;
+    }
+    setStatus(s => ({ ...s, loading: false }));
+  };
+
+  const isDirty =
+    form.firstName !== initialValues.firstName ||
+    form.lastName !== initialValues.lastName ||
+    form.email !== initialValues.email ||
+    file !== null;
+
   return (
     <Modal open={open} onClose={onClose}>
-      <Box sx={style}>
+      <Box sx={modalStyle}>
         <Typography variant="h6" gutterBottom>
           Update Profile
         </Typography>
+
         <Box display="flex" justifyContent="center" mb={2}>
-          <Avatar sx={{ width: 80, height: 80 }} src={avatarPreview} />
+          <Avatar sx={{ width: 80, height: 80 }} src={preview} />
           <IconButton component="label" sx={{ ml: -3, mt: 5 }}>
-            <input type="file" hidden accept="image/*" onChange={handleFileChange} />
+            <input hidden accept="image/*" type="file" onChange={handleFileChange} />
             <PhotoCameraIcon />
           </IconButton>
         </Box>
+
         <TextField
           label="First Name"
           fullWidth
-          value={firstName}
-          onChange={(e) => setFirstName(e.target.value)}
+          value={form.firstName}
+          onChange={handleChange('firstName')}
           sx={{ mb: 2 }}
         />
         <TextField
           label="Last Name"
           fullWidth
-          value={lastName}
-          onChange={(e) => setLastName(e.target.value)}
+          value={form.lastName}
+          onChange={handleChange('lastName')}
           sx={{ mb: 2 }}
         />
         <TextField
           label="Email"
           type="email"
           fullWidth
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={form.email}
+          onChange={handleChange('email')}
           sx={{ mb: 2 }}
         />
-        {error && (
+
+        {status.error && (
           <Typography color="error" variant="body2" sx={{ mb: 2 }}>
-            {error}
+            {status.error}
           </Typography>
         )}
+
         <Box display="flex" justifyContent="flex-end">
-          <Button sx={{ ...buttonStyle, mr: 1 }} onClick={onClose}>
+          <Button
+            sx={{ ...buttonStyle, mr: 1 }}
+            onClick={onClose}
+            disabled={status.loading}
+          >
             Cancel
           </Button>
           <LoadingButton
-            onClick={handleUpdate}
-            loading={loading}
+            loading={status.loading}
             variant="contained"
             sx={buttonStyle}
+            onClick={handleUpdate}
+            disabled={!isDirty}
           >
             Update
           </LoadingButton>

@@ -2,6 +2,7 @@ import { TableRow, TableCell, Button, Box } from '@mui/material';
 import { Link } from 'react-router-dom';
 import type { UserDTO } from '../../types/User';
 import { buttonStyle } from '../../styles/CommonStyles';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 export interface UserRowProps {
   user: UserDTO;
@@ -27,7 +28,7 @@ export default function UserRow({ user, onDelete }: UserRowProps) {
       <TableCell align="center">
         <Box display="inline-flex" gap={1}>
           <Button sx={buttonStyle} onClick={onDelete}>
-            Delete
+            <DeleteIcon />
           </Button>
         </Box>
       </TableCell>

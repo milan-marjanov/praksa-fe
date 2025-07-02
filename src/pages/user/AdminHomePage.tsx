@@ -34,7 +34,9 @@ export default function AdminHomePage() {
       try {
         const data = await getAllUsers();
         setUsers(Array.isArray(data) ? data : []);
-      } catch {
+      } catch (e) {
+        console.error(e);
+        toast.error('Failed to load users');
         setUsers([]);
       } finally {
         setLoading(false);
@@ -80,17 +82,12 @@ export default function AdminHomePage() {
   };
 
   const initials =
-    (adminFirstName.charAt(0) || '').toUpperCase() +
-    (adminLastName.charAt(0) || '').toUpperCase();
+    (adminFirstName.charAt(0) || '').toUpperCase() + (adminLastName.charAt(0) || '').toUpperCase();
 
   return (
     <Container
       maxWidth="lg"
-      sx={{
-        mt: { xs: 2, md: 4 },
-        px: { xs: 2, md: 3 },
-        pb: { xs: 6, md: 8 },
-      }}
+      sx={{ mt: { xs: 2, md: 4 }, px: { xs: 2, md: 3 }, pb: { xs: 6, md: 8 } }}
     >
       <Typography variant={isSm ? 'h5' : 'h4'} align="center" sx={{ my: { xs: 3, md: 5 } }}>
         Admin Panel
@@ -118,6 +115,10 @@ export default function AdminHomePage() {
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}>
           <CircularProgress />
         </Box>
+      ) : users.length === 0 ? (
+        <Typography variant="body2" sx={{ p: 2, textAlign: 'center' }}>
+          No users found.
+        </Typography>
       ) : (
         <Box sx={{ overflowX: 'auto' }}>
           <UserList users={users} onDelete={(id) => setDeleteId(id)} />

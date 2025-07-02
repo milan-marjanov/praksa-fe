@@ -1,15 +1,7 @@
 import { useRef, useState } from 'react';
-import {
-  Button,
-  Modal,
-  Box,
-  Typography,
-  Stack,
-  Divider,
-  IconButton
-} from '@mui/material';
+import { Button, Modal, Box, Typography, Stack, Divider, IconButton } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import EventModal from './EventModal';
+import EventModal from '../../components/events/EventModal';
 import {
   CreateEventDto,
   CreateEventModalProps,
@@ -17,13 +9,13 @@ import {
   UpdateEventDTO,
   EventDTO,
 } from '../../types/Event';
-import TimeOptionsModal from './TimeOptionsModal';
+import TimeOptionsModal from '../../components/events/TimeOptionsModal';
 import { createEvent, updateEvent } from '../../services/eventService';
 import { useEventForm } from '../../contexts/EventContext';
 import { toast } from 'react-toastify';
 import CloseIcon from '@mui/icons-material/Close';
-import EventConfirmDialog from './EventConfirmDialog';
-import RestaurantOptionsModal from './RestaurantOptionsModal';
+import EventConfirmDialog from '../../components/events/EventConfirmDialog';
+import RestaurantOptionsModal from '../../components/events/RestaurantOptionsModal';
 import {
   closeButtonStyle,
   modalBoxStyle,
@@ -57,7 +49,7 @@ export default function CreateEventModal({
 
   const slides = [
     <EventModal key="form" users={users} creator={creator} ref={formRef} />,
-    <TimeOptionsModal key="slide2" ref={formRef} />,  
+    <TimeOptionsModal key="slide2" ref={formRef} />,
     <RestaurantOptionsModal key="slide3" ref={formRef} />,
     <EventDataReview key="slide4" onValidationChange={handleValidationChange} />,
   ];
@@ -79,7 +71,9 @@ export default function CreateEventModal({
     if (slideIndex < slides.length - 1) setSlideIndex(slideIndex + 1);
   };
 
-  const back = () => { if (slideIndex > 0) setSlideIndex(slideIndex - 1); };
+  const back = () => {
+    if (slideIndex > 0) setSlideIndex(slideIndex - 1);
+  };
 
   const handleClose = () => {
     setOpenDialog(false);
@@ -89,7 +83,10 @@ export default function CreateEventModal({
 
   const buildSubmitData = (): Partial<CreateEventDto> => {
     if (eventData.timeOptionType !== 'CAPACITY_BASED') {
-      eventData.timeOptions = eventData.timeOptions?.map((opt) => ({ ...opt, maxCapacity: undefined }));
+      eventData.timeOptions = eventData.timeOptions?.map((opt) => ({
+        ...opt,
+        maxCapacity: undefined,
+      }));
     }
 
     if (eventData.timeOptionType === 'FIXED' && eventData.restaurantOptionType !== 'VOTING') {
@@ -104,7 +101,10 @@ export default function CreateEventModal({
       const dataToSubmit = buildSubmitData();
 
       if (isUpdate) {
-        const updated: EventDTO = await updateEvent(eventData.id as number, dataToSubmit as UpdateEventDTO);
+        const updated: EventDTO = await updateEvent(
+          eventData.id as number,
+          dataToSubmit as UpdateEventDTO,
+        );
         toast.success('Event updated successfully');
         onEventUpdated?.(updated);
       } else {
@@ -124,7 +124,9 @@ export default function CreateEventModal({
     <Box style={{ padding: 40 }}>
       <Modal
         open={open}
-        onClose={(_e, reason) => reason === 'backdropClick' || reason === 'escapeKeyDown' ? null : handleClose()}
+        onClose={(_e, reason) =>
+          reason === 'backdropClick' || reason === 'escapeKeyDown' ? null : handleClose()
+        }
       >
         <Box sx={modalBoxStyle}>
           <Box sx={modalScrollbarStyle}>
@@ -146,10 +148,14 @@ export default function CreateEventModal({
             <Box>{slides[slideIndex]}</Box>
 
             <Stack direction="row" justifyContent="space-between" mb={2} alignItems="center" mt={4}>
-              <Button onClick={back} disabled={slideIndex === 0}>Back</Button>
+              <Button onClick={back} disabled={slideIndex === 0}>
+                Back
+              </Button>
 
               <Stack direction="row" spacing={1}>
-                {slides.map((_, idx) => (<Box key={idx} sx={slideIndicatorStyle(idx === slideIndex)} />))}
+                {slides.map((_, idx) => (
+                  <Box key={idx} sx={slideIndicatorStyle(idx === slideIndex)} />
+                ))}
               </Stack>
 
               {slideIndex === slides.length - 1 ? (
@@ -173,7 +179,10 @@ export default function CreateEventModal({
         open={openDialog}
         title={dialogTitle}
         onCancel={() => setOpenDialog(false)}
-        onConfirm={() => { setOpenDialog(false); dialogAction(); }}
+        onConfirm={() => {
+          setOpenDialog(false);
+          dialogAction();
+        }}
       >
         {dialogContent}
       </EventConfirmDialog>

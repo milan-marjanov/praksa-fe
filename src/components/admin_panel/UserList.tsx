@@ -10,11 +10,16 @@ import {
   useMediaQuery,
   Typography,
   Button,
-  Paper,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import type { UserDTO } from '../../types/User';
 import UserRow from './UserRow';
 import { buttonStyle } from '../../styles/CommonStyles';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 export interface UserListProps {
   users: UserDTO[];
@@ -23,50 +28,39 @@ export interface UserListProps {
 
 export default function UserList({ users, onDelete }: UserListProps) {
   const theme = useTheme();
-  const isSm = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const navigate = useNavigate();
 
-  if (isSm) {
+  if (users.length === 0) {
     return (
-      <Box display="flex" flexDirection="column" gap={1}>
-        {users.map((user) => (
-          <Paper
-            key={user.id}
-            elevation={1}
-            sx={{
-              p: 1,
-              display: 'flex',
-              alignItems: 'center',
-            }}
-          >
-            <Box
-              sx={{
-                flexGrow: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'flex-start',
-              }}
-            >
-              <Typography variant="body1" noWrap>
-                {user.firstName} {user.lastName}
-              </Typography>
-              <Typography variant="body2" noWrap sx={{ opacity: 0.8, fontSize: '0.8rem' }}>
-                {user.email}
-              </Typography>
-            </Box>
-
-            <Button
-              sx={{ ...buttonStyle, py: 0.5, px: 1, minWidth: 'auto' }}
-              size="small"
-              onClick={() => onDelete(user.id)}
-            >
-              Delete
-            </Button>
-          </Paper>
-        ))}
-      </Box>
+      <Typography variant="body2" sx={{ p: 2, textAlign: 'center' }}>
+        No users found.
+      </Typography>
     );
   }
 
+  if (isMobile) {
+    return (
+      <Box>
+        <List>
+          {users.map((user) => (
+            <ListItem key={user.id} disablePadding>
+              <ListItemButton onClick={() => navigate(`/user/${user.id}`)}>
+                <ListItemText primary={`${user.firstName} ${user.lastName}`} secondary={user.email} />
+              </ListItemButton>
+              <Button
+                sx={{ ...buttonStyle, py: 0.5, px: 2, minWidth: 'auto' }}
+                size="small"
+                onClick={(e) => { e.stopPropagation(); onDelete(user.id); }}
+              >
+                <DeleteIcon />
+              </Button>
+            </ListItem>
+          ))}
+        </List>
+      </Box>
+    );
+  }
   return (
     <TableContainer
       component={Box}

@@ -18,7 +18,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const token = localStorage.getItem('jwtToken');
-
     if (!token) return;
     (async () => {
       try {
@@ -31,7 +30,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     })();
   }, []);
-
   return <AuthContext.Provider value={{ user, loading , userId , setUserId}}>{children}</AuthContext.Provider>;
 };
 

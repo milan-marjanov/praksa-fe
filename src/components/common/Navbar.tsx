@@ -31,7 +31,6 @@ export default function Navbar() {
   const token = localStorage.getItem('jwtToken');
   const isLoggedIn = Boolean(token);
   const showNav = isLoggedIn && !hidePaths.includes(location.pathname);
-
   const { setNotifications, unreadCount, setUnreadCount } = useNotificationContext();
 
   let isAdmin = false;
@@ -39,7 +38,7 @@ export default function Navbar() {
     try {
       const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
       isAdmin = payload.role === 'ADMIN';
-    } catch { }
+    } catch {}
   }
 
   const navItems = [

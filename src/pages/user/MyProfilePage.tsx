@@ -1,94 +1,156 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Container, Box, Avatar, Typography, Button, IconButton } from '@mui/material';
+import { Container, Box, Avatar, Typography, Button, IconButton, CircularProgress } from '@mui/material';
+import useProfile from '../../hooks/useProfile';
+import type { MyProfileDTO, PasswordChangeRequestDTO, UpdateProfileRequestDTO } from '../../types/User';
 import { UpdateProfileModal } from '../../components/profile/UpdateProfileModal';
 import { ChangePasswordModal } from '../../components/profile/ChangePasswordModal';
 import { ChangePfpModal } from '../../components/profile/ChangePfpModal';
 import { buttonStyle } from '../../styles/CommonStyles';
-import {
-  getMyProfile,
-  getProfileImage,
-  updateProfile,
-  uploadProfilePicture,
-  changePassword,
-  removeProfilePicture,
-} from '../../services/userService';
-import { PasswordChangeRequestDTO, UpdateProfileRequestDTO } from '../../types/User';
+import { uploadProfilePicture, getProfileImage, updateProfile, changePassword, removeProfilePicture } from '../../services/userService';
+import { toast } from 'react-toastify';
+
+const defaultAvatar = 'https://example.com/default-profile.png';
+
+type ModalType = 'update' | 'pwd' | 'pfp' | null;
+
+const getUserIdFromToken = (): number | null => {
+  const token = localStorage.getItem('jwtToken');
+  return token ? JSON.parse(atob(token.split('.')[1])).id : null;
+};
 
 const MyProfilePage: React.FC = () => {
   const navigate = useNavigate();
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [profilePictureUrl, setProfilePictureUrl] = useState<string | null>(null);
-  const [openUpdate, setOpenUpdate] = useState(false);
-  const [openChangePwd, setOpenChangePwd] = useState(false);
-  const [openChangePfp, setOpenChangePfp] = useState(false);
+  const { data, loading, error } = useProfile();
+  const userId = getUserIdFromToken();
+
+  const [profile, setProfile] = useState<{
+    firstName: string;
+    lastName: string;
+    email: string;
+    profilePictureUrl: string | null;
+  }>({
+    firstName: '',
+    lastName: '',
+    email: '',
+    profilePictureUrl: null,
+  });
+
+  const [openModal, setOpenModal] = useState<ModalType>(null);
 
   useEffect(() => {
+    if (data) {
+      const { firstName, lastName, email } = data as MyProfileDTO;
+      setProfile(p => ({ ...p, firstName, lastName, email }));
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (!data) return;
+    let active = true;
+
+    if (userId === null) {
+      setProfile(p => ({ ...p, profilePictureUrl: defaultAvatar }));
+      return;
+    }
+
     (async () => {
       try {
-        const profile = await getMyProfile();
-        setFirstName(profile.firstName);
-        setLastName(profile.lastName);
-        setEmail(profile.email);
-      } catch (e) {
-        console.error('Error loading profile data', e);
+        const imageUrl = await getProfileImage(userId);
+        if (active) {
+          setProfile(p => ({ ...p, profilePictureUrl: imageUrl || defaultAvatar }));
+        } else{
+          setProfile(p => ({ ...p, profilePictureUrl: defaultAvatar }));
+        }
+      } catch {
+        if (active) {
+          setProfile(p => ({ ...p, profilePictureUrl: defaultAvatar }));
+        }
       }
-      const defaultUrl = 'https://example.com/default-profile.png';
-      const imageUrl = await getProfileImage();
-      setProfilePictureUrl(imageUrl || defaultUrl);
     })();
-  }, []);
 
-  const handleUpdate = async (data: UpdateProfileRequestDTO & { profilePicture?: File }) => {
-    const oldEmail = email;
+    return () => { active = false; };
+  }, [data, userId]);
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 10 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <Container sx={{ mt: 10, textAlign: 'center' }}>
+        <Typography color="error" sx={{ mb: 2 }}>
+          Error loading profile.
+        </Typography>
+        <Button sx={buttonStyle} onClick={() => navigate(-1)}>
+          Back
+        </Button>
+      </Container>
+    );
+  }
+
+  const handleUpdate = async (
+    form: UpdateProfileRequestDTO & { profilePicture?: File }
+  ) => {
+    const oldEmail = profile.email;
     try {
-      if (data.email !== oldEmail && data.profilePicture) {
-        await uploadProfilePicture({ profilePicture: data.profilePicture });
-        const newUrl = await getProfileImage();
-        setProfilePictureUrl(newUrl || profilePictureUrl);
-      }
-      const updated = await updateProfile({
-        firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.email,
+      const updated: MyProfileDTO = await updateProfile({
+        firstName: form.firstName,
+        lastName: form.lastName,
+        email: form.email,
       });
-      setFirstName(updated.firstName);
-      setLastName(updated.lastName);
-      setEmail(updated.email);
-      if (data.email === oldEmail && data.profilePicture) {
-        await uploadProfilePicture({ profilePicture: data.profilePicture });
-        const newUrl = await getProfileImage();
-        setProfilePictureUrl(newUrl || profilePictureUrl);
+      setProfile(p => ({
+        ...p,
+        firstName: updated.firstName,
+        lastName: updated.lastName,
+        email: updated.email,
+      }));
+
+      if (form.profilePicture && userId !== null) {
+        await uploadProfilePicture({ profilePicture: form.profilePicture });
+        const newUrl = await getProfileImage(userId);
+        setProfile(p => ({ ...p, profilePictureUrl: newUrl || p.profilePictureUrl }));
       }
-      if (data.email !== oldEmail) {
+
+      if (updated.email !== oldEmail) {
         localStorage.removeItem('jwtToken');
         navigate('/login', { replace: true });
         return;
       }
-      setOpenUpdate(false);
-    } catch (error) {
-      console.error('Error updating profile', error);
-      setOpenUpdate(false);
+      setOpenModal(null);
+    } catch (err) {
+      console.error('Error updating profile', err);
+      toast.error('Failed to update profile');
+      setOpenModal(null);
     }
   };
 
   const handleChangePassword = async (dto: PasswordChangeRequestDTO) => {
-    await changePassword(dto);
-    localStorage.removeItem('jwtToken');
-    navigate('/login', { replace: true });
+    try {
+      await changePassword(dto);
+      localStorage.removeItem('jwtToken');
+      navigate('/login', { replace: true });
+    } catch (err) {
+      console.error('Error changing password', err);
+      toast.error('Failed to change password');
+    }
   };
 
   const handleUploadPfp = async (file: File) => {
+    if (userId === null) return;
     try {
       await uploadProfilePicture({ profilePicture: file });
-      const newUrl = await getProfileImage();
-      setProfilePictureUrl(newUrl || profilePictureUrl);
-    } catch (error) {
-      console.error('Error uploading picture', error);
+      const newUrl = await getProfileImage(userId);
+      setProfile(p => ({ ...p, profilePictureUrl: newUrl || p.profilePictureUrl }));
+    } catch (err) {
+      console.error('Error uploading picture', err);
+      toast.error('Failed to upload picture');
     } finally {
-      setOpenChangePfp(false);
+      setOpenModal(null);
     }
   };
 
@@ -106,46 +168,61 @@ const MyProfilePage: React.FC = () => {
       }}
     >
       <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
-        <IconButton onClick={() => setOpenChangePfp(true)} sx={{ p: 0 }}>
-          <Avatar src={profilePictureUrl || undefined} sx={{ width: 120, height: 120 }} />
+        <IconButton onClick={() => setOpenModal('pfp')} sx={{ p: 0 }}>
+          <Avatar
+            src={profile.profilePictureUrl || defaultAvatar}
+            sx={{ width: 120, height: 120 }}
+          />
         </IconButton>
         <Typography variant="h5">
-          {firstName} {lastName}
+          {profile.firstName} {profile.lastName}
         </Typography>
-        <Typography color="textSecondary">{email}</Typography>
+        <Typography color="textSecondary">{profile.email}</Typography>
       </Box>
+
       <Box display="flex" justifyContent="center" gap={2} mt={4}>
-        <Button variant="contained" sx={buttonStyle} onClick={() => setOpenUpdate(true)}>
+        <Button
+          variant="contained"
+          sx={buttonStyle}
+          onClick={() => setOpenModal('update')}
+        >
           Update Profile
         </Button>
-        <Button variant="contained" sx={buttonStyle} onClick={() => setOpenChangePwd(true)}>
+        <Button
+          variant="contained"
+          sx={buttonStyle}
+          onClick={() => setOpenModal('pwd')}
+        >
           Change Password
         </Button>
       </Box>
+
       <UpdateProfileModal
-        open={openUpdate}
-        onClose={() => setOpenUpdate(false)}
+        open={openModal === 'update'}
+        onClose={() => setOpenModal(null)}
         onUpdate={handleUpdate}
         initialValues={{
-          firstName,
-          lastName,
-          email,
-          avatarUrl: profilePictureUrl || undefined,
+          firstName: profile.firstName,
+          lastName: profile.lastName,
+          email: profile.email,
+          avatarUrl: profile.profilePictureUrl || undefined,
         }}
       />
+
       <ChangePasswordModal
-        open={openChangePwd}
-        onClose={() => setOpenChangePwd(false)}
+        open={openModal === 'pwd'}
+        onClose={() => setOpenModal(null)}
         onChangePassword={handleChangePassword}
       />
+
       <ChangePfpModal
-        open={openChangePfp}
-        initialPreview={profilePictureUrl || undefined}
-        onClose={() => setOpenChangePfp(false)}
+        open={openModal === 'pfp'}
+        initialPreview={profile.profilePictureUrl || undefined}
+        onClose={() => setOpenModal(null)}
         onUpload={handleUploadPfp}
         onRemove={async () => {
           await removeProfilePicture();
-          setProfilePictureUrl(null);
+          setProfile(p => ({ ...p, profilePictureUrl: null }));
         }}
       />
     </Container>

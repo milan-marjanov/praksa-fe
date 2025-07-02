@@ -14,28 +14,20 @@ export default function useProfile(userId?: number): Result {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    let ignore = false;
-
     const fetchData = async () => {
       setLoading(true);
       try {
         const profile = userId ? await getUserProfile(userId) : await getMyProfile();
-        if (!ignore) {
-          setData(profile);
-          setError(null);
-        }
+        setData(profile);
+        setError(null);
       } catch (err) {
-        if (!ignore) setError(err as Error);
+        setError(err as Error);
       } finally {
-        if (!ignore) setLoading(false);
+        setLoading(false);
       }
     };
-
     fetchData();
-    return () => {
-      ignore = true;
-    };
   }, [userId]);
-
   return { data, loading, error };
 }
+
