@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import ConfirmDialog from '../../components/admin_panel/ConfirmDialog';
-import CreateEventModal from '../../components/events/CreateEventModal';
+import CreateEventModal from '../../components/events/create/CreateEventModal';
 import { EventDTO } from '../../types/Event';
 import { deleteEvent } from '../../services/eventService';
 import { useEvents } from '../../hooks/useEvents';

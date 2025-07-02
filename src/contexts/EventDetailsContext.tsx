@@ -1,8 +1,8 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
 import { useEventDetails, UseEventDetailsResult } from '../hooks/useEventDetails';
-import ConfirmOption from '../components/events/ConfirmOption';
+import ConfirmOption from '../components/events/create/ConfirmOption';
 import VoteList from '../components/events/details/VoteList';
-import EventConfirmDialog from '../components/events/EventConfirmDialog';
+import EventConfirmDialog from '../components/events/create/EventConfirmDialog';
 import { ParticipantProfileDto } from '../types/User';
 
 interface ConfirmModalState {
