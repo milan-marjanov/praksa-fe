@@ -67,7 +67,6 @@ const EventDataReview = forwardRef<EventModalRef, EventDataReviewProps>(
         <Paper variant="outlined" sx={{ p: 2, bgcolor: '#f5f5dc' }}>
           <Typography variant="h6">Event Info</Typography>
           <Divider sx={{ my: 1 }} />
-
           <List sx={{ ml: -1, mt: -1 }}>
             <ListItem>
               <ListItemText
@@ -107,9 +106,9 @@ const EventDataReview = forwardRef<EventModalRef, EventDataReviewProps>(
                       <TableCell sx={tableCellStyle}>{formatDateTime(option.endTime)}</TableCell>
                       <TableCell sx={tableCellStyle}>
                         {eventData.timeOptionType !== 'CAPACITY_BASED'
-                          ? ''
+                          ? 'N/A'
                           : option.maxCapacity || 'N/A'}
-                      </TableCell>{' '}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -119,7 +118,6 @@ const EventDataReview = forwardRef<EventModalRef, EventDataReviewProps>(
             <Typography>No time options added.</Typography>
           )}
         </Paper>
-
         <Paper variant="outlined" sx={{ p: 2, bgcolor: '#f5f5dc' }}>
           <Typography variant="h6">Restaurant Options</Typography>
           <Divider sx={{ my: 2 }} />
@@ -169,7 +167,6 @@ const EventDataReview = forwardRef<EventModalRef, EventDataReviewProps>(
             />
           </>
         )}
-
         <EventConfirmDialog
           open={openDialog}
           title="Confirm Close Voting"

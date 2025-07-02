@@ -26,7 +26,6 @@ const RestaurantOptionsModal = forwardRef<EventModalRef, {}>((_props, ref) => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
-    console.log(eventData);
     if ((!restaurantOptions || restaurantOptions.length === 0) && optionType !== 3) {
       setEventData({
         restaurantOptions: [{ id: Date.now(), name: '' }],
@@ -35,8 +34,6 @@ const RestaurantOptionsModal = forwardRef<EventModalRef, {}>((_props, ref) => {
   }, [eventData, optionType, restaurantOptions, setEventData]);
 
   useEffect(() => {
-    console.log('One or more restaurant names changed');
-
     setErrors((prevErrors) => {
       const newErrors = { ...prevErrors };
 
