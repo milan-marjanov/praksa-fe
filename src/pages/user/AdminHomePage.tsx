@@ -82,8 +82,7 @@ export default function AdminHomePage() {
   };
 
   const initials =
-    (adminFirstName.charAt(0) || '').toUpperCase() +
-    (adminLastName.charAt(0) || '').toUpperCase();
+    (adminFirstName.charAt(0) || '').toUpperCase() + (adminLastName.charAt(0) || '').toUpperCase();
 
   return (
     <Container

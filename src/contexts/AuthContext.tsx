@@ -15,7 +15,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const token = localStorage.getItem('jwtToken');
 
   useEffect(() => {
-
     if (!token) return;
     (async () => {
       try {

@@ -17,7 +17,7 @@ export default function VoteList({ open, onClose, title, users }: VoteListProps)
       <DialogTitle>{title}</DialogTitle>
       <DialogContent dividers>
         <List>
-          {users.map(u => (
+          {users.map((u) => (
             <ListItem key={u.id} disablePadding>
               <ListItemButton onClick={() => navigate(`/user/${u.id}`)}>  
                 <ListItemAvatar>

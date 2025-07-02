@@ -12,14 +12,16 @@ import {
   useTheme,
   Box,
   useMediaQuery,
-  colors
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
 import { useEffect, useState } from 'react';
-import { getUserNotifications, markNotificationAsRead, deleteNotification } from '../../services/userService';
+import {
+  getUserNotifications,
+  markNotificationAsRead,
+  deleteNotification,
+} from '../../services/userService';
 import { NotificationDto } from '../../types/Notification';
-import { lightBlue, lightGreen } from '@mui/material/colors';
 
 export default function Notifications() {
   const theme = useTheme();
@@ -51,10 +53,8 @@ export default function Notifications() {
   const handleMarkAsRead = async (id: number) => {
     try {
       await markNotificationAsRead(id);
-      setNotifications(prev =>
-        prev.map(notif =>
-          notif.id === id ? { ...notif, isRead: true } : notif
-        )
+      setNotifications((prev) =>
+        prev.map((notif) => (notif.id === id ? { ...notif, isRead: true } : notif)),
       );
     } catch (error) {
       console.error('Failed to mark as read', error);
@@ -64,12 +64,11 @@ export default function Notifications() {
   const handleDelete = async (id: number) => {
     try {
       await deleteNotification(id);
-      setNotifications(prev => prev.filter(notif => notif.id !== id));
+      setNotifications((prev) => prev.filter((notif) => notif.id !== id));
     } catch (error) {
       console.error('Failed to delete notification', error);
     }
   };
-
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4 }}>
@@ -89,13 +88,41 @@ export default function Notifications() {
           </TableHead>
           <TableBody>
             {notifications.map((notif) => (
-              <TableRow sx={{bgcolor: notif.isRead ? '#ffffff' : '#f0f0f0'}} key={notif.eventId + notif.createdAt}>
-                <TableCell sx={{ fontSize: isMobile ? '0.7rem' : '1rem', fontWeight: notif.isRead ? 'normal' : 'bold'}}>{notif.title}</TableCell>
-                <TableCell sx={{ fontSize: isMobile ? '0.7rem' : '1rem', fontWeight: notif.isRead ? 'normal' : 'bold'}}>{notif.text}</TableCell>
-                <TableCell sx={{ fontSize: isMobile ? '0.7rem' : '1rem', fontWeight: notif.isRead ? 'normal' : 'bold'}}>
+              <TableRow
+                sx={{ bgcolor: notif.isRead ? '#ffffff' : '#f0f0f0' }}
+                key={notif.eventId + notif.createdAt}
+              >
+                <TableCell
+                  sx={{
+                    fontSize: isMobile ? '0.7rem' : '1rem',
+                    fontWeight: notif.isRead ? 'normal' : 'bold',
+                  }}
+                >
+                  {notif.title}
+                </TableCell>
+                <TableCell
+                  sx={{
+                    fontSize: isMobile ? '0.7rem' : '1rem',
+                    fontWeight: notif.isRead ? 'normal' : 'bold',
+                  }}
+                >
+                  {notif.text}
+                </TableCell>
+                <TableCell
+                  sx={{
+                    fontSize: isMobile ? '0.7rem' : '1rem',
+                    fontWeight: notif.isRead ? 'normal' : 'bold',
+                  }}
+                >
                   {new Date(notif.createdAt).toLocaleString()}
                 </TableCell>
-                <TableCell sx={{ fontSize: isMobile ? '0.7rem' : '1rem', verticalAlign: 'middle', py: isMobile ? 0.5 : 1 }}>
+                <TableCell
+                  sx={{
+                    fontSize: isMobile ? '0.7rem' : '1rem',
+                    verticalAlign: 'middle',
+                    py: isMobile ? 0.5 : 1,
+                  }}
+                >
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Chip
                       label={notif.isRead ? 'Read' : 'Unread'}
@@ -104,7 +131,7 @@ export default function Notifications() {
                       sx={{ minWidth: '70px', justifyContent: 'center' }}
                       onClick={() => {
                         if (!notif.isRead) {
-                          handleMarkAsRead(notif.id)
+                          handleMarkAsRead(notif.id);
                         }
                       }}
                     />
@@ -118,8 +145,6 @@ export default function Notifications() {
                     </IconButton>
                   </Box>
                 </TableCell>
-
-
               </TableRow>
             ))}
           </TableBody>
