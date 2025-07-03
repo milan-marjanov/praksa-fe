@@ -26,6 +26,7 @@ import {
   buttonStyle,
   cardActionsStyle,
   cardContentStyle,
+  deleteButtonStyle,
   eventCardStyle,
   eventDescriptionStyle,
   eventHeaderStyle,
@@ -153,7 +154,7 @@ export default function EventsPage() {
             labelId="event-filter-label"
             value={filter}
             label="Filter"
-            sx={{ ...buttonStyle, width: '150px', height: '55px', padding: 0 }}
+            sx={{ ...deleteButtonStyle, width: '150px', height: '55px', padding: 0 }}
             onChange={(e) => setFilter(e.target.value as any)}
           >
             <MenuItem value="all">All</MenuItem>

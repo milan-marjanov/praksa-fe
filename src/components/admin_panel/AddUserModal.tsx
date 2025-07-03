@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Modal, Box, Typography, TextField, Button } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import type { CreateUserDTO } from '../../types/User';
-import { buttonStyle, AddUserModalStyle } from '../../styles/CommonStyles';
+import { buttonStyle, AddUserModalStyle, deleteButtonStyle } from '../../styles/CommonStyles';
 
 export interface AddUserModalProps {
   open: boolean;
@@ -113,9 +113,9 @@ export default function AddUserModal({ open, onClose, onAdd }: AddUserModalProps
           </Typography>
         )}
 
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <Button sx={buttonStyle} onClick={onClose} disabled={loading}>
-            Cancel
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+          <Button sx={deleteButtonStyle} onClick={onClose} disabled={loading}>
+            Close
           </Button>
           <LoadingButton
             variant="contained"

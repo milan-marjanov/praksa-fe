@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, Box, Typography, Button, Avatar, IconButton } from '@mui/material';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
-import { buttonStyle, modalStyle } from '../../styles/CommonStyles';
+import { buttonStyle, deleteButtonStyle, modalStyle } from '../../styles/CommonStyles';
 
 export interface ChangePfpModalProps {
   open: boolean;
@@ -87,11 +87,11 @@ export function ChangePfpModal({
         )}
 
         <Box display="flex" justifyContent="space-between" mt={2}>
-          <Button sx={buttonStyle} onClick={handleRemove}>
+          <Button sx={deleteButtonStyle} onClick={handleRemove}>
             Remove
           </Button>
           <Box sx={{ flex: 1 }} />
-          <Button sx={{ ...buttonStyle, mr: 1 }} onClick={onClose}>
+          <Button sx={{ ...deleteButtonStyle, mr: 1 }} onClick={onClose}>
             Cancel
           </Button>
           <Button

@@ -23,6 +23,7 @@ import {
   slideIndicatorStyle,
 } from '../../../styles/EventModalStyles';
 import EventDataReview from './EventDataReview';
+import { buttonStyle } from '../../../styles/CommonStyles';
 
 export default function CreateEventModal({
   users,
@@ -164,6 +165,7 @@ export default function CreateEventModal({
                   onClick={handleSaveEvent}
                   disabled={validationError || loading}
                   loading={loading}
+                  sx={buttonStyle}
                 >
                   {isUpdate ? 'Save Changes' : 'Create Event'}
                 </LoadingButton>

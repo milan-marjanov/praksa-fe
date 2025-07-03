@@ -1,7 +1,7 @@
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 import React from 'react';
 import { LoadingButton } from '@mui/lab';
-import { buttonStyle } from '../../../styles/CommonStyles';
+import { buttonStyle, deleteButtonStyle } from '../../../styles/CommonStyles';
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -29,7 +29,7 @@ export default function ConfirmDialog({
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>{children}</DialogContent>
       <DialogActions>
-        <Button sx={buttonStyle} color="error" onClick={onCancel} disabled={confirmLoading}>
+        <Button sx={deleteButtonStyle} color="error" onClick={onCancel} disabled={confirmLoading}>
           {cancelText}
         </Button>
         <LoadingButton

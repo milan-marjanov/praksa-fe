@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Box, Typography, TextField, Button, Avatar, IconButton } from '@mui/material';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
-import { buttonStyle, modalStyle } from '../../styles/CommonStyles';
+import { buttonStyle, deleteButtonStyle, modalStyle } from '../../styles/CommonStyles';
 import { LoadingButton } from '@mui/lab';
 
 export interface UpdateProfileModalProps {
@@ -133,7 +133,7 @@ export function UpdateProfileModal({
         )}
 
         <Box display="flex" justifyContent="flex-end">
-          <Button sx={{ ...buttonStyle, mr: 1 }} onClick={onClose} disabled={status.loading}>
+          <Button sx={{ ...deleteButtonStyle, mr: 1 }} onClick={onClose} disabled={status.loading}>
             Cancel
           </Button>
           <LoadingButton

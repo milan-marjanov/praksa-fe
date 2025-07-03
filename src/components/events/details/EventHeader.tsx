@@ -54,7 +54,6 @@ export default function EventHeader() {
           py: 1,
         }}
       >
-        {/* Close Voting samo za kreatora kada postoji glasanje */}
         {event.creatorId === userId && hasAnyVoting && (
           <Tooltip
             title={!hasVotedTime || !hasVotedRestaurant ? 'Cast your vote before closing.' : ''}
@@ -74,7 +73,6 @@ export default function EventHeader() {
           </Tooltip>
         )}
 
-        {/* Chat dugme vidljivo svima */}
         <Button
           variant="contained"
           size="small"

@@ -11,7 +11,7 @@ import {
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { buttonStyle, modalStyle } from '../../styles/CommonStyles';
+import { buttonStyle, deleteButtonStyle, modalStyle } from '../../styles/CommonStyles';
 
 export interface ChangePasswordModalProps {
   open: boolean;
@@ -152,7 +152,7 @@ export function ChangePasswordModal({ open, onClose, onChangePassword }: ChangeP
         />
 
         <Box display="flex" justifyContent="flex-end">
-          <Button sx={{ ...buttonStyle, mr: 1 }} onClick={onClose}>
+          <Button sx={{ ...deleteButtonStyle, mr: 1 }} onClick={onClose}>
             Cancel
           </Button>
           <Button variant="contained" sx={buttonStyle} onClick={handleConfirm}>
