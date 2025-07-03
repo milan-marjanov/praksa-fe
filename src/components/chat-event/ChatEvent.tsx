@@ -45,7 +45,7 @@ const ChatEvent: React.FC<ChatEventProps> = ({ eventId, title }) => {
       debug: (str) => console.log(str),
       onConnect: () => {
         setConnected(true);
-        stompClient.subscribe('/topic/chat', (message) => {
+        stompClient.subscribe(`/topic/chat/${eventId}`, (message) => {
           if (message.body) {
             const msg: MessageDto = JSON.parse(message.body);
             setMessages((prev) => [...prev, msg]);
